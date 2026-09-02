@@ -1,0 +1,13 @@
+subject,condition,difficulty,time_taken_s,correct,attempts,equation_x,equation_y,is_fake_error
+1,hard,hard,15.001,False,0,(11 * 3) - 18,23 + 23 - 37,False
+1,hard,hard,15.001,False,1,5 - (12 / 3),(6 * 5) - 20,False
+1,hard,hard,15.0,False,0,10 + 16 - 19,(6 * 8) - 47,False
+1,hard,hard,15.0,False,1,14 + 26 - 39,16 + 20 - 33,False
+1,hard,hard,15.001,False,0,11 + 15 - 25,11 - (40 / 10),True
+1,hard,hard,15.001,False,0,15 + 13 - 23,19 + 15 - 26,False
+1,hard,hard,15.001,False,0,19 - (42 / 7),19 - (72 / 12),False
+1,hard,hard,15.001,False,0,16 + 12 - 22,15 + 16 - 21,False
+1,hard,hard,15.001,False,0,20 - (48 / 4),14 - (70 / 7),False
+1,hard,hard,15.001,False,0,16 + 15 - 30,11 - (81 / 9),True
+1,hard,hard,15.0,False,0,(8 * 11) - 73,23 + 10 - 27,False
+1,hard,hard,15.001,False,0,(10 * 11) - 101,14 + 32 - 32,False
