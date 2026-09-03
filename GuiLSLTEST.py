@@ -42,7 +42,7 @@ container2_audio = os.path.join(base_dir, "CONTAINER2.wav")
 mistake_audio = os.path.join(base_dir, "MISTAKE_ALERT.wav")
 
 # Robot IP and Port for Difficulty[cite: 3]
-ROBOT_OWN_IP = "192.168.29.62"
+ROBOT_OWN_IP = "192.168.29.61"
 DIFFICULTY_PORT = 50001
 
 # --- LSL Setup ---
