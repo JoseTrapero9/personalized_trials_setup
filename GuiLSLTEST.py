@@ -99,8 +99,8 @@ haptic_loop = None
 
 async def init_haptics():
     # initialize the bhaptics sdk
-    app_id = "6a97da355fa17dce7a1e0d7b"
-    api_key = "LsHVhykpVUDmGRxVY0FB"
+    app_id = "3wpIajB4Bdq2KfRhkDzZ"
+    api_key = "yimPxWeZlB2Hxk5dNbOZ"
     await bhaptics_python.registry_and_initialize(app_id, api_key, "")
     print("bHaptics background connection established.")
 
