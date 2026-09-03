@@ -122,14 +122,13 @@ audio_sys = AudioController()
 haptic_loop = None
 
 async def init_haptics():
-<<<<<<< HEAD
+
     # initialize the bhaptics sdk
     app_id = "3wpIajB4Bdq2KfRhkDzZ"
     api_key = "yimPxWeZlB2Hxk5dNbOZ"
-=======
     app_id = "6a97da355fa17dce7a1e0d7b"
     api_key = "LsHVhykpVUDmGRxVY0FB"
->>>>>>> 5d15045c05182f2cc9aeb60d634b86328d8e74cc
+
     await bhaptics_python.registry_and_initialize(app_id, api_key, "")
     print("bHaptics background connection established.")
 
