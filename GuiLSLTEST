@@ -11,13 +11,14 @@ import math
 import subprocess
 import threading
 import asyncio
+import socket
 import bhaptics_python
 import sounddevice as sd
 import soundfile as sf
 
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, 
-                             QPushButton, QVBoxLayout, QMessageBox, QStackedWidget,
-                             QShortcut, QComboBox, QGridLayout)
+                             QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QStackedWidget,
+                             QShortcut, QComboBox, QGridLayout, QCheckBox, QGroupBox)
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont, QKeySequence
 from pylsl import StreamInfo, StreamOutlet
@@ -25,22 +26,30 @@ from pylsl import StreamInfo, StreamOutlet
 # dynamically resolve the directory where this script is located
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-# All audio files are now set to .wav as requested
+# Audio paths
 correct_audio = os.path.join(base_dir, "correct_answer.wav") 
 incorrect_audio = os.path.join(base_dir, "incorrect_answer.wav")
 mode_audio_haptic = os.path.join(base_dir, "AUDIO_HAPTIC_MODE.wav")
 mode_audio_only = os.path.join(base_dir, "AUDIOHELP_mode.wav")
 mode_haptic_only = os.path.join(base_dir, "HapticVest_Mode.wav")
+# New placeholders for researcher alerts - add these files if you want audio cues for them
+mode_robot_fast = os.path.join(base_dir, "ROBOT_FAST_MODE.wav")
+mode_robot_slow = os.path.join(base_dir, "ROBOT_SLOW_MODE.wav")
+mode_baseline = os.path.join(base_dir, "BASELINE_MODE.wav")
+
 container1_audio = os.path.join(base_dir, "CONTAINER1_ALERT.wav")
 container2_audio = os.path.join(base_dir, "CONTAINER2.wav")
 mistake_audio = os.path.join(base_dir, "MISTAKE_ALERT.wav")
+
+# Robot IP and Port for Difficulty[cite: 3]
+ROBOT_OWN_IP = "192.168.29.10"
+DIFFICULTY_PORT = 50001
 
 # --- LSL Setup ---
 marker_outlet = None
 
 def init_lsl():
     global marker_outlet
-    # Name, Type, Channel Count, Sampling Rate (0 = irregular), Data Format, Source ID
     info = StreamInfo('ParadigmMarkers', 'Markers', 1, 0, 'string', 'pyqt_paradigm_123')
     marker_outlet = StreamOutlet(info)
     print("LSL Marker Outlet initialized.")
@@ -51,6 +60,28 @@ def send_marker(marker_string):
         marker_outlet.push_sample([marker_string])
         print(f"Sent marker: {marker_string}")
 
+# --- Robot Speed Communication ---
+def set_robot_speed(scenario_name):
+    # Determine the speed level based on the scenario[cite: 3]
+    level = 1 # Normal (Speed 0.8)[cite: 3]
+    if scenario_name == "robot_slow":
+        level = 0 # Slow (Speed 0.6)[cite: 3]
+    elif scenario_name == "robot_fast":
+        level = 2 # Fast (Speed 1.0)[cite: 3]
+        
+    def send_level():
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1.0)
+            sock.connect((ROBOT_OWN_IP, DIFFICULTY_PORT)) # Connect to the difficulty thread[cite: 3]
+            sock.sendall(str(level).encode('utf-8'))
+            sock.close()
+            print(f"Robot speed set to Level {level} for '{scenario_name}'[cite: 3]")
+        except Exception as e:
+            print(f"Notice: Could not connect to robot to set speed (Robot script might not be running yet).")
+            
+    threading.Thread(target=send_level, daemon=True).start()
+
 # --- Audio Controller ---
 class AudioController:
     def __init__(self):
@@ -58,11 +89,8 @@ class AudioController:
         self.researcher_device = None
         
     def setup_devices(self, participant_keyword, researcher_keyword):
-        # Query all available audio devices in Windows
         devices = sd.query_devices()
-        
         for i, d in enumerate(devices):
-            # Find output devices matching the keywords
             if d['max_output_channels'] > 0:
                 name = d['name'].lower()
                 if participant_keyword.lower() in name and self.participant_device is None:
@@ -71,24 +99,20 @@ class AudioController:
                 elif researcher_keyword.lower() in name and self.researcher_device is None:
                     self.researcher_device = i
                     print(f"Researcher Audio set to Device {i}: {d['name']}")
-                    
-        if self.participant_device is None:
-            print(f"WARNING: Could not find participant device containing '{participant_keyword}'")
-        if self.researcher_device is None:
-            print(f"WARNING: Could not find researcher device containing '{researcher_keyword}'")
 
     def play_participant(self, filepath):
-        threading.Thread(target=self._play_audio, args=(filepath, self.participant_device), daemon=True).start()
+        if os.path.exists(filepath):
+            threading.Thread(target=self._play_audio, args=(filepath, self.participant_device), daemon=True).start()
 
     def play_researcher(self, filepath):
-        threading.Thread(target=self._play_audio, args=(filepath, self.researcher_device), daemon=True).start()
+        if os.path.exists(filepath):
+            threading.Thread(target=self._play_audio, args=(filepath, self.researcher_device), daemon=True).start()
 
     def _play_audio(self, filepath, device_id):
         try:
-            # Added dtype='float32' to fix the "rushed" audio playback distortion
             data, fs = sf.read(filepath, dtype='float32')
             sd.play(data, samplerate=fs, device=device_id)
-            sd.wait() # Keep thread alive until audio finishes playing
+            sd.wait() 
         except Exception as e:
             print(f"Error playing {filepath}: {e}")
 
@@ -98,16 +122,13 @@ audio_sys = AudioController()
 haptic_loop = None
 
 async def init_haptics():
-    # initialize the bhaptics sdk
     app_id = "6a97da355fa17dce7a1e0d7b"
     api_key = "LsHVhykpVUDmGRxVY0FB"
     await bhaptics_python.registry_and_initialize(app_id, api_key, "")
     print("bHaptics background connection established.")
 
 async def trigger_vest_async():
-    # Create a list of 40 motors, all set to 50 intensity
     full_vest_pattern = [50] * 40
-    # play the full pattern for 500ms
     await bhaptics_python.play_dot(0, 500, full_vest_pattern)
     
 async def close_haptics():
@@ -117,39 +138,26 @@ async def close_haptics():
 
 def start_haptic_thread():
     global haptic_loop
-    # Create a dedicated event loop for the background thread
     haptic_loop = asyncio.new_event_loop()
-    
-    # Run the loop forever in a daemon thread
     t = threading.Thread(target=haptic_loop.run_forever, daemon=True)
     t.start()
-    
-    # Schedule the one-time bHaptics initialization
     asyncio.run_coroutine_threadsafe(init_haptics(), haptic_loop)
 
 def activate_haptic_vest():
-    # Safely send the trigger command to the background haptics loop
     if haptic_loop is not None:
         asyncio.run_coroutine_threadsafe(trigger_vest_async(), haptic_loop)
 
-
-# set this multiplier to adjust the overall scaling of fonts and ui elements
 font_size_multiplier = 1.6
-
-# global variables for experiment configuration
 difficulty = "hard"
 subject_number = "1"
 current_condition = "training"
-
-# global reference to the robot process
+active_scenarios_list = []
 robot_process = None
 
 def get_equation_for_target(target, is_x=False):
     if difficulty == "easy":
         if is_x:
-            # easy mode x coordinate: 2 numbers
             op = random.choice(["+", "-"])
-            
             if op == "+" and target > 1:
                 a = random.randint(1, target - 1)
                 b = target - a
@@ -159,75 +167,63 @@ def get_equation_for_target(target, is_x=False):
                 a = target + b
                 return f"{a} - {b}"
         else:
-            # easy mode y coordinate: original 3 numbers logic
             a = random.randint(1, 9)
             b = random.randint(1, 9)
             c = a + b - target
-            
             while c < 1 or c > 9:
                 a = random.randint(1, 9)
                 b = random.randint(1, 9)
                 c = a + b - target
-                
             return f"{a} + {b} - {c}"
             
     elif difficulty == "hard":
-        # hard mode: custom constraints per operation type
         equation_type = random.choice(["add_sub", "mul_sub", "div_sub"])
-        
         if equation_type == "add_sub":
             a = random.randint(10, 39)
             b = random.randint(10, 39)
             c = a + b - target
-            
             while c < 10 or c > 39:
                 a = random.randint(10, 39)
                 b = random.randint(10, 39)
                 c = a + b - target
-                
             return f"{a} + {b} - {c}"
-            
         elif equation_type == "mul_sub":
             a = random.randint(3, 12)
             b = random.randint(3, 12)
             c = (a * b) - target
-            
             while c < 0:
                 a = random.randint(3, 12)
                 b = random.randint(3, 12)
                 c = (a * b) - target
-                
             return f"({a} * {b}) - {c}"
-            
         elif equation_type == "div_sub":
             b = random.randint(2, 12)
             div_val = random.randint(2, 12)
             a = b * div_val
             c = target + div_val
-                
             return f"{c} - ({a} / {b})"
-
 
 class setupscreen(QWidget):
     def __init__(self, switch_callback):
         super().__init__()
         self.switch_callback = switch_callback
+        self.scenario_checkboxes = {}
         self.init_ui()
         
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(30 * font_size_multiplier))
+        layout.setSpacing(int(20 * font_size_multiplier))
         
         main_font = QFont("Helvetica", int(18 * font_size_multiplier))
         title_font = QFont("Helvetica", int(20 * font_size_multiplier), QFont.Bold)
         
-        self.title_label = QLabel("experiment configuration")
+        self.title_label = QLabel("Experiment Configuration")
         self.title_label.setFont(title_font)
         self.title_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.title_label)
         
-        self.subj_label = QLabel("subject number:")
+        self.subj_label = QLabel("Subject Number:")
         self.subj_label.setFont(main_font)
         self.subj_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.subj_label)
@@ -239,7 +235,7 @@ class setupscreen(QWidget):
             self.subj_combo.addItem(str(i))
         layout.addWidget(self.subj_combo, alignment=Qt.AlignCenter)
         
-        self.cond_label = QLabel("condition:")
+        self.cond_label = QLabel("Condition:")
         self.cond_label.setFont(main_font)
         self.cond_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.cond_label)
@@ -247,8 +243,26 @@ class setupscreen(QWidget):
         self.cond_combo = QComboBox()
         self.cond_combo.setFont(main_font)
         self.cond_combo.setFixedWidth(int(300 * font_size_multiplier))
-        self.cond_combo.addItems(["training", "baseline", "easy", "hard"])
+        self.cond_combo.addItems(["training", "baseline", "easy", "hard", "manual"])
+        self.cond_combo.currentTextChanged.connect(self.on_condition_changed)
         layout.addWidget(self.cond_combo, alignment=Qt.AlignCenter)
+        
+        # Scenario Selection for Manual Mode
+        self.scenario_group = QGroupBox("Select Scenarios (Manual Mode Only)")
+        self.scenario_group.setFont(main_font)
+        scenario_layout = QGridLayout()
+        
+        scenarios = ["audio", "haptic", "audio_haptic", "robot_fast", "robot_slow", "baseline"]
+        for i, sc in enumerate(scenarios):
+            cb = QCheckBox(sc)
+            cb.setFont(main_font)
+            cb.setChecked(True)
+            self.scenario_checkboxes[sc] = cb
+            scenario_layout.addWidget(cb, i // 2, i % 2)
+            
+        self.scenario_group.setLayout(scenario_layout)
+        self.scenario_group.setEnabled(False) # Disabled by default unless "manual" is selected
+        layout.addWidget(self.scenario_group, alignment=Qt.AlignCenter)
         
         self.continue_button = QPushButton("continue")
         self.continue_button.setFont(main_font)
@@ -259,16 +273,27 @@ class setupscreen(QWidget):
         
         self.setLayout(layout)
         
+    def on_condition_changed(self, text):
+        self.scenario_group.setEnabled(text == "manual")
+        
     def save_and_continue(self):
-        global difficulty, subject_number, current_condition
+        global difficulty, subject_number, current_condition, active_scenarios_list
         
         subject_number = self.subj_combo.currentText()
         current_condition = self.cond_combo.currentText()
         
         if current_condition == "hard":
             difficulty = "hard"
+            active_scenarios_list = ["audio", "haptic", "audio_haptic", "robot_fast", "robot_slow", "baseline"]
+        elif current_condition == "manual":
+            difficulty = "hard"
+            active_scenarios_list = [sc for sc, cb in self.scenario_checkboxes.items() if cb.isChecked()]
+            if not active_scenarios_list:
+                QMessageBox.warning(self, "Error", "Please select at least one scenario for manual mode.")
+                return
         else:
             difficulty = "easy"
+            active_scenarios_list = ["baseline"]
             
         send_marker(f"Setup_Complete_Subj_{subject_number}_Cond_{current_condition}_Diff_{difficulty}")
         self.switch_callback()
@@ -279,11 +304,8 @@ class startscreen(QWidget):
         super().__init__()
         self.switch_callback = switch_callback
         self.ticks_left = 30
-        
         self.timer = QTimer(self)
-        self.timer.setTimerType(Qt.PreciseTimer)
         self.timer.timeout.connect(self.timer_tick)
-        
         self.init_ui()
         
     def init_ui(self):
@@ -302,7 +324,6 @@ class startscreen(QWidget):
         self.message_label.setFont(main_font)
         self.message_label.setAlignment(Qt.AlignCenter)
         self.message_label.setWordWrap(True)
-        self.message_label.setContentsMargins(50, 0, 50, 0)
         layout.addWidget(self.message_label)
         
         self.countdown_label = QLabel("")
@@ -324,7 +345,6 @@ class startscreen(QWidget):
         global robot_process
         send_marker("Robot_Started_Waiting_30s")
         
-        # launch the robot script
         robot_process = subprocess.Popen(
             [sys.executable, "robot_sequence.py"],
             stdin=subprocess.PIPE,
@@ -333,7 +353,6 @@ class startscreen(QWidget):
         
         self.start_button.hide()
         self.message_label.setText("Please take the piece from container I.<br><br>Then wait for the next screen.")
-        
         self.countdown_label.setText(f"{self.ticks_left} s")
         self.countdown_label.show()
         self.timer.start(1000)
@@ -346,42 +365,36 @@ class startscreen(QWidget):
         else:
             self.countdown_label.setText(f"{self.ticks_left} s")
 
-# --- Rest Screen Class ---
+
 class restscreen(QWidget):
     def __init__(self, switch_callback):
         super().__init__()
         self.switch_callback = switch_callback
         self.ticks_left = 30
-        
         self.timer = QTimer(self)
-        self.timer.setTimerType(Qt.PreciseTimer)
         self.timer.timeout.connect(self.timer_tick)
-        
         self.init_ui()
         
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(int(40 * font_size_multiplier))
-        
         main_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
         timer_font = QFont("Helvetica", int(60 * font_size_multiplier), QFont.Bold)
         
         self.message_label = QLabel("Great job! Please take a quick rest.<br><br>The next scenario will begin shortly.")
         self.message_label.setFont(main_font)
         self.message_label.setAlignment(Qt.AlignCenter)
-        self.message_label.setWordWrap(True)
         layout.addWidget(self.message_label)
         
         self.countdown_label = QLabel("30 s")
         self.countdown_label.setFont(timer_font)
         self.countdown_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.countdown_label)
-        
         self.setLayout(layout)
         
     def start_rest(self):
-        send_marker("Screen_Rest_Started")
+        send_marker("Screen_Short_Rest_Started")
         self.ticks_left = 30
         self.countdown_label.setText(f"{self.ticks_left} s")
         self.timer.start(1000)
@@ -390,10 +403,46 @@ class restscreen(QWidget):
         self.ticks_left -= 1
         if self.ticks_left <= 0:
             self.timer.stop()
-            send_marker("Screen_Rest_Finished")
+            send_marker("Screen_Short_Rest_Finished")
             self.switch_callback()
         else:
             self.countdown_label.setText(f"{self.ticks_left} s")
+
+# Variable length break triggered after every 3 scenarios
+class longrestscreen(QWidget):
+    def __init__(self, switch_callback):
+        super().__init__()
+        self.switch_callback = switch_callback
+        self.init_ui()
+        
+    def init_ui(self):
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(int(40 * font_size_multiplier))
+        
+        main_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
+        button_font = QFont("Helvetica", int(18 * font_size_multiplier))
+        
+        self.message_label = QLabel("You have completed a block of 3 scenarios.<br><br>Please take a longer break.<br>Press the button below whenever you are ready to resume.")
+        self.message_label.setFont(main_font)
+        self.message_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.message_label)
+        
+        self.resume_button = QPushButton("Continue Measurements")
+        self.resume_button.setFont(button_font)
+        self.resume_button.setFixedWidth(int(400 * font_size_multiplier))
+        self.resume_button.setFixedHeight(int(80 * font_size_multiplier))
+        self.resume_button.clicked.connect(self.on_resume_clicked)
+        layout.addWidget(self.resume_button, alignment=Qt.AlignCenter)
+        
+        self.setLayout(layout)
+        
+    def start_rest(self):
+        send_marker("Screen_Long_Variable_Rest_Started")
+        
+    def on_resume_clicked(self):
+        send_marker("Screen_Long_Variable_Rest_Finished")
+        self.switch_callback()
 
 class intermediatescreen(QWidget):
     def __init__(self, switch_callback, get_scenario_cb):
@@ -403,11 +452,8 @@ class intermediatescreen(QWidget):
         self.ticks_left = 0
         self.container_one_next = True
         self.position_counter = 1
-        
         self.timer = QTimer(self)
-        self.timer.setTimerType(Qt.PreciseTimer)
         self.timer.timeout.connect(self.timer_tick)
-        
         self.init_ui()
         
     def init_ui(self):
@@ -421,8 +467,6 @@ class intermediatescreen(QWidget):
         self.message_label = QLabel("")
         self.message_label.setFont(main_font)
         self.message_label.setAlignment(Qt.AlignCenter)
-        self.message_label.setWordWrap(True)
-        self.message_label.setContentsMargins(50, 0, 50, 0)
         
         self.timer_label = QLabel("0 s")
         self.timer_label.setFont(timer_font)
@@ -433,24 +477,18 @@ class intermediatescreen(QWidget):
         self.setLayout(layout)
         
     def start_transition(self, x, y, saved_time=0.0):
-        if difficulty == "hard":
-            base_time = 16
-        else:
-            base_time = 18
-        
-        total_time = base_time + math.floor(saved_time)
+        total_time = (16 if difficulty == "hard" else 18) + math.floor(saved_time)
         container_name = "II" if self.container_one_next else "I"
         
-        # Audio Alert for Containers based on scenario
         if difficulty == "hard":
             current_scenario = self.get_scenario_cb()
+            # Play container alerts for scenarios that support audio sensory assistance
             if current_scenario in ["audio", "audio_haptic"]:
                 if self.container_one_next:
                     audio_sys.play_participant(container1_audio)
                 else:
                     audio_sys.play_participant(container2_audio)
         else:
-            # If not in hard mode, default to playing alerts
             if self.container_one_next:
                 audio_sys.play_participant(container1_audio)
             else:
@@ -462,10 +500,7 @@ class intermediatescreen(QWidget):
             f"After placing it, go to <b>container {container_name}</b> to retrieve the next one and come back"
         )
         
-        self.position_counter += 1
-        if self.position_counter > 4:
-            self.position_counter = 1
-            
+        self.position_counter = 1 if self.position_counter > 4 else self.position_counter + 1
         self.container_one_next = not self.container_one_next
         self.ticks_left = total_time
         self.timer_label.setText(f"{self.ticks_left} s")
@@ -473,7 +508,6 @@ class intermediatescreen(QWidget):
         
     def timer_tick(self):
         self.ticks_left -= 1
-        
         if self.ticks_left <= 0:
             self.timer.stop()
             self.switch_callback()
@@ -491,7 +525,6 @@ class coordinatechallengeapp(QWidget):
         self.target_y = 0
         self.time_limit = 15.0
         self.is_red = False
-        
         self.attempts = 0
         self.current_eq_x = ""
         self.current_eq_y = ""
@@ -502,11 +535,9 @@ class coordinatechallengeapp(QWidget):
         self.next_fake_interval = random.randint(2, 5)
         
         self.ui_timer = QTimer(self)
-        self.ui_timer.setTimerType(Qt.PreciseTimer)
         self.ui_timer.timeout.connect(self.update_ui_tick)
         
         self.timeout_timer = QTimer(self)
-        self.timeout_timer.setTimerType(Qt.PreciseTimer)
         self.timeout_timer.setSingleShot(True)
         self.timeout_timer.timeout.connect(self.force_time_over)
         
@@ -526,8 +557,6 @@ class coordinatechallengeapp(QWidget):
         self.instructions_label = QLabel("calculate coordinates (1 to 16) to place the piece.")
         self.instructions_label.setFont(title_font)
         self.instructions_label.setAlignment(Qt.AlignCenter)
-        self.instructions_label.setMinimumWidth(int(800 * font_size_multiplier))
-        self.instructions_label.setWordWrap(True) 
         center_layout.addWidget(self.instructions_label)
         
         self.x_equation_label = QLabel("")
@@ -588,11 +617,9 @@ class coordinatechallengeapp(QWidget):
         self.exit_button.clicked.connect(QApplication.instance().quit)
         
         master_layout.addWidget(self.exit_button, 0, 2, alignment=Qt.AlignCenter)
-        
         master_layout.setColumnStretch(0, 1)
         master_layout.setColumnStretch(1, 0)
         master_layout.setColumnStretch(2, 1)
-        master_layout.setContentsMargins(0, 0, 0, 0)
         
         self.setLayout(master_layout)
         
@@ -608,7 +635,6 @@ class coordinatechallengeapp(QWidget):
             
         filename = f"{subj_str}_{current_condition}.csv"
         filepath = os.path.join(log_dir, filename)
-        
         file_exists = os.path.isfile(filepath)
         
         with open(filepath, mode='a', newline='', encoding='utf-8') as f:
@@ -635,16 +661,14 @@ class coordinatechallengeapp(QWidget):
         
         self.x_equation_label.setText(f"x equation:  {eq_x}")
         self.y_equation_label.setText(f"y equation:  {eq_y}")
-        
         self.x_entry.clear()
         self.y_entry.clear()
         self.status_label.setText("")
-        
         self.current_eq_x = eq_x
         self.current_eq_y = eq_y
         self.attempts = 0
-        
         self.is_red = False
+        
         self.timer_value_label.setStyleSheet("color: black;")
         self.timer_text_label.setStyleSheet("color: black;")
         self.timer_value_label.setText(f"{int(self.time_limit)} s")
@@ -674,12 +698,10 @@ class coordinatechallengeapp(QWidget):
     def update_ui_tick(self):
         elapsed = time.perf_counter() - self.start_time
         remaining = self.time_limit - elapsed
-        
         if remaining <= 0:
             return
             
         time_seconds = math.ceil(remaining)
-        
         if time_seconds <= 5:
             if self.is_red:
                 self.timer_value_label.setStyleSheet("color: black;")
@@ -698,7 +720,6 @@ class coordinatechallengeapp(QWidget):
     def force_time_over(self):
         send_marker("MathTask_Timeout")
         self.ui_timer.stop()
-        
         elapsed = time.perf_counter() - self.start_time
         self.timer_value_label.setText("0 s")
         self.save_to_csv(elapsed, False)
@@ -708,16 +729,12 @@ class coordinatechallengeapp(QWidget):
         
     def check_answer(self):
         elapsed = time.perf_counter() - self.start_time
-
         if elapsed >= self.time_limit:
             return
             
-        user_x_str = self.x_entry.text()
-        user_y_str = self.y_entry.text()
-        
         try:
-            user_x = int(user_x_str)
-            user_y = int(user_y_str)
+            user_x = int(self.x_entry.text())
+            user_y = int(self.y_entry.text())
             
             if not (1 <= user_x <= 16) or not (1 <= user_y <= 16):
                 send_marker("MathTask_InvalidBounds")
@@ -757,42 +774,34 @@ class paradigmcontroller(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("coordinate placement paradigm")
-        
         self.current_trial = 0
         self.max_trials = 10 
         
-        # Scenario Tracking
-        self.scenarios = ["audio", "haptic", "audio_haptic"]
-        random.shuffle(self.scenarios)
+        self.scenarios = []
         self.current_scenario_idx = 0
-        self.active_seconds = 0
+        self.scenario_active_seconds = 0
+        
         self.mistake_on_cooldown = False
-        self.pending_rest = False
+        self.pending_short_rest = False
+        self.pending_long_rest = False
         
-        # Print the randomized order to the terminal immediately upon initialization
-        print("\n" + "="*50)
-        print("SCENARIO ORDER FOR THIS SESSION:")
-        for i, s in enumerate(self.scenarios):
-            print(f"  {i+1}. {s.upper()}")
-        print("="*50 + "\n")
-        
-        # Master Timer for Hard Mode (tracks total active time)
         self.master_timer = QTimer(self)
         self.master_timer.timeout.connect(self.master_timer_tick)
         
         self.stacked_widget = QStackedWidget()
-        
-        self.setup_screen = setupscreen(self.show_start_screen)
+        self.setup_screen = setupscreen(self.setup_finished_callback)
         self.start_screen = startscreen(self.start_experiment_tracking) 
         self.intermediate_screen = intermediatescreen(self.show_main_task, self.get_current_scenario)
         self.main_task_screen = coordinatechallengeapp(self.show_intermediate_screen, self.get_current_scenario)
-        self.rest_screen = restscreen(self.after_rest_callback)
+        self.short_rest_screen = restscreen(self.after_rest_callback)
+        self.long_rest_screen = longrestscreen(self.after_rest_callback)
         
-        self.stacked_widget.addWidget(self.setup_screen)        # Index 0
-        self.stacked_widget.addWidget(self.start_screen)        # Index 1
-        self.stacked_widget.addWidget(self.intermediate_screen) # Index 2
-        self.stacked_widget.addWidget(self.main_task_screen)    # Index 3
-        self.stacked_widget.addWidget(self.rest_screen)         # Index 4
+        self.stacked_widget.addWidget(self.setup_screen)        # 0
+        self.stacked_widget.addWidget(self.start_screen)        # 1
+        self.stacked_widget.addWidget(self.intermediate_screen) # 2
+        self.stacked_widget.addWidget(self.main_task_screen)    # 3
+        self.stacked_widget.addWidget(self.short_rest_screen)   # 4
+        self.stacked_widget.addWidget(self.long_rest_screen)    # 5
         
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -801,72 +810,89 @@ class paradigmcontroller(QWidget):
         
         self.quit_shortcut = QShortcut(QKeySequence("q"), self)
         self.quit_shortcut.activated.connect(QApplication.instance().quit)
-        
-        # --- F12 Shortcut for Mistake Alert ---
         self.mistake_shortcut = QShortcut(QKeySequence("F12"), self)
         self.mistake_shortcut.activated.connect(self.trigger_mistake)
         
         send_marker("Screen_Setup")
         
+    def setup_finished_callback(self):
+        # Pull the dynamically populated list from setup phase
+        self.scenarios = active_scenarios_list.copy()
+        random.shuffle(self.scenarios)
+        
+        print("\n" + "="*50)
+        print("SCENARIO ORDER FOR THIS SESSION:")
+        for i, s in enumerate(self.scenarios):
+            print(f"  {i+1}. {s.upper()}")
+        print("="*50 + "\n")
+        
+        self.stacked_widget.setCurrentIndex(1) # Go to start screen
+        
     def get_current_scenario(self):
-        return self.scenarios[self.current_scenario_idx]
+        if self.scenarios and self.current_scenario_idx < len(self.scenarios):
+            return self.scenarios[self.current_scenario_idx]
+        return "baseline"
         
     def start_experiment_tracking(self):
         send_marker("Screen_Start_Instructions")
         if difficulty == "hard":
-            self.master_timer.start(1000) # Check time every second
+            self.scenario_active_seconds = 0
+            self.master_timer.start(1000) 
             self.announce_scenario()
         self.show_main_task()
 
     def master_timer_tick(self):
-        # Only increment active seconds when the master timer is running (not during rests)
-        self.active_seconds += 1
+        self.scenario_active_seconds += 1
         
-        # Target milestones: 300s (5m), 600s (10m), 900s (15m)
-        target_time = (self.current_scenario_idx + 1) * 300
-        
-        if self.active_seconds >= 900: 
-            # Reached full 15 minutes of active time
-            send_marker("Experiment_Complete_Time_Limit")
-            QApplication.instance().quit()
-        elif self.active_seconds >= target_time:
-            # We reached a 5-minute milestone, cue the rest phase
-            self.pending_rest = True
+        if self.scenario_active_seconds >= 300: # 5 mins per scenario
+            # Flag that the current scenario is complete
+            if self.current_scenario_idx + 1 >= len(self.scenarios):
+                # Completed the entire list
+                send_marker("Experiment_Complete_Time_Limit")
+                QApplication.instance().quit()
+            else:
+                # Need a break before moving to the next
+                if (self.current_scenario_idx + 1) % 3 == 0:
+                    self.pending_long_rest = True
+                else:
+                    self.pending_short_rest = True
 
     def announce_scenario(self):
-        mode = self.scenarios[self.current_scenario_idx]
+        mode = self.get_current_scenario()
         send_marker(f"Scenario_Changed_{mode}")
+        set_robot_speed(mode)
         
+        # Audio cue to researcher
         if mode == "audio":
             audio_sys.play_researcher(mode_audio_only)
         elif mode == "haptic":
             audio_sys.play_researcher(mode_haptic_only)
         elif mode == "audio_haptic":
             audio_sys.play_researcher(mode_audio_haptic)
+        elif mode == "robot_fast":
+            audio_sys.play_researcher(mode_robot_fast)
+        elif mode == "robot_slow":
+            audio_sys.play_researcher(mode_robot_slow)
+        elif mode == "baseline":
+            audio_sys.play_researcher(mode_baseline)
 
     def trigger_mistake(self):
-        # Enforce the cooldown and ensure we are in hard mode
         if self.mistake_on_cooldown or difficulty != "hard":
             return
             
         send_marker("Manual_Mistake_Alert_Triggered")
-        mode = self.scenarios[self.current_scenario_idx]
+        mode = self.get_current_scenario()
         
-        # Trigger assistance based on the active scenario
         if mode in ["haptic", "audio_haptic"]:
             activate_haptic_vest()
         if mode in ["audio", "audio_haptic"]:
             audio_sys.play_participant(mistake_audio)
             
-        # Activate 2-second cooldown
         self.mistake_on_cooldown = True
         QTimer.singleShot(2000, self.reset_mistake_cooldown)
 
     def reset_mistake_cooldown(self):
         self.mistake_on_cooldown = False
-
-    def show_start_screen(self):
-        self.stacked_widget.setCurrentIndex(1)
         
     def show_intermediate_screen(self, x, y, saved_time=0.0):
         global robot_process
@@ -883,15 +909,22 @@ class paradigmcontroller(QWidget):
         self.stacked_widget.setCurrentIndex(2)
         
     def show_main_task(self):
-        # Check if we need to take a break before the next trial begins
-        if difficulty == "hard" and self.pending_rest:
-            self.pending_rest = False
-            self.master_timer.stop() # pause the active experiment timer
-            self.rest_screen.start_rest()
-            self.stacked_widget.setCurrentIndex(4) # show rest screen
-            return
+        # Handle transitions between scenarios
+        if difficulty == "hard":
+            if self.pending_long_rest:
+                self.pending_long_rest = False
+                self.master_timer.stop()
+                self.long_rest_screen.start_rest()
+                self.stacked_widget.setCurrentIndex(5)
+                return
+            elif self.pending_short_rest:
+                self.pending_short_rest = False
+                self.master_timer.stop()
+                self.short_rest_screen.start_rest()
+                self.stacked_widget.setCurrentIndex(4) 
+                return
 
-        # In non-hard mode, respect the 10 trial limit
+        # Simple limit exit for easy/training conditions
         if difficulty != "hard" and self.current_trial >= self.max_trials:
             send_marker("Experiment_Complete_Trial_Limit")
             QApplication.instance().quit()
@@ -904,17 +937,13 @@ class paradigmcontroller(QWidget):
         self.stacked_widget.setCurrentIndex(3)
 
     def after_rest_callback(self):
-        # Proceed to the next scenario
         self.current_scenario_idx += 1
+        self.scenario_active_seconds = 0
         self.announce_scenario()
         
-        # Resume the master timer
         self.master_timer.start(1000)
-        
-        # Launch the next trial
         self.current_trial += 1
         send_marker(f"Screen_MathTask_Trial_{self.current_trial}")
-        
         self.main_task_screen.start_challenge()
         self.stacked_widget.setCurrentIndex(3)
 
@@ -934,7 +963,6 @@ def cleanup_resources():
             print(f"Error closing haptics: {e}")
         haptic_loop.call_soon_threadsafe(haptic_loop.stop)
 
-
 def run_paradigm():
     init_lsl()
     start_haptic_thread()
@@ -942,7 +970,6 @@ def run_paradigm():
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(cleanup_resources)
     
-    # Configure specific hardware routing 
     audio_sys.setup_devices(participant_keyword="Beats", researcher_keyword="Realtek")
     
     controller = paradigmcontroller()
@@ -953,7 +980,6 @@ def run_paradigm():
         controller.move(second_screen.left(), second_screen.top())
         
     controller.showFullScreen()
-    
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
