@@ -11,3 +11,9 @@ subject,condition,difficulty,time_taken_s,correct,attempts,equation_x,equation_y
 1,hard,hard,15.001,False,0,16 + 15 - 30,11 - (81 / 9),True
 1,hard,hard,15.0,False,0,(8 * 11) - 73,23 + 10 - 27,False
 1,hard,hard,15.001,False,0,(10 * 11) - 101,14 + 32 - 32,False
+1,hard,hard,15.005,False,0,8 - (55 / 11),(7 * 10) - 60,False
+1,hard,hard,14.99,False,0,(9 * 5) - 41,(11 * 6) - 56,True
+1,hard,hard,14.997,False,0,25 - (44 / 4),(5 * 10) - 43,False
+1,hard,hard,14.992,False,0,(5 * 7) - 23,29 + 13 - 30,True
+1,hard,hard,14.996,False,0,16 + 25 - 30,(3 * 7) - 8,False
+1,hard,hard,15.0,False,0,(5 * 7) - 23,37 + 16 - 37,False

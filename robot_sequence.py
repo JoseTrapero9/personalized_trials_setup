@@ -57,93 +57,62 @@ class Scripter:
 
     def move_down_collect_pt_1(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [140.74, -69.39, 107.61, -126.45, -89.21, -40.37]  
+        degrees = [90.18, -106.50, 146.41, -126.55, -91.51, -90.40]   
         self._send_movel_degrees(degrees, delay=wait_time)
 
     def movej_up_collect_pt_1(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [140.80, -80.52, 89.73, -97.43, -88.99, -40.69]  
+        degrees = [90.33, -120.05, 120.56, -87.16, -91.26, -90.78]   
         self._send_movej_degrees(degrees, delay=wait_time)
 
     def movel_up_collect_pt_1(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [140.80, -80.52, 89.73, -97.43, -88.99, -40.69]   
+        degrees = [90.33, -120.05, 120.56, -87.16, -91.26, -90.78]    
         self._send_movel_degrees(degrees, delay=wait_time)
 
 
     def move_down_collect_pt_2(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [131.92, -60.79, 94.15, -121.57, -89.45, -49.23] 
+        degrees = [114.18, -95, 138.4, -129.46, -90, -66.4] 
         self._send_movel_degrees(degrees, delay=wait_time) 
 
     def movel_up_collect_pt_2(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [131.97, -70.25, 75.21, -93.17, -89.26, -49.56]  
+        degrees = [114.28, -108.98, 119.48, -96.55, -89.75, -66.73]  
         self._send_movel_degrees(degrees, delay=wait_time)
 
     def movej_up_collect_pt_2(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [131.97, -70.25, 75.21, -93.17, -89.26, -49.56]    
+        degrees = [114.28, -108.98, 119.48, -96.55, -89.75, -66.73]     
         self._send_movej_degrees(degrees, delay=wait_time)
 
 
     def move_down_collect_pt_3(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [121.42, -71.46, 111.02, -127.81, -89.81, -59.67] 
+        degrees = [128.75, -83.96, 126.75, -128.84, -89.01, -51.85] 
         self._send_movel_degrees(degrees, delay=wait_time)  
 
     def movej_up_collect_pt_3(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [121.48, -83.08, 93.52, -98.70, -89.59, -59.99]  
+        degrees = [128.83, -97.30, 107.55, -96.28, -88.75, -52.20]  
         self._send_movej_degrees(degrees, delay=wait_time)
 
     def movel_up_collect_pt_3(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [121.48, -83.08, 93.52, -98.70, -89.59, -59.99]  
-        self._send_movel_degrees(degrees, delay=wait_time)
-
-
-    def move_down_collect_pt_4(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [129.86, -81.80, 125.36, -131.78, -89.59, -51.20] 
-        self._send_movel_degrees(degrees, delay=wait_time)
-
-    def movej_up_collect_pt_4(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [129.93, -95.39, 106.98, -99.80, -89.33, -51.53]  
-        self._send_movej_degrees(degrees, delay=wait_time)
-
-    def movel_up_collect_pt_4(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [129.93, -95.39, 106.98, -99.80, -89.33, -51.53]  
+        degrees = [128.83, -97.30, 107.55, -96.28, -88.75, -52.20]    
         self._send_movel_degrees(degrees, delay=wait_time)
        
     # Home position
     def move_home(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [145.63, -95.27, 95.41, -88.83, -89.03, -35.92] 
+        degrees = [143.85, -106.87, 116.87, -96.27, -87.73, -35.21] 
         self._send_movej_degrees(degrees, delay=wait_time) 
 
     # Ramp movements
-    def move_ramp_1_up(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [130.98, -45.40, 31.55, -77.25, -88.15, -54.98] 
-        self._send_movej_degrees(degrees, delay=wait_time) 
-
-    def move_ramp_1_down(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [130.94, -47.09, 52.65, -96.66, -88.17, -54.73] 
-        self._send_movej_degrees(degrees, delay=wait_time) 
-
-    def move_ramp_2_up(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [184.48, -75.16, 67.15, -83.44, -89.57, 4.23] 
-        self._send_movej_degrees(degrees, delay=wait_time) 
-
-    def move_ramp_2_down(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [184.42, -72.68, 91.43, -110.18, -89.67, 4.55] 
-        self._send_movej_degrees(degrees, delay=wait_time) 
+    def move_(self, wait_time: float = 2.00):
+            # define your down position in degrees
+            degrees = [143.85, -106.87, 116.87, -96.27, -87.73, -35.21] 
+            self._send_movej_degrees(degrees, delay=wait_time)
 
     def close(self):
         # clean up script socket

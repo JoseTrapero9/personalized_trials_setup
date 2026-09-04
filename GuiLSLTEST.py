@@ -42,7 +42,7 @@ container2_audio = os.path.join(base_dir, "CONTAINER2.wav")
 mistake_audio = os.path.join(base_dir, "MISTAKE_ALERT.wav")
 
 # Robot IP and Port for Difficulty[cite: 3]
-ROBOT_OWN_IP = "192.168.29.10"
+ROBOT_OWN_IP = "192.168.29.61"
 DIFFICULTY_PORT = 50001
 
 # --- LSL Setup ---
@@ -65,7 +65,7 @@ def set_robot_speed(scenario_name):
     # Determine the speed level based on the scenario[cite: 3]
     level = 1 # Normal (Speed 0.8)[cite: 3]
     if scenario_name == "robot_slow":
-        level = 0 # Slow (Speed 0.6)[cite: 3]
+        level = 0 # Slow (Speed 0.06)[cite: 3]
     elif scenario_name == "robot_fast":
         level = 2 # Fast (Speed 1.0)[cite: 3]
         
@@ -124,8 +124,8 @@ haptic_loop = None
 async def init_haptics():
 
     # initialize the bhaptics sdk
-    app_id = "3wpIajB4Bdq2KfRhkDzZ"
-    api_key = "yimPxWeZlB2Hxk5dNbOZ"
+    #app_id = "3wpIajB4Bdq2KfRhkDzZ"
+    #api_key = "yimPxWeZlB2Hxk5dNbOZ"
     app_id = "6a97da355fa17dce7a1e0d7b"
     api_key = "LsHVhykpVUDmGRxVY0FB"
 
@@ -849,7 +849,7 @@ class paradigmcontroller(QWidget):
     def master_timer_tick(self):
         self.scenario_active_seconds += 1
         
-        if self.scenario_active_seconds >= 300: # 5 mins per scenario
+        if self.scenario_active_seconds >= 30: # 5 mins per scenario
             # Flag that the current scenario is complete
             if self.current_scenario_idx + 1 >= len(self.scenarios):
                 # Completed the entire list
