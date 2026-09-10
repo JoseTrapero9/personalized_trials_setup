@@ -1074,7 +1074,7 @@ def run_paradigm():
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(cleanup_resources)
     
-    audio_sys.setup_devices(participant_keyword="Beats", researcher_keyword="Realtek")
+    audio_sys.setup_devices(participant_keyword="Realtek", researcher_keyword="Realtek")
     
     controller = paradigmcontroller()
     
