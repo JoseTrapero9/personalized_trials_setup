@@ -108,10 +108,35 @@ class Scripter:
         degrees = [143.85, -106.87, 116.87, -96.27, -87.73, -35.21] 
         self._send_movej_degrees(degrees, delay=wait_time) 
 
-    # Ramp movements
-    def move_(self, wait_time: float = 2.00):
+    # Collection movements
+    def move_left_up(self, wait_time: float = 2.00):
             # define your down position in degrees
-            degrees = [143.85, -106.87, 116.87, -96.27, -87.73, -35.21] 
+            degrees = [128.66, -50.45, 39.38, -77.93, -87.86, -51.88] 
+            self._send_movej_degrees(degrees, delay=wait_time)
+
+    def move_left_down(self, wait_time: float = 2.00):
+                # define your down position in degrees
+                degrees = [128.6, -46.09, 68.87, -111.79, -87.97, -51.47] 
+                self._send_movej_degrees(degrees, delay=wait_time)
+
+    def move_right_up(self, wait_time: float = 2.00):
+            # define your down position in degrees
+            degrees = [157.98, -79.92, 90.30, -100.16, -87.56, -22.26] 
+            self._send_movej_degrees(degrees, delay=wait_time)
+
+    def move_right_down(self, wait_time: float = 2.00):
+            # define your down position in degrees
+            degrees = [157.92, -68.53, 107.44, -128.70, -87.78, -21.95] 
+            self._send_movej_degrees(degrees, delay=wait_time)
+
+    def move_ramp_disposal_up(self, wait_time: float = 2.00):
+            # define your down position in degrees
+            degrees = [181.08, -97.95, 99.50, -90.62, -89.51, 91.38] 
+            self._send_movej_degrees(degrees, delay=wait_time)
+
+    def move_ramp_disposal_down(self, wait_time: float = 2.00):
+            # define your down position in degrees
+            degrees = [181.04, -95.01, 114.02, -108.08, -89.59, 91.58] 
             self._send_movej_degrees(degrees, delay=wait_time)
 
     def close(self):
@@ -169,35 +194,6 @@ def main():
             s.close_gripper()
             s.movel_up_collect_pt_2(wait_time=2.5)
 
-            s.move_ramp_2_up(wait_time=4)
-            s.move_ramp_2_down(wait_time=2)
-            wait_for_gui_signal()
-            s.open_gripper()
-            s.move_ramp_2_up(wait_time=2)
-
-            # Going to third collection point
-            s.movej_up_collect_pt_3(wait_time=4)
-            s.move_down_collect_pt_3(wait_time=3)
-            s.close_gripper()
-            s.movel_up_collect_pt_3(wait_time=2.5)
-
-            s.move_ramp_1_up(wait_time=4)
-            s.move_ramp_1_down(wait_time=2)
-            wait_for_gui_signal()
-            s.open_gripper()
-            s.move_ramp_1_up(wait_time=1.5)
-
-            # Going to fourth collection point
-            s.movej_up_collect_pt_4(wait_time=3)
-            s.move_down_collect_pt_4(wait_time=3)
-            s.close_gripper()
-            s.movel_up_collect_pt_4(wait_time=2.5)
-
-            s.move_ramp_2_up(wait_time=4)
-            s.move_ramp_2_down(wait_time=2)
-            wait_for_gui_signal()
-            s.open_gripper()
-            s.move_ramp_2_up(wait_time=2)
 
         # End of cycle  
         s.move_home(wait_time=8)
