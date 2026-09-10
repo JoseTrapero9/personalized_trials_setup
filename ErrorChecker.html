@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f4f5f7">
+<title>Sequence Tracker</title>
+<style>
+:root{
+  --bg:#f4f5f7; --card:#ffffff; --text:#202124; --muted:#6b7280;
+  --border:#d7dbe0; --primary:#1f4e78; --primary2:#173a5b;
+  --good:#2e7d32; --bad:#c62828; --shadow:0 5px 18px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--text)}
+button,input,select{font:inherit}
+.app{max-width:980px;margin:auto;padding:18px 16px 40px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+h1{font-size:24px;margin:0}
+h2{font-size:18px;margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
+.setup-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}
+label{display:block;font-weight:600;font-size:13px;margin-bottom:6px}
+input,select{width:100%;height:46px;border:1px solid #c9ced6;border-radius:10px;padding:0 12px;background:#fff}
+.primary,.secondary,.correct,.incorrect,.danger{border:0;border-radius:12px;padding:13px 18px;font-weight:700;cursor:pointer}
+.primary{background:var(--primary);color:white}.primary:active{background:var(--primary2)}
+.secondary{background:#e9edf2;color:#202124}.danger{background:#fff0f0;color:var(--bad);border:1px solid #efb6b6}
+.correct{background:#e7f4e8;color:var(--good);border:2px solid #7ab47e;min-width:145px}
+.incorrect{background:#fff0f0;color:var(--bad);border:2px solid #d88a8a;min-width:145px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.session-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.progress{height:10px;background:#e3e6ea;border-radius:99px;overflow:hidden;margin:12px 0 18px}
+.progress>div{height:100%;background:var(--primary);width:0}
+.trial-number{font-size:14px;color:var(--muted);font-weight:700}
+.score{text-align:right}
+.score strong{font-size:24px}
+.score small{display:block;color:var(--muted)}
+
+/* Area de estimulos y diseno neutral de bloques con etiquetas */
+.stimulus-area{min-height:480px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#eef1f5;border-radius:14px;border:1px solid #d0d4da;padding:26px}
+.tower{display:flex;flex-direction:column-reverse;align-items:center;width:min(280px,80vw);gap:5px}
+
+.block{
+  width:100%;
+  height:60px;
+  background-color:#ffffff;
+  color:#111111;
+  border:2.5px solid #2d3748;
+  border-radius:8px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  font-weight:900;
+  font-size:18px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  box-shadow:0 3px 6px rgba(0,0,0,.12);
+  user-select:none;
+}
+
+/* Studs tipo lego en la parte superior */
+.block::before{
+  content:"";
+  position:absolute;
+  top:-8px;
+  left:20px;
+  right:20px;
+  height:7px;
+  background-color:#e2e8f0;
+  border-top:2.5px solid #2d3748;
+  border-left:2.5px solid #2d3748;
+  border-right:2.5px solid #2d3748;
+  border-radius:4px 4px 0 0;
+}
+
+.controls{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:16px}
+.status{text-align:center;min-height:26px;font-weight:700;margin-top:12px}
+.status.good{color:var(--good)}.status.bad{color:var(--bad)}
+.next-row{text-align:center;margin-top:14px}
+.hidden{display:none!important}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.metric{background:#f7f8fa;border:1px solid var(--border);border-radius:12px;padding:13px;text-align:center}
+.metric b{display:block;font-size:22px}.metric span{color:var(--muted);font-size:12px}
+.results-table{width:100%;border-collapse:collapse;font-size:13px}
+.results-table th,.results-table td{padding:8px;border-bottom:1px solid #e1e4e8;text-align:left}
+.results-table th{background:#f4f6f8}
+.good-cell{color:var(--good);font-weight:700}.bad-cell{color:var(--bad);font-weight:700}
+.history-wrap{overflow:auto}
+.small{font-size:12px;color:var(--muted)}
+.action-row{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:700px){
+ .setup-grid{grid-template-columns:1fr}
+ .summary-grid{grid-template-columns:repeat(2,1fr)}
+ .stimulus-area{min-height:400px}
+ header{align-items:flex-start}
+}
+@media print{
+ body{background:#fff}.app{max-width:none;padding:0}.no-print{display:none!important}
+ .card{box-shadow:none;border:1px solid #aaa;break-inside:avoid}
+ #setup,#experiment,#history{display:none!important}
+ #report{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <h1>Sequence Tracker</h1>
+  <div class="small">Experimenter interface</div>
+</header>
+
+<section id="setup" class="card">
+  <h2>New Session</h2>
+  <div class="setup-grid">
+    <div><label for="subject">Subject Name</label><input id="subject" placeholder="Enter subject name"></div>
+    <div><label for="session">Session Number</label><input id="session" type="number" min="1" placeholder="e.g. 1"></div>
+    <div><label for="sequence">Sequence</label><select id="sequence">
+      <option value="A">Sequence A</option><option value="B">Sequence B</option>
+      <option value="C">Sequence C</option><option value="D">Sequence D</option>
+      <option value="E">Sequence E</option>
+    </select></div>
+  </div>
+  <div style="margin-top:14px" class="action-row">
+    <button class="primary" id="startBtn">Start Session</button>
+  </div>
+</section>
+
+<section id="experiment" class="card hidden">
+  <div class="session-top">
+    <div>
+      <div class="trial-number" id="trialLabel">Trial 1 / 42</div>
+      <div class="small" id="sessionInfo"></div>
+    </div>
+    <div class="score"><strong id="score">0 / 0</strong><small id="accuracy">Accuracy: 0%</small></div>
+  </div>
+  <div class="progress"><div id="progressBar"></div></div>
+
+  <div class="stimulus-area">
+    <div class="small" style="margin-bottom:12px;font-weight:800;color:var(--muted);letter-spacing:1px">▲ TOP (Nivel 5) ▲</div>
+    <div class="tower" id="tower"></div>
+    <div class="small" style="margin-top:14px;font-weight:800;color:var(--muted);letter-spacing:1px">▼ BASE (Nivel 1) ▼</div>
+  </div>
+
+  <div class="controls">
+    <button class="incorrect" id="incorrectBtn">INCORRECT</button>
+    <button class="correct" id="correctBtn">CORRECT</button>
+  </div>
+  <div id="status" class="status"></div>
+  <div class="next-row">
+    <button class="primary" id="nextBtn" disabled>NEXT TRIAL</button>
+  </div>
+  <div style="text-align:center;margin-top:12px" class="no-print">
+    <button class="danger" id="resetBtn">RESET SESSION</button>
+  </div>
+</section>
+
+<section id="report" class="card hidden">
+  <div class="session-top">
+    <div><h2>Session Results</h2><div class="small" id="reportHeader"></div></div>
+    <div class="action-row no-print">
+      <button class="primary" id="printBtn">PRINT / SAVE PDF</button>
+      <button class="secondary" id="csvBtn">EXPORT EXCEL FILE</button>
+      <button class="secondary" id="newBtn">NEW SESSION</button>
+    </div>
+  </div>
+  <div class="summary-grid" style="margin-top:14px">
+    <div class="metric"><b id="rCorrect">0</b><span>Correct</span></div>
+    <div class="metric"><b id="rIncorrect">0</b><span>Incorrect</span></div>
+    <div class="metric"><b id="rAccuracy">0%</b><span>Accuracy</span></div>
+    <div class="metric"><b id="rSequence">A</b><span>Sequence</span></div>
+  </div>
+
+  <h2 style="margin-top:22px">Trial Results</h2>
+  <div class="history-wrap">
+    <table class="results-table">
+      <thead><tr><th>Trial</th><th>Color Sequence (Base → Top)</th><th>Result</th></tr></thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+
+  <h2 style="margin-top:22px">Performance History</h2>
+  <div class="history-wrap">
+    <table class="results-table">
+      <thead><tr><th>Subject</th><th>Session</th><th>Sequence</th><th>Correct</th><th>Accuracy</th><th>Date</th></tr></thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="history" class="card">
+  <div class="session-top"><div><h2>Saved Performance History</h2><div class="small">Stored locally on this device/browser.</div></div>
+  <button class="danger no-print" id="clearHistoryBtn">CLEAR HISTORY</button></div>
+  <div class="history-wrap" style="margin-top:12px">
+    <table class="results-table">
+      <thead><tr><th>Subject</th><th>Session</th><th>Sequence</th><th>Correct</th><th>Accuracy</th><th>Date</th></tr></thead>
+      <tbody id="savedHistoryBody"></tbody>
+    </table>
+  </div>
+</section>
+</div>
+
+<script>
+const SEQUENCES = {"A": [["Blanco", "Amarillo", "Gris", "Verde", "Rojo"], ["Negro", "Verde", "Gris", "Amarillo", "Rojo"], ["Amarillo", "Negro", "Blanco", "Rojo", "Verde"], ["Negro", "Gris", "Rojo", "Amarillo", "Verde"], ["Verde", "Gris", "Blanco", "Negro", "Amarillo"], ["Gris", "Amarillo", "Blanco", "Rojo", "Negro"], ["Amarillo", "Verde", "Rojo", "Gris", "Blanco"], ["Verde", "Gris", "Blanco", "Amarillo", "Negro"], ["Rojo", "Negro", "Verde", "Gris", "Amarillo"], ["Negro", "Gris", "Rojo", "Amarillo", "Verde"], ["Verde", "Gris", "Negro", "Amarillo", "Blanco"], ["Negro", "Gris", "Rojo", "Verde", "Amarillo"], ["Blanco", "Negro", "Gris", "Amarillo", "Rojo"], ["Negro", "Rojo", "Blanco", "Gris", "Amarillo"], ["Gris", "Blanco", "Rojo", "Verde", "Amarillo"], ["Verde", "Blanco", "Gris", "Negro", "Amarillo"], ["Amarillo", "Gris", "Negro", "Blanco", "Rojo"], ["Rojo", "Amarillo", "Blanco", "Verde", "Gris"], ["Gris", "Negro", "Amarillo", "Blanco", "Rojo"], ["Negro", "Blanco", "Amarillo", "Rojo", "Gris"], ["Verde", "Gris", "Negro", "Amarillo", "Blanco"], ["Negro", "Amarillo", "Rojo", "Verde", "Gris"], ["Negro", "Verde", "Blanco", "Amarillo", "Gris"], ["Verde", "Amarillo", "Blanco", "Rojo", "Gris"], ["Verde", "Amarillo", "Gris", "Blanco", "Rojo"], ["Blanco", "Gris", "Amarillo", "Rojo", "Verde"], ["Gris", "Blanco", "Rojo", "Verde", "Amarillo"], ["Gris", "Blanco", "Rojo", "Negro", "Verde"], ["Blanco", "Gris", "Rojo", "Amarillo", "Verde"], ["Rojo", "Amarillo", "Negro", "Blanco", "Gris"], ["Amarillo", "Gris", "Blanco", "Verde", "Rojo"], ["Verde", "Blanco", "Amarillo", "Negro", "Gris"], ["Rojo", "Gris", "Verde", "Amarillo", "Negro"], ["Gris", "Verde", "Blanco", "Negro", "Rojo"], ["Verde", "Blanco", "Negro", "Rojo", "Gris"], ["Amarillo", "Blanco", "Gris", "Verde", "Negro"], ["Rojo", "Gris", "Negro", "Blanco", "Verde"], ["Rojo", "Negro", "Verde", "Blanco", "Gris"], ["Negro", "Verde", "Blanco", "Rojo", "Gris"], ["Gris", "Rojo", "Negro", "Verde", "Amarillo"], ["Negro", "Rojo", "Amarillo", "Verde", "Gris"], ["Blanco", "Negro", "Verde", "Amarillo", "Gris"]], "B": [["Blanco", "Amarillo", "Gris", "Verde", "Negro"], ["Negro", "Amarillo", "Gris", "Blanco", "Verde"], ["Amarillo", "Verde", "Rojo", "Negro", "Blanco"], ["Blanco", "Negro", "Amarillo", "Gris", "Verde"], ["Verde", "Rojo", "Gris", "Negro", "Blanco"], ["Rojo", "Gris", "Negro", "Amarillo", "Verde"], ["Amarillo", "Negro", "Blanco", "Verde", "Gris"], ["Verde", "Rojo", "Negro", "Gris", "Blanco"], ["Amarillo", "Negro", "Rojo", "Blanco", "Verde"], ["Blanco", "Verde", "Rojo", "Amarillo", "Gris"], ["Verde", "Negro", "Gris", "Rojo", "Amarillo"], ["Blanco", "Rojo", "Negro", "Verde", "Gris"], ["Blanco", "Rojo", "Amarillo", "Negro", "Verde"], ["Negro", "Gris", "Amarillo", "Blanco", "Verde"], ["Verde", "Blanco", "Negro", "Rojo", "Amarillo"], ["Verde", "Rojo", "Amarillo", "Blanco", "Negro"], ["Gris", "Amarillo", "Negro", "Verde", "Blanco"], ["Negro", "Verde", "Amarillo", "Gris", "Rojo"], ["Gris", "Negro", "Verde", "Amarillo", "Blanco"], ["Rojo", "Negro", "Blanco", "Gris", "Verde"], ["Verde", "Negro", "Amarillo", "Rojo", "Gris"], ["Verde", "Rojo", "Blanco", "Gris", "Negro"], ["Gris", "Negro", "Rojo", "Amarillo", "Verde"], ["Blanco", "Rojo", "Negro", "Amarillo", "Verde"], ["Rojo", "Negro", "Amarillo", "Gris", "Blanco"], ["Blanco", "Rojo", "Amarillo", "Gris", "Negro"], ["Gris", "Negro", "Blanco", "Amarillo", "Rojo"], ["Negro", "Gris", "Verde", "Amarillo", "Blanco"], ["Gris", "Amarillo", "Rojo", "Blanco", "Negro"], ["Rojo", "Gris", "Negro", "Verde", "Amarillo"], ["Rojo", "Amarillo", "Verde", "Blanco", "Gris"], ["Negro", "Gris", "Verde", "Rojo", "Amarillo"], ["Negro", "Verde", "Blanco", "Gris", "Rojo"], ["Negro", "Rojo", "Gris", "Blanco", "Amarillo"], ["Verde", "Amarillo", "Negro", "Gris", "Rojo"], ["Amarillo", "Verde", "Rojo", "Blanco", "Negro"], ["Rojo", "Gris", "Negro", "Amarillo", "Blanco"], ["Verde", "Gris", "Amarillo", "Negro", "Rojo"], ["Negro", "Verde", "Amarillo", "Gris", "Blanco"], ["Rojo", "Gris", "Negro", "Amarillo", "Verde"], ["Gris", "Negro", "Rojo", "Verde", "Amarillo"], ["Blanco", "Negro", "Verde", "Amarillo", "Gris"]], "C": [["Blanco", "Amarillo", "Negro", "Rojo", "Verde"], ["Negro", "Blanco", "Amarillo", "Gris", "Rojo"], ["Gris", "Amarillo", "Verde", "Negro", "Rojo"], ["Negro", "Amarillo", "Gris", "Verde", "Rojo"], ["Verde", "Blanco", "Amarillo", "Gris", "Negro"], ["Gris", "Amarillo", "Negro", "Blanco", "Rojo"], ["Amarillo", "Blanco", "Rojo", "Gris", "Negro"], ["Rojo", "Negro", "Verde", "Gris", "Blanco"], ["Rojo", "Amarillo", "Gris", "Negro", "Verde"], ["Blanco", "Verde", "Amarillo", "Gris", "Negro"], ["Amarillo", "Gris", "Negro", "Rojo", "Blanco"], ["Rojo", "Gris", "Blanco", "Amarillo", "Negro"], ["Blanco", "Gris", "Verde", "Rojo", "Negro"], ["Amarillo", "Blanco", "Negro", "Verde", "Gris"], ["Gris", "Negro", "Amarillo", "Blanco", "Rojo"], ["Blanco", "Negro", "Amarillo", "Verde", "Gris"], ["Negro", "Verde", "Blanco", "Gris", "Amarillo"], ["Amarillo", "Negro", "Gris", "Blanco", "Verde"], ["Negro", "Blanco", "Verde", "Rojo", "Gris"], ["Negro", "Verde", "Gris", "Rojo", "Amarillo"], ["Blanco", "Negro", "Amarillo", "Rojo", "Verde"], ["Verde", "Blanco", "Negro", "Gris", "Amarillo"], ["Gris", "Negro", "Rojo", "Amarillo", "Blanco"], ["Verde", "Rojo", "Negro", "Gris", "Blanco"], ["Verde", "Amarillo", "Blanco", "Gris", "Rojo"], ["Blanco", "Gris", "Verde", "Rojo", "Amarillo"], ["Verde", "Gris", "Blanco", "Rojo", "Amarillo"], ["Negro", "Amarillo", "Gris", "Rojo", "Blanco"], ["Negro", "Rojo", "Amarillo", "Blanco", "Verde"], ["Rojo", "Negro", "Gris", "Blanco", "Verde"], ["Amarillo", "Rojo", "Verde", "Negro", "Gris"], ["Verde", "Gris", "Negro", "Rojo", "Amarillo"], ["Rojo", "Amarillo", "Gris", "Blanco", "Negro"], ["Rojo", "Negro", "Amarillo", "Gris", "Verde"], ["Verde", "Blanco", "Amarillo", "Negro", "Gris"], ["Negro", "Blanco", "Rojo", "Gris", "Amarillo"], ["Rojo", "Negro", "Gris", "Verde", "Amarillo"], ["Rojo", "Amarillo", "Gris", "Verde", "Negro"], ["Verde", "Rojo", "Gris", "Blanco", "Negro"], ["Verde", "Blanco", "Negro", "Rojo", "Gris"], ["Amarillo", "Negro", "Blanco", "Verde", "Gris"], ["Verde", "Gris", "Rojo", "Blanco", "Negro"]], "D": [["Verde", "Amarillo", "Gris", "Negro", "Rojo"], ["Amarillo", "Blanco", "Negro", "Verde", "Rojo"], ["Verde", "Negro", "Gris", "Rojo", "Blanco"], ["Amarillo", "Rojo", "Blanco", "Negro", "Gris"], ["Verde", "Blanco", "Gris", "Negro", "Rojo"], ["Negro", "Rojo", "Verde", "Gris", "Amarillo"], ["Amarillo", "Gris", "Blanco", "Verde", "Negro"], ["Blanco", "Negro", "Rojo", "Amarillo", "Gris"], ["Rojo", "Amarillo", "Blanco", "Gris", "Negro"], ["Blanco", "Verde", "Rojo", "Gris", "Negro"], ["Negro", "Gris", "Rojo", "Verde", "Blanco"], ["Amarillo", "Verde", "Blanco", "Gris", "Negro"], ["Blanco", "Gris", "Negro", "Verde", "Rojo"], ["Amarillo", "Negro", "Gris", "Verde", "Blanco"], ["Rojo", "Negro", "Verde", "Amarillo", "Gris"], ["Blanco", "Amarillo", "Gris", "Rojo", "Verde"], ["Rojo", "Negro", "Gris", "Blanco", "Verde"], ["Amarillo", "Negro", "Verde", "Gris", "Blanco"], ["Blanco", "Negro", "Gris", "Rojo", "Amarillo"], ["Rojo", "Amarillo", "Blanco", "Negro", "Gris"], ["Verde", "Rojo", "Blanco", "Negro", "Amarillo"], ["Verde", "Amarillo", "Gris", "Negro", "Rojo"], ["Rojo", "Gris", "Amarillo", "Negro", "Blanco"], ["Rojo", "Verde", "Negro", "Gris", "Blanco"], ["Verde", "Blanco", "Rojo", "Negro", "Amarillo"], ["Blanco", "Gris", "Verde", "Negro", "Amarillo"], ["Verde", "Negro", "Amarillo", "Rojo", "Blanco"], ["Gris", "Amarillo", "Rojo", "Blanco", "Verde"], ["Gris", "Negro", "Rojo", "Amarillo", "Verde"], ["Negro", "Amarillo", "Blanco", "Rojo", "Gris"], ["Blanco", "Amarillo", "Verde", "Gris", "Negro"], ["Negro", "Rojo", "Blanco", "Verde", "Amarillo"], ["Rojo", "Gris", "Blanco", "Amarillo", "Verde"], ["Blanco", "Amarillo", "Negro", "Verde", "Gris"], ["Verde", "Amarillo", "Negro", "Blanco", "Gris"], ["Amarillo", "Gris", "Verde", "Rojo", "Negro"], ["Rojo", "Negro", "Amarillo", "Verde", "Gris"], ["Negro", "Rojo", "Verde", "Blanco", "Amarillo"], ["Negro", "Rojo", "Blanco", "Amarillo", "Gris"], ["Verde", "Blanco", "Gris", "Amarillo", "Negro"], ["Verde", "Amarillo", "Negro", "Gris", "Blanco"], ["Blanco", "Negro", "Amarillo", "Rojo", "Gris"]], "E": [["Blanco", "Verde", "Negro", "Rojo", "Amarillo"], ["Negro", "Blanco", "Amarillo", "Rojo", "Verde"], ["Amarillo", "Rojo", "Negro", "Gris", "Verde"], ["Negro", "Gris", "Blanco", "Rojo", "Verde"], ["Verde", "Rojo", "Gris", "Amarillo", "Negro"], ["Gris", "Amarillo", "Negro", "Rojo", "Blanco"], ["Amarillo", "Rojo", "Verde", "Gris", "Blanco"], ["Verde", "Blanco", "Rojo", "Gris", "Amarillo"], ["Rojo", "Negro", "Amarillo", "Verde", "Blanco"], ["Blanco", "Verde", "Rojo", "Negro", "Amarillo"], ["Amarillo", "Gris", "Blanco", "Verde", "Rojo"], ["Rojo", "Amarillo", "Gris", "Verde", "Negro"], ["Blanco", "Rojo", "Negro", "Amarillo", "Gris"], ["Amarillo", "Negro", "Rojo", "Blanco", "Gris"], ["Gris", "Blanco", "Negro", "Rojo", "Amarillo"], ["Blanco", "Gris", "Verde", "Rojo", "Negro"], ["Negro", "Verde", "Blanco", "Amarillo", "Rojo"], ["Amarillo", "Negro", "Gris", "Rojo", "Blanco"], ["Negro", "Rojo", "Blanco", "Amarillo", "Verde"], ["Negro", "Amarillo", "Gris", "Blanco", "Verde"], ["Blanco", "Amarillo", "Negro", "Gris", "Verde"], ["Verde", "Amarillo", "Blanco", "Rojo", "Negro"], ["Gris", "Negro", "Blanco", "Amarillo", "Rojo"], ["Verde", "Amarillo", "Gris", "Rojo", "Blanco"], ["Verde", "Negro", "Gris", "Rojo", "Amarillo"], ["Blanco", "Rojo", "Amarillo", "Verde", "Gris"], ["Verde", "Gris", "Blanco", "Amarillo", "Negro"], ["Negro", "Amarillo", "Gris", "Verde", "Rojo"], ["Gris", "Amarillo", "Blanco", "Negro", "Verde"], ["Rojo", "Amarillo", "Negro", "Gris", "Blanco"], ["Amarillo", "Blanco", "Rojo", "Gris", "Verde"], ["Negro", "Rojo", "Amarillo", "Gris", "Verde"], ["Rojo", "Amarillo", "Verde", "Negro", "Blanco"], ["Negro", "Rojo", "Verde", "Blanco", "Gris"], ["Verde", "Blanco", "Amarillo", "Negro", "Rojo"], ["Negro", "Blanco", "Rojo", "Gris", "Verde"], ["Rojo", "Gris", "Verde", "Blanco", "Negro"], ["Rojo", "Amarillo", "Negro", "Verde", "Blanco"], ["Negro", "Rojo", "Blanco", "Amarillo", "Verde"], ["Verde", "Blanco", "Gris", "Amarillo", "Rojo"], ["Verde", "Amarillo", "Blanco", "Rojo", "Negro"], ["Blanco", "Negro", "Amarillo", "Rojo", "Verde"]]};
+
+let state = null;
+const $ = id => document.getElementById(id);
+
+function renderTower() {
+  const colors = SEQUENCES[state.sequence][state.index];
+  $("tower").innerHTML = "";
+
+  // Renderiza cada bloque con su nombre de color centrado en texto
+  colors.forEach(c => {
+    const b = document.createElement("div");
+    b.className = "block";
+    b.textContent = c.toUpperCase();
+    $("tower").appendChild(b);
+  });
+
+  $("trialLabel").textContent = `Trial ${state.index+1} / 42`;
+  $("sessionInfo").textContent = `${state.subject} · Session ${state.session} · Sequence ${state.sequence}`;
+  const completed = state.results.length;
+  const correct = state.results.filter(x => x.correct).length;
+  $("score").textContent = `${correct} / ${completed}`;
+  $("accuracy").textContent = `Accuracy: ${completed ? (correct/completed*100).toFixed(1) : "0"}%`;
+  $("progressBar").style.width = `${(state.index/42)*100}%`;
+  $("status").textContent = "";
+  $("status").className = "status";
+  $("correctBtn").disabled = false;
+  $("incorrectBtn").disabled = false;
+  $("nextBtn").disabled = true;
+}
+
+function recordResult(correct) {
+  if (state.currentResult !== null) return;
+  state.currentResult = correct;
+  state.results.push({trial: state.index+1, colors:[...SEQUENCES[state.sequence][state.index]], correct});
+  $("correctBtn").disabled = true;
+  $("incorrectBtn").disabled = true;
+  $("nextBtn").disabled = false;
+  $("status").textContent = correct ? "Correct recorded" : "Incorrect recorded";
+  $("status").className = "status " + (correct ? "good" : "bad");
+  const completed = state.results.length;
+  const nCorrect = state.results.filter(x => x.correct).length;
+  $("score").textContent = `${nCorrect} / ${completed}`;
+  $("accuracy").textContent = `Accuracy: ${(nCorrect/completed*100).toFixed(1)}%`;
+}
+
+function nextTrial() {
+  if (state.currentResult === null) return;
+  if (state.index >= 41) { finishSession(); return; }
+  state.index++;
+  state.currentResult = null;
+  renderTower();
+}
+
+function startSession() {
+  const subject = $("subject").value.trim();
+  const session = $("session").value.trim();
+  if (!subject || !session) {
+    alert("Please enter the Subject Name and Session Number.");
+    return;
+  }
+  state = {subject, session, sequence:$("sequence").value, index:0, currentResult:null, results:[]};
+  $("setup").classList.add("hidden");
+  $("history").classList.add("hidden");
+  $("report").classList.add("hidden");
+  $("experiment").classList.remove("hidden");
+  renderTower();
+}
+
+function finishSession() {
+  const correct = state.results.filter(x=>x.correct).length;
+  const incorrect = 42-correct;
+  const accuracy = correct/42*100;
+  const record = {
+    subject:state.subject, session:state.session, sequence:state.sequence,
+    correct, incorrect, accuracy:Number(accuracy.toFixed(1)),
+    date:new Date().toLocaleString(), results:state.results
+  };
+  const history = JSON.parse(localStorage.getItem("sequenceTrackerHistory") || "[]");
+  history.push(record);
+  localStorage.setItem("sequenceTrackerHistory", JSON.stringify(history));
+  $("experiment").classList.add("hidden");
+  $("report").classList.remove("hidden");
+  populateReport(record, history);
+}
+
+function populateReport(record, history) {
+  $("reportHeader").textContent = `${record.subject} · Session ${record.session} · Sequence ${record.sequence}`;
+  $("rCorrect").textContent = record.correct;
+  $("rIncorrect").textContent = record.incorrect;
+  $("rAccuracy").textContent = record.accuracy.toFixed(1) + "%";
+  $("rSequence").textContent = record.sequence;
+
+  $("resultsBody").innerHTML = record.results.map(r =>
+    `<tr><td>${r.trial}</td><td>${r.colors.join(" → ")}</td><td class="${r.correct?"good-cell":"bad-cell"}">${r.correct?"CORRECT":"INCORRECT"}</td></tr>`
+  ).join("");
+
+  const rows = history.slice().reverse().map(h =>
+    `<tr><td>${escapeHtml(h.subject)}</td><td>${escapeHtml(h.session)}</td><td>${h.sequence}</td><td>${h.correct} / 42</td><td>${h.accuracy.toFixed(1)}%</td><td>${escapeHtml(h.date)}</td></tr>`
+  ).join("");
+  $("historyBody").innerHTML = rows || `<tr><td colspan="6">No previous sessions.</td></tr>`;
+  renderSavedHistory(history);
+}
+
+function renderSavedHistory(history = JSON.parse(localStorage.getItem("sequenceTrackerHistory") || "[]")) {
+  $("savedHistoryBody").innerHTML = history.slice().reverse().map(h =>
+    `<tr><td>${escapeHtml(h.subject)}</td><td>${escapeHtml(h.session)}</td><td>${h.sequence}</td><td>${h.correct} / 42</td><td>${h.accuracy.toFixed(1)}%</td><td>${escapeHtml(h.date)}</td></tr>`
+  ).join("") || `<tr><td colspan="6">No sessions saved yet.</td></tr>`;
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+function resetSession() {
+  if (confirm("Reset the current session? Current results will be lost.")) {
+    state = null;
+    $("experiment").classList.add("hidden");
+    $("setup").classList.remove("hidden");
+    $("history").classList.remove("hidden");
+    renderSavedHistory();
+  }
+}
+function newSession() {
+  state = null;
+  $("report").classList.add("hidden");
+  $("setup").classList.remove("hidden");
+  $("history").classList.remove("hidden");
+  $("subject").focus();
+}
+function exportCSV() {
+  if (!state && !$("resultsBody").children.length) return;
+  const history = JSON.parse(localStorage.getItem("sequenceTrackerHistory") || "[]");
+  const record = history[history.length-1];
+  let csv = "Subject,Session,Sequence,Trial,Color Sequence,Result\n";
+  record.results.forEach(r => {
+    csv += [record.subject,record.session,record.sequence,r.trial,r.colors.join(" -> "),r.correct?"CORRECT":"INCORRECT"]
+      .map(v => `"${String(v).replace(/"/g,'""')}"`).join(",") + "\n";
+  });
+  csv += `\nSubject,Session,Sequence,Correct,Incorrect,Accuracy\n`;
+  csv += [record.subject,record.session,record.sequence,record.correct,record.incorrect,record.accuracy+"%"]
+    .map(v => `"${String(v).replace(/"/g,'""')}"`).join(",") + "\n";
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `Sequence_${record.sequence}_Session_${record.session}_${record.subject.replace(/\s+/g,"_")}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+$("startBtn").onclick=startSession;
+$("correctBtn").onclick=()=>recordResult(true);
+$("incorrectBtn").onclick=()=>recordResult(false);
+$("nextBtn").onclick=nextTrial;
+$("resetBtn").onclick=resetSession;
+$("newBtn").onclick=newSession;
+$("printBtn").onclick=()=>window.print();
+$("csvBtn").onclick=exportCSV;
+$("clearHistoryBtn").onclick=()=>{
+  if(confirm("Clear all saved performance history from this browser?")){
+    localStorage.removeItem("sequenceTrackerHistory"); renderSavedHistory();
+  }
+};
+renderSavedHistory();
+</script>
+</body>
+</html>
