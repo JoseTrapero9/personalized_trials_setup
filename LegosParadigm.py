@@ -169,25 +169,228 @@ current_condition = "training"
 active_scenarios_list = []
 robot_process = None
 
-# --- Generador de Secuencias Balanceadas de 5 piezas ---
-ALL_COLORS = ["green", "red", "yellow", "black", "gray", "white"]
-
-def generate_balanced_sequence(seed_val, total_trials=45):
-    rng = random.Random(seed_val)
-    sequence = []
-    for _ in range(total_trials):
-        # 5 colores únicos por combinación de 5 piezas
-        pattern = rng.sample(ALL_COLORS, 5)
-        sequence.append(pattern)
-    return sequence
-
-# 5 Secuencias Pre-programadas
+# --- 5 Secuencias Fijas y Predefinidas (Idénticas al HTML del Supervisor) ---
 SEQUENCES_POOL = {
-    "SECUENCIA A": generate_balanced_sequence(101),
-    "SECUENCIA B": generate_balanced_sequence(202),
-    "SECUENCIA C": generate_balanced_sequence(303),
-    "SECUENCIA D": generate_balanced_sequence(404),
-    "SECUENCIA E": generate_balanced_sequence(505)
+    "SECUENCIA A": [
+        ["Blanco", "Amarillo", "Gris", "Verde", "Rojo"],
+        ["Negro", "Verde", "Gris", "Amarillo", "Rojo"],
+        ["Amarillo", "Negro", "Blanco", "Rojo", "Verde"],
+        ["Negro", "Gris", "Rojo", "Amarillo", "Verde"],
+        ["Verde", "Gris", "Blanco", "Negro", "Amarillo"],
+        ["Gris", "Amarillo", "Blanco", "Rojo", "Negro"],
+        ["Amarillo", "Verde", "Rojo", "Gris", "Blanco"],
+        ["Verde", "Gris", "Blanco", "Amarillo", "Negro"],
+        ["Rojo", "Negro", "Verde", "Gris", "Amarillo"],
+        ["Negro", "Gris", "Rojo", "Amarillo", "Verde"],
+        ["Verde", "Gris", "Negro", "Amarillo", "Blanco"],
+        ["Negro", "Gris", "Rojo", "Verde", "Amarillo"],
+        ["Blanco", "Negro", "Gris", "Amarillo", "Rojo"],
+        ["Negro", "Rojo", "Blanco", "Gris", "Amarillo"],
+        ["Gris", "Blanco", "Rojo", "Verde", "Amarillo"],
+        ["Verde", "Blanco", "Gris", "Negro", "Amarillo"],
+        ["Amarillo", "Gris", "Negro", "Blanco", "Rojo"],
+        ["Rojo", "Amarillo", "Blanco", "Verde", "Gris"],
+        ["Gris", "Negro", "Amarillo", "Blanco", "Rojo"],
+        ["Negro", "Blanco", "Amarillo", "Rojo", "Gris"],
+        ["Verde", "Gris", "Negro", "Amarillo", "Blanco"],
+        ["Negro", "Amarillo", "Rojo", "Verde", "Gris"],
+        ["Negro", "Verde", "Blanco", "Amarillo", "Gris"],
+        ["Verde", "Amarillo", "Blanco", "Rojo", "Gris"],
+        ["Verde", "Amarillo", "Gris", "Blanco", "Rojo"],
+        ["Blanco", "Gris", "Amarillo", "Rojo", "Verde"],
+        ["Gris", "Blanco", "Rojo", "Verde", "Amarillo"],
+        ["Gris", "Blanco", "Rojo", "Negro", "Verde"],
+        ["Blanco", "Gris", "Rojo", "Amarillo", "Verde"],
+        ["Rojo", "Amarillo", "Negro", "Blanco", "Gris"],
+        ["Amarillo", "Gris", "Blanco", "Verde", "Rojo"],
+        ["Verde", "Blanco", "Amarillo", "Negro", "Gris"],
+        ["Rojo", "Gris", "Verde", "Amarillo", "Negro"],
+        ["Gris", "Verde", "Blanco", "Negro", "Rojo"],
+        ["Verde", "Blanco", "Negro", "Rojo", "Gris"],
+        ["Amarillo", "Blanco", "Gris", "Verde", "Negro"],
+        ["Rojo", "Gris", "Negro", "Blanco", "Verde"],
+        ["Rojo", "Negro", "Verde", "Blanco", "Gris"],
+        ["Negro", "Verde", "Blanco", "Rojo", "Gris"],
+        ["Gris", "Rojo", "Negro", "Verde", "Amarillo"],
+        ["Negro", "Rojo", "Amarillo", "Verde", "Gris"],
+        ["Blanco", "Negro", "Verde", "Amarillo", "Gris"]
+    ],
+    "SECUENCIA B": [
+        ["Blanco", "Amarillo", "Gris", "Verde", "Negro"],
+        ["Negro", "Amarillo", "Gris", "Blanco", "Verde"],
+        ["Amarillo", "Verde", "Rojo", "Negro", "Blanco"],
+        ["Blanco", "Negro", "Amarillo", "Gris", "Verde"],
+        ["Verde", "Rojo", "Gris", "Negro", "Blanco"],
+        ["Rojo", "Gris", "Negro", "Amarillo", "Verde"],
+        ["Amarillo", "Negro", "Blanco", "Verde", "Gris"],
+        ["Verde", "Rojo", "Negro", "Gris", "Blanco"],
+        ["Amarillo", "Negro", "Rojo", "Blanco", "Verde"],
+        ["Blanco", "Verde", "Rojo", "Amarillo", "Gris"],
+        ["Verde", "Negro", "Gris", "Rojo", "Amarillo"],
+        ["Blanco", "Rojo", "Negro", "Verde", "Gris"],
+        ["Blanco", "Rojo", "Amarillo", "Negro", "Verde"],
+        ["Negro", "Gris", "Amarillo", "Blanco", "Verde"],
+        ["Verde", "Blanco", "Negro", "Rojo", "Amarillo"],
+        ["Verde", "Rojo", "Amarillo", "Blanco", "Negro"],
+        ["Gris", "Amarillo", "Negro", "Verde", "Blanco"],
+        ["Negro", "Verde", "Amarillo", "Gris", "Rojo"],
+        ["Gris", "Negro", "Verde", "Amarillo", "Blanco"],
+        ["Rojo", "Negro", "Blanco", "Gris", "Verde"],
+        ["Verde", "Negro", "Amarillo", "Rojo", "Gris"],
+        ["Verde", "Rojo", "Blanco", "Gris", "Negro"],
+        ["Gris", "Negro", "Rojo", "Amarillo", "Verde"],
+        ["Blanco", "Rojo", "Negro", "Amarillo", "Verde"],
+        ["Rojo", "Negro", "Amarillo", "Gris", "Blanco"],
+        ["Blanco", "Rojo", "Amarillo", "Gris", "Negro"],
+        ["Gris", "Negro", "Blanco", "Amarillo", "Rojo"],
+        ["Negro", "Gris", "Verde", "Amarillo", "Blanco"],
+        ["Gris", "Amarillo", "Rojo", "Blanco", "Negro"],
+        ["Rojo", "Gris", "Negro", "Verde", "Amarillo"],
+        ["Rojo", "Amarillo", "Verde", "Blanco", "Gris"],
+        ["Negro", "Gris", "Verde", "Rojo", "Amarillo"],
+        ["Negro", "Verde", "Blanco", "Gris", "Rojo"],
+        ["Negro", "Rojo", "Gris", "Blanco", "Amarillo"],
+        ["Verde", "Amarillo", "Negro", "Gris", "Rojo"],
+        ["Amarillo", "Verde", "Rojo", "Blanco", "Negro"],
+        ["Rojo", "Gris", "Negro", "Amarillo", "Blanco"],
+        ["Verde", "Gris", "Amarillo", "Negro", "Rojo"],
+        ["Negro", "Verde", "Amarillo", "Gris", "Blanco"],
+        ["Rojo", "Gris", "Negro", "Amarillo", "Verde"],
+        ["Gris", "Negro", "Rojo", "Verde", "Amarillo"],
+        ["Blanco", "Negro", "Verde", "Amarillo", "Gris"]
+    ],
+    "SECUENCIA C": [
+        ["Blanco", "Amarillo", "Negro", "Rojo", "Verde"],
+        ["Negro", "Blanco", "Amarillo", "Gris", "Rojo"],
+        ["Gris", "Amarillo", "Verde", "Negro", "Rojo"],
+        ["Negro", "Amarillo", "Gris", "Verde", "Rojo"],
+        ["Verde", "Blanco", "Amarillo", "Gris", "Negro"],
+        ["Gris", "Amarillo", "Negro", "Blanco", "Rojo"],
+        ["Amarillo", "Blanco", "Rojo", "Gris", "Negro"],
+        ["Rojo", "Negro", "Verde", "Gris", "Blanco"],
+        ["Rojo", "Amarillo", "Gris", "Negro", "Verde"],
+        ["Blanco", "Verde", "Amarillo", "Gris", "Negro"],
+        ["Amarillo", "Gris", "Negro", "Rojo", "Blanco"],
+        ["Rojo", "Gris", "Blanco", "Amarillo", "Negro"],
+        ["Blanco", "Gris", "Verde", "Rojo", "Negro"],
+        ["Amarillo", "Blanco", "Negro", "Verde", "Gris"],
+        ["Gris", "Negro", "Amarillo", "Blanco", "Rojo"],
+        ["Blanco", "Negro", "Amarillo", "Verde", "Gris"],
+        ["Negro", "Verde", "Blanco", "Gris", "Amarillo"],
+        ["Amarillo", "Negro", "Gris", "Blanco", "Verde"],
+        ["Negro", "Blanco", "Verde", "Rojo", "Gris"],
+        ["Negro", "Verde", "Gris", "Rojo", "Amarillo"],
+        ["Blanco", "Negro", "Amarillo", "Rojo", "Verde"],
+        ["Verde", "Blanco", "Negro", "Gris", "Amarillo"],
+        ["Gris", "Negro", "Rojo", "Amarillo", "Blanco"],
+        ["Verde", "Rojo", "Negro", "Gris", "Blanco"],
+        ["Verde", "Amarillo", "Blanco", "Gris", "Rojo"],
+        ["Blanco", "Gris", "Verde", "Rojo", "Amarillo"],
+        ["Verde", "Gris", "Blanco", "Rojo", "Amarillo"],
+        ["Negro", "Amarillo", "Gris", "Rojo", "Blanco"],
+        ["Negro", "Rojo", "Amarillo", "Blanco", "Verde"],
+        ["Rojo", "Negro", "Gris", "Blanco", "Verde"],
+        ["Amarillo", "Rojo", "Verde", "Negro", "Gris"],
+        ["Verde", "Gris", "Negro", "Rojo", "Amarillo"],
+        ["Rojo", "Amarillo", "Gris", "Blanco", "Negro"],
+        ["Rojo", "Negro", "Amarillo", "Gris", "Verde"],
+        ["Verde", "Blanco", "Amarillo", "Negro", "Gris"],
+        ["Negro", "Blanco", "Rojo", "Gris", "Amarillo"],
+        ["Rojo", "Negro", "Gris", "Verde", "Amarillo"],
+        ["Rojo", "Amarillo", "Gris", "Verde", "Negro"],
+        ["Verde", "Rojo", "Gris", "Blanco", "Negro"],
+        ["Verde", "Blanco", "Negro", "Rojo", "Gris"],
+        ["Amarillo", "Negro", "Blanco", "Verde", "Gris"],
+        ["Verde", "Gris", "Rojo", "Blanco", "Negro"]
+    ],
+    "SECUENCIA D": [
+        ["Verde", "Amarillo", "Gris", "Negro", "Rojo"],
+        ["Amarillo", "Blanco", "Negro", "Verde", "Rojo"],
+        ["Verde", "Negro", "Gris", "Rojo", "Blanco"],
+        ["Amarillo", "Rojo", "Blanco", "Negro", "Gris"],
+        ["Verde", "Blanco", "Gris", "Negro", "Rojo"],
+        ["Negro", "Rojo", "Verde", "Gris", "Amarillo"],
+        ["Amarillo", "Gris", "Blanco", "Verde", "Negro"],
+        ["Blanco", "Negro", "Rojo", "Amarillo", "Gris"],
+        ["Rojo", "Amarillo", "Blanco", "Gris", "Negro"],
+        ["Blanco", "Verde", "Rojo", "Gris", "Negro"],
+        ["Negro", "Gris", "Rojo", "Verde", "Blanco"],
+        ["Amarillo", "Verde", "Blanco", "Gris", "Negro"],
+        ["Blanco", "Gris", "Negro", "Verde", "Rojo"],
+        ["Amarillo", "Negro", "Gris", "Verde", "Blanco"],
+        ["Rojo", "Negro", "Verde", "Amarillo", "Gris"],
+        ["Blanco", "Amarillo", "Gris", "Rojo", "Verde"],
+        ["Rojo", "Negro", "Gris", "Blanco", "Verde"],
+        ["Amarillo", "Negro", "Verde", "Gris", "Blanco"],
+        ["Blanco", "Negro", "Gris", "Rojo", "Amarillo"],
+        ["Rojo", "Amarillo", "Blanco", "Negro", "Gris"],
+        ["Verde", "Rojo", "Blanco", "Negro", "Amarillo"],
+        ["Verde", "Amarillo", "Gris", "Negro", "Rojo"],
+        ["Rojo", "Gris", "Amarillo", "Negro", "Blanco"],
+        ["Rojo", "Verde", "Negro", "Gris", "Blanco"],
+        ["Verde", "Blanco", "Rojo", "Negro", "Amarillo"],
+        ["Blanco", "Gris", "Verde", "Negro", "Amarillo"],
+        ["Verde", "Negro", "Amarillo", "Rojo", "Blanco"],
+        ["Gris", "Amarillo", "Rojo", "Blanco", "Verde"],
+        ["Gris", "Negro", "Rojo", "Amarillo", "Verde"],
+        ["Negro", "Amarillo", "Blanco", "Rojo", "Gris"],
+        ["Blanco", "Amarillo", "Verde", "Gris", "Negro"],
+        ["Negro", "Rojo", "Blanco", "Verde", "Amarillo"],
+        ["Rojo", "Gris", "Blanco", "Amarillo", "Verde"],
+        ["Blanco", "Amarillo", "Negro", "Verde", "Gris"],
+        ["Verde", "Amarillo", "Negro", "Blanco", "Gris"],
+        ["Amarillo", "Gris", "Verde", "Rojo", "Negro"],
+        ["Rojo", "Negro", "Amarillo", "Verde", "Gris"],
+        ["Negro", "Rojo", "Verde", "Blanco", "Amarillo"],
+        ["Negro", "Rojo", "Blanco", "Amarillo", "Gris"],
+        ["Verde", "Blanco", "Gris", "Amarillo", "Negro"],
+        ["Verde", "Amarillo", "Negro", "Gris", "Blanco"],
+        ["Blanco", "Negro", "Amarillo", "Rojo", "Gris"]
+    ],
+    "SECUENCIA E": [
+        ["Blanco", "Verde", "Negro", "Rojo", "Amarillo"],
+        ["Negro", "Blanco", "Amarillo", "Rojo", "Verde"],
+        ["Amarillo", "Rojo", "Negro", "Gris", "Verde"],
+        ["Negro", "Gris", "Blanco", "Rojo", "Verde"],
+        ["Verde", "Rojo", "Gris", "Amarillo", "Negro"],
+        ["Gris", "Amarillo", "Negro", "Rojo", "Blanco"],
+        ["Amarillo", "Rojo", "Verde", "Gris", "Blanco"],
+        ["Verde", "Blanco", "Rojo", "Gris", "Amarillo"],
+        ["Rojo", "Negro", "Amarillo", "Verde", "Blanco"],
+        ["Blanco", "Verde", "Rojo", "Negro", "Amarillo"],
+        ["Amarillo", "Gris", "Blanco", "Verde", "Rojo"],
+        ["Rojo", "Amarillo", "Gris", "Verde", "Negro"],
+        ["Blanco", "Rojo", "Negro", "Amarillo", "Gris"],
+        ["Amarillo", "Negro", "Rojo", "Blanco", "Gris"],
+        ["Gris", "Blanco", "Negro", "Rojo", "Amarillo"],
+        ["Blanco", "Gris", "Verde", "Rojo", "Negro"],
+        ["Negro", "Verde", "Blanco", "Amarillo", "Rojo"],
+        ["Amarillo", "Negro", "Gris", "Rojo", "Blanco"],
+        ["Negro", "Rojo", "Blanco", "Amarillo", "Verde"],
+        ["Negro", "Amarillo", "Gris", "Blanco", "Verde"],
+        ["Blanco", "Amarillo", "Negro", "Gris", "Verde"],
+        ["Verde", "Amarillo", "Blanco", "Rojo", "Negro"],
+        ["Gris", "Negro", "Blanco", "Amarillo", "Rojo"],
+        ["Verde", "Amarillo", "Gris", "Rojo", "Blanco"],
+        ["Verde", "Negro", "Gris", "Rojo", "Amarillo"],
+        ["Blanco", "Rojo", "Amarillo", "Verde", "Gris"],
+        ["Verde", "Gris", "Blanco", "Amarillo", "Negro"],
+        ["Negro", "Amarillo", "Gris", "Verde", "Rojo"],
+        ["Gris", "Amarillo", "Blanco", "Negro", "Verde"],
+        ["Rojo", "Amarillo", "Negro", "Gris", "Blanco"],
+        ["Amarillo", "Blanco", "Rojo", "Gris", "Verde"],
+        ["Negro", "Rojo", "Amarillo", "Gris", "Verde"],
+        ["Rojo", "Amarillo", "Verde", "Negro", "Blanco"],
+        ["Negro", "Rojo", "Verde", "Blanco", "Gris"],
+        ["Verde", "Blanco", "Amarillo", "Negro", "Rojo"],
+        ["Negro", "Blanco", "Rojo", "Gris", "Verde"],
+        ["Rojo", "Gris", "Verde", "Blanco", "Negro"],
+        ["Rojo", "Amarillo", "Negro", "Verde", "Blanco"],
+        ["Negro", "Rojo", "Blanco", "Amarillo", "Verde"],
+        ["Verde", "Blanco", "Gris", "Amarillo", "Rojo"],
+        ["Verde", "Amarillo", "Blanco", "Rojo", "Negro"],
+        ["Blanco", "Negro", "Amarillo", "Rojo", "Verde"]
+    ]
 }
 
 selected_sequence_id = "SECUENCIA A"
@@ -242,21 +445,20 @@ def get_equation_for_target(target, is_x=False):
             c = target + div_val
             return f"{c} - ({a} / {b})"
 
-# --- Canvas de Dibujo Vectorial para 5 Bloques Lego ---
+# --- Canvas de Dibujo Vectorial para 5 Bloques Lego con Color ---
 class LegoAssemblyWidget(QWidget):
     COLOR_MAP = {
-        "green":  QColor("#2E7D32"),
-        "red":    QColor("#D32F2F"),
-        "yellow": QColor("#FBC02D"),
-        "black":  QColor("#212121"),
-        "gray":   QColor("#757575"),
-        "white":  QColor("#ECEFF1"),
+        "verde":    QColor("#2E7D32"),
+        "rojo":     QColor("#D32F2F"),
+        "amarillo": QColor("#FBC02D"),
+        "negro":    QColor("#212121"),
+        "gris":     QColor("#757575"),
+        "blanco":   QColor("#ECEFF1"),
     }
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.pattern = []
-        # Tamaño ajustado para acomodar 5 bloques apilados
         self.setFixedSize(int(360 * font_size_multiplier), int(290 * font_size_multiplier))
 
     def set_pattern(self, pattern):
@@ -270,7 +472,6 @@ class LegoAssemblyWidget(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        # Dimensiones optimizadas para 5 piezas
         brick_w = 150 * (font_size_multiplier / 1.6)
         brick_h = 42 * (font_size_multiplier / 1.6)
         stud_r = 7 * (font_size_multiplier / 1.6)
@@ -281,7 +482,7 @@ class LegoAssemblyWidget(QWidget):
 
         for layer_idx, color_name in enumerate(self.pattern):
             fill_color = self.COLOR_MAP.get(color_name, QColor("gray"))
-            border_color = fill_color.darker(140) if color_name != "black" else QColor("#424242")
+            border_color = fill_color.darker(140) if color_name != "negro" else QColor("#424242")
 
             bx = center_x - (brick_w / 2)
             by = base_y - ((layer_idx + 1) * brick_h)
@@ -292,7 +493,7 @@ class LegoAssemblyWidget(QWidget):
             painter.drawRoundedRect(QRectF(bx, by, brick_w, brick_h), 4, 4)
 
             # Studs superiores
-            stud_brush = QBrush(fill_color.lighter(120) if color_name != "white" else QColor("#CFD8DC"))
+            stud_brush = QBrush(fill_color.lighter(120) if color_name != "blanco" else QColor("#CFD8DC"))
             painter.setBrush(stud_brush)
             for s in range(4):
                 sx = bx + 16 + s * (brick_w - 32) / 3
@@ -426,7 +627,6 @@ class startscreen(QWidget):
         self.message_label.setWordWrap(True)
         layout.addWidget(self.message_label)
         
-        # Etiqueta para avisar la secuencia al investigador
         self.seq_display_label = QLabel("")
         self.seq_display_label.setFont(alert_font)
         self.seq_display_label.setStyleSheet("color: #D32F2F;")
@@ -453,7 +653,6 @@ class startscreen(QWidget):
         global robot_process
         send_marker(f"Robot_Started_Waiting_30s_{selected_sequence_id}")
         
-        # Mostrar secuencia al investigador
         print("\n" + "#"*60)
         print(f"--> REGISTRO: UTILIZAR LA HOJA DE '{selected_sequence_id}' <--")
         print("#"*60 + "\n")
@@ -643,7 +842,6 @@ class assemblyscreen(QWidget):
         self.header_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.header_label)
 
-        # Canvas de bloques Lego
         self.lego_canvas = LegoAssemblyWidget(self)
         layout.addWidget(self.lego_canvas, alignment=Qt.AlignCenter)
 
