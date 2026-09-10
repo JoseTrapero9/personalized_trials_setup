@@ -175,24 +175,31 @@ def main():
             s.move_home(wait_time=5)
 
             # Going to first collection point
-            s.movej_up_collect_pt_1(wait_time=3)
-            s.move_down_collect_pt_1(wait_time=3)
+            s.move_left_up(wait_time=5)
+            wait_for_gui_signal()
+            s.move_left_down(wait_time=5)
             s.close_gripper()
-            s.movel_up_collect_pt_1(wait_time=2.5)
-
-            s.move_ramp_1_up(wait_time=4)
-            s.move_ramp_1_down(wait_time=2)
+            #going to the ramp
+            s.move_left_up(wait_time=5)
+            s.move_ramp_disposal_up(wait_time=2)
+            s.move_ramp_disposal_down(wait_time=3)
             s.open_gripper()
-            # skip the wait signal on the very first loop iteration
-            if i > 0:
-                wait_for_gui_signal()
-            s.move_ramp_1_up(wait_time=1.5)
 
+            s.move_home(wait_time=5)
+            
             # Going to second collection point
-            s.movej_up_collect_pt_2(wait_time=2)
-            s.move_down_collect_pt_2(wait_time=3)
+            s.move_right_up(wait_time=5)
+            wait_for_gui_signal()
+            s.move_right_down(wait_time=5)
             s.close_gripper()
-            s.movel_up_collect_pt_2(wait_time=2.5)
+            #going to the ramp
+            s.move_left_up(wait_time=5)
+            s.move_ramp_disposal_up(wait_time=2)
+            s.move_ramp_disposal_down(wait_time=3)
+            s.open_gripper()
+
+
+            
 
 
         # End of cycle  
