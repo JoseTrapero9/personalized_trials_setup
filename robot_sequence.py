@@ -201,10 +201,6 @@ def main():
             s.open_gripper()
             s.move_ramp_disposal_up(wait_time=2.5)
 
-
-            
-
-
         # End of cycle  
         s.move_home(wait_time=8)
 

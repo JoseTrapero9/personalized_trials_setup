@@ -2,3 +2,6 @@ subject,condition,difficulty,time_taken_s,correct,attempts,equation_x,equation_y
 1,manual,hard,14.991,False,0,(7 * 11) - 64,25 + 22 - 38,False
 1,manual,hard,15.01,False,0,5 - (22 / 11),15 + 14 - 28,False
 1,manual,hard,15.002,False,0,13 + 26 - 34,(7 * 9) - 56,False
+1,manual,hard,8.931,True,1,12 - (54 / 6),(9 * 3) - 12,False
+1,manual,hard,15.016,False,0,20 + 15 - 32,(7 * 7) - 47,False
+1,manual,hard,14.996,False,0,12 - (72 / 12),(4 * 11) - 38,False
