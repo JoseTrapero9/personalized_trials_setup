@@ -5,3 +5,5 @@ subject,condition,difficulty,time_taken_s,correct,attempts,equation_x,equation_y
 1,manual,hard,8.931,True,1,12 - (54 / 6),(9 * 3) - 12,False
 1,manual,hard,15.016,False,0,20 + 15 - 32,(7 * 7) - 47,False
 1,manual,hard,14.996,False,0,12 - (72 / 12),(4 * 11) - 38,False
+1,manual,hard,SECUENCIA C,14.991,False,1,18 + 15 - 26,29 + 13 - 37,False,
+1,manual,hard,SECUENCIA C,15.01,False,0,6 - (16 / 4),(10 * 7) - 59,False,
