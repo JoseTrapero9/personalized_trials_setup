@@ -87,7 +87,7 @@ class Scripter:
 
     def move_disposal_down(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [22.86, -77.21, 118.37, -130.53, -90.19, -156.14] 
+        degrees = [22.86, -78.30, 117.68, -128.76, -90.17, -156.16] 
         self._send_movel_degrees(degrees, delay=wait_time)
 
     def close(self):
@@ -117,22 +117,21 @@ def main():
     d = Dashboard()
     
     try:
-        # s.open_gripper()
-        # s.close_gripper()
-        # s.open_gripper()
+        s.open_gripper()
+        s.close_gripper()
+        s.open_gripper()
 
-        # # s.move_left_up(wait_time=2)
+        s.move_left_up(wait_time=8)
         # s.move_home(wait_time=8)
 
-        # s.move_left_up(wait_time=4)
-        # s.move_left_down(wait_time=2)
-        # s.close_gripper()
+        s.move_left_down(wait_time=2)
+        s.close_gripper()
+        s.move_left_up(wait_time=4)
         
-        s.move_disposal_up(wait_time=5.5)
-        s.move_home(wait_time=5.5)
+        # s.move_home(wait_time=5.5)
         
-        # s.move_disposal_down(wait_time=2)
-        # s.move_disposal_up(wait_time=2)
+        s.move_disposal_down(wait_time=2)
+        s.move_disposal_up(wait_time=8)
 
     finally:
         # closing streams

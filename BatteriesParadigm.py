@@ -20,23 +20,25 @@ from PyQt5.QtGui import QFont, QKeySequence, QPixmap
 from pylsl import StreamInfo, StreamOutlet
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
+audio_dir = os.path.join(base_dir, "audios")
 
-correct_audio = os.path.join(base_dir, "correct_answer.wav") 
-incorrect_audio = os.path.join(base_dir, "incorrect_answer.wav")
-alarm_audio = os.path.join(base_dir, "alarm_llm.wav")
+correct_audio = os.path.join(audio_dir, "correct_answer.wav") 
+incorrect_audio = os.path.join(audio_dir, "incorrect_answer.wav")
+alarm_audio = os.path.join(audio_dir, "alarm_llm.wav")
+
 if not os.path.exists(alarm_audio):
     alarm_audio = incorrect_audio
 
-mode_audio_haptic = os.path.join(base_dir, "AUDIO_HAPTIC_MODE.wav")
-mode_audio_only = os.path.join(base_dir, "AUDIOHELP_mode.wav")
-mode_haptic_only = os.path.join(base_dir, "HapticVest_Mode.wav")
-mode_robot_fast = os.path.join(base_dir, "ROBOT_FAST_MODE.wav")
-mode_robot_slow = os.path.join(base_dir, "ROBOT_SLOW_MODE.wav")
-mode_baseline = os.path.join(base_dir, "BASELINE_MODE.wav")
+mode_audio_haptic = os.path.join(audio_dir, "AUDIO_HAPTIC_MODE.wav")
+mode_audio_only = os.path.join(audio_dir, "AUDIOHELP_mode.wav")
+mode_haptic_only = os.path.join(audio_dir, "HapticVest_Mode.wav")
+mode_robot_fast = os.path.join(audio_dir, "ROBOT_FAST_MODE.wav")
+mode_robot_slow = os.path.join(audio_dir, "ROBOT_SLOW_MODE.wav")
+mode_baseline = os.path.join(audio_dir, "BASELINE_MODE.wav")
 
-container1_audio = os.path.join(base_dir, "CONTAINER1_ALERT.wav")
-container2_audio = os.path.join(base_dir, "CONTAINER2.wav")
-mistake_audio = os.path.join(base_dir, "MISTAKE_ALERT.wav")
+container1_audio = os.path.join(audio_dir, "CONTAINER1_ALERT.wav")
+container2_audio = os.path.join(audio_dir, "CONTAINER2.wav")
+mistake_audio = os.path.join(audio_dir, "MISTAKE_ALERT.wav")
 
 ROBOT_OWN_IP = "192.168.29.61"
 DIFFICULTY_PORT = 50001
@@ -157,7 +159,7 @@ def activate_haptic_vest():
     if haptic_loop is not None:
         asyncio.run_coroutine_threadsafe(trigger_vest_async(), haptic_loop)
 
-font_size_multiplier = 1.4
+font_size_multiplier = 1.8
 difficulty = "hard"
 subject_number = "1"
 current_condition = "training"
@@ -175,7 +177,7 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s14_no_llm_seq
                 else:
                     sequence.append(("text", int(row["param1"]), row["param2"]))
     else:
-        # Fallback sequence if file is missing
+        # fallback sequence if file is missing
         for i in range(1, 41):
             sequence.append(("text", random.choice([6, 7, 8, 9]), "Assemble accordingly"))
     return sequence
@@ -197,11 +199,11 @@ class setupscreen(QWidget):
         main_font = QFont("Helvetica", int(16 * font_size_multiplier))
         title_font = QFont("Helvetica", int(18 * font_size_multiplier), QFont.Bold)
         
-        self.title_label = QLabel("Configuración del Experimento")
+        self.title_label = QLabel("Experiment Configuration")
         self.title_label.setFont(title_font)
         layout.addWidget(self.title_label, alignment=Qt.AlignCenter)
         
-        self.subj_label = QLabel("Número de Sujeto:")
+        self.subj_label = QLabel("Subject Number:")
         self.subj_label.setFont(main_font)
         layout.addWidget(self.subj_label, alignment=Qt.AlignCenter)
         
@@ -212,7 +214,7 @@ class setupscreen(QWidget):
             self.subj_combo.addItem(str(i))
         layout.addWidget(self.subj_combo, alignment=Qt.AlignCenter)
         
-        self.cond_label = QLabel("Condición:")
+        self.cond_label = QLabel("Condition:")
         self.cond_label.setFont(main_font)
         layout.addWidget(self.cond_label, alignment=Qt.AlignCenter)
         
@@ -223,7 +225,7 @@ class setupscreen(QWidget):
         self.cond_combo.currentTextChanged.connect(self.on_condition_changed)
         layout.addWidget(self.cond_combo, alignment=Qt.AlignCenter)
         
-        self.scenario_group = QGroupBox("Seleccionar Escenarios (Solo Modo Manual)")
+        self.scenario_group = QGroupBox("Select Scenarios (Manual Mode Only)")
         self.scenario_group.setFont(main_font)
         scenario_layout = QGridLayout()
         
@@ -239,7 +241,7 @@ class setupscreen(QWidget):
         self.scenario_group.setEnabled(False)
         layout.addWidget(self.scenario_group, alignment=Qt.AlignCenter)
         
-        self.continue_button = QPushButton("Continuar")
+        self.continue_button = QPushButton("Continue")
         self.continue_button.setFont(main_font)
         self.continue_button.setFixedWidth(int(300 * font_size_multiplier))
         self.continue_button.setFixedHeight(int(60 * font_size_multiplier))
@@ -264,7 +266,7 @@ class setupscreen(QWidget):
             difficulty = "hard"
             active_scenarios_list = [sc for sc, cb in self.scenario_checkboxes.items() if cb.isChecked()]
             if not active_scenarios_list:
-                QMessageBox.warning(self, "Error", "Seleccione al menos un escenario en modo manual.")
+                QMessageBox.warning(self, "Error", "Please select at least one scenario in manual mode.")
                 return
         else:
             difficulty = "easy"
@@ -291,12 +293,12 @@ class startscreen(QWidget):
         button_font = QFont("Helvetica", int(18 * font_size_multiplier))
         timer_font = QFont("Helvetica", int(48 * font_size_multiplier), QFont.Bold)
         
-        intro_text = ("<b>Inicio del Paradigma</b><br><br>"
-                      "1. Toma las piezas del Contenedor I o II.<br>"
-                      "2. Observa el objetivo y ensámblalo según las reglas de color y ranura.<br>"
-                      "3. Dispones de <b>20 segundos</b> antes de que inicie la alarma.<br><br>"
-                      "Presiona <b>F13</b> para Punto 1 (Izquierda)<br>"
-                      "Presiona <b>F14</b> para Punto 2 (Derecha)")
+        intro_text = ("<b>Paradigm Start</b><br><br>"
+                      "1. Retrieve parts from Container I or II.<br>"
+                      "2. Observe the objective and assemble according to color and slot rules.<br>"
+                      "3. You have <b>25 seconds</b> before the alarm triggers.<br><br>"
+                      "Press <b>F13</b> for Point 1 (Left)<br>"
+                      "Press <b>F14</b> for Point 2 (Right)")
         
         self.message_label = QLabel(intro_text)
         self.message_label.setFont(main_font)
@@ -310,7 +312,7 @@ class startscreen(QWidget):
         self.countdown_label.hide()
         layout.addWidget(self.countdown_label)
 
-        self.start_button = QPushButton("Comenzar Paradigma")
+        self.start_button = QPushButton("Start Paradigm")
         self.start_button.setFont(button_font)
         self.start_button.setFixedWidth(int(300 * font_size_multiplier))
         self.start_button.setFixedHeight(int(70 * font_size_multiplier))
@@ -330,7 +332,7 @@ class startscreen(QWidget):
         )
         
         self.start_button.hide()
-        self.message_label.setText("Preparando los componentes experimentales...")
+        self.message_label.setText("Preparing experimental components...")
         self.countdown_label.setText(f"{self.ticks_left} s")
         self.countdown_label.show()
         self.timer.start(1000)
@@ -359,7 +361,7 @@ class restscreen(QWidget):
         main_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
         timer_font = QFont("Helvetica", int(60 * font_size_multiplier), QFont.Bold)
         
-        self.message_label = QLabel("¡Gran trabajo! Toma un breve descanso.<br><br>El siguiente escenario comenzará pronto.")
+        self.message_label = QLabel("Great job! Take a short break.<br><br>The next scenario will start soon.")
         self.message_label.setFont(main_font)
         self.message_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.message_label)
@@ -399,12 +401,12 @@ class longrestscreen(QWidget):
         main_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
         button_font = QFont("Helvetica", int(18 * font_size_multiplier))
         
-        self.message_label = QLabel("Has completado un bloque de 3 escenarios.<br><br>Toma un descanso más largo.<br>Presiona el botón cuando estés listo para continuar.")
+        self.message_label = QLabel("You have completed a block of 3 scenarios.<br><br>Please take a longer break.<br>Press the button when you are ready to continue.")
         self.message_label.setFont(main_font)
         self.message_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.message_label)
         
-        self.resume_button = QPushButton("Continuar Mediciones")
+        self.resume_button = QPushButton("Continue Measurements")
         self.resume_button.setFont(button_font)
         self.resume_button.setFixedWidth(int(400 * font_size_multiplier))
         self.resume_button.setFixedHeight(int(80 * font_size_multiplier))
@@ -425,7 +427,7 @@ class retrievalscreen(QWidget):
         super().__init__()
         self.finish_callback = finish_callback
         self.get_scenario_cb = get_scenario_cb
-        self.ticks_left = 20
+        self.ticks_left = 25
         self.container_toggle = True
         
         self.timer = QTimer(self)
@@ -445,7 +447,7 @@ class retrievalscreen(QWidget):
         self.instruction_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.instruction_label)
 
-        self.timer_label = QLabel("20 s")
+        self.timer_label = QLabel("25 s")
         self.timer_label.setFont(timer_font)
         self.timer_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.timer_label)
@@ -455,7 +457,7 @@ class retrievalscreen(QWidget):
     def start_retrieval(self):
         self.ticks_left = 20
         target_container = "I" if self.container_toggle else "II"
-        self.instruction_label.setText(f"Toma las piezas del <b>Contenedor {target_container}</b>")
+        self.instruction_label.setText(f"Retrieve the parts from <b>Container {target_container}</b>")
         self.timer_label.setText(f"{self.ticks_left} s")
 
         current_scenario = self.get_scenario_cb()
@@ -498,7 +500,7 @@ class workpiecetaskscreen(QWidget):
         main_layout = QHBoxLayout()
         main_layout.setSpacing(int(20 * font_size_multiplier))
         
-        # Left Panel (Task Content & Counter)
+        # left panel (task content & counter)
         self.left_panel = QFrame()
         self.left_panel.setFrameShape(QFrame.StyledPanel)
         self.left_panel.setStyleSheet("background-color: white; border-radius: 8px;")
@@ -514,7 +516,7 @@ class workpiecetaskscreen(QWidget):
         self.header_label.setFont(title_font)
         left_layout.addWidget(self.header_label, alignment=Qt.AlignCenter)
 
-        self.timer_label = QLabel("20 s")
+        self.timer_label = QLabel("25 s")
         self.timer_label.setFont(timer_font)
         left_layout.addWidget(self.timer_label, alignment=Qt.AlignCenter)
 
@@ -533,7 +535,7 @@ class workpiecetaskscreen(QWidget):
         self.handover_label.setAlignment(Qt.AlignCenter)
         left_layout.addWidget(self.handover_label, alignment=Qt.AlignCenter)
 
-        # Right Panel (Rules)
+        # right panel (rules)
         self.right_panel = QFrame()
         self.right_panel.setFrameShape(QFrame.StyledPanel)
         self.right_panel.setStyleSheet("background-color: #FAFAFA; border-radius: 8px;")
@@ -564,7 +566,7 @@ class workpiecetaskscreen(QWidget):
         self.setLayout(main_layout)
 
     def start_task(self, trial_num, target_pt):
-        self.ticks_left = 20  # 20 seconds before alarm
+        self.ticks_left = 25  # 25 seconds before alarm
         self.alarm_triggered = False
         self.active_collection_pt = target_pt
         self.task_start_time = time.perf_counter()
@@ -586,12 +588,12 @@ class workpiecetaskscreen(QWidget):
             self.current_task_info = f"sum_{p1}_{p2}"
             self.instruction_label.setText(f"Sum must be {p1}\n{p2}")
 
-        pt_name = "Punto 1 (Izquierda)" if target_pt == 1 else "Punto 2 (Derecha)"
+        pt_name = "Point 1 (Left)" if target_pt == 1 else "Point 2 (Right)"
         key_hint = "F13" if target_pt == 1 else "F14"
 
         self.handover_label.setText(
-            f"Coloca la pieza en <b>{pt_name}</b>.<br>"
-            f"Presiona <b>{key_hint}</b> al finalizar."
+            f"Place the workpiece at <b>{pt_name}</b>.<br>"
+            f"Press <b>{key_hint}</b> upon completion."
         )
 
         self.timer_label.setStyleSheet("color: black;")
@@ -652,7 +654,7 @@ class workpiecetaskscreen(QWidget):
 class paradigmcontroller(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Paradigma de Ensamble y Colaboración")
+        self.setWindowTitle("Assembly and Collaboration Paradigm")
         self.current_trial = 0
         self.max_trials = 40
         
@@ -706,7 +708,7 @@ class paradigmcontroller(QWidget):
         random.shuffle(self.scenarios)
         
         print("\n" + "="*50)
-        print("ORDEN DE ESCENARIOS:")
+        print("SCENARIO ORDER:")
         for i, s in enumerate(self.scenarios):
             print(f"  {i+1}. {s.upper()}")
         print("="*50 + "\n")

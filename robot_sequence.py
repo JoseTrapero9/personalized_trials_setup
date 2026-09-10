@@ -36,10 +36,15 @@ class Scripter:
         self.send_command(cmd, delay)
 
     def _send_movec_degrees(self, degrees_list_1, degrees_list_2, a=0.90, v=0.90, delay=2.50):
-        # convert degrees to radians and send movej with two decimals
+        # convert degrees to radians
         radians_1 = [math.radians(deg) for deg in degrees_list_1]
         radians_2 = [math.radians(deg) for deg in degrees_list_2]
-        cmd = f"movec([{radians_1[0]:.2f}, {radians_1[1]:.2f}, {radians_1[2]:.2f}, {radians_1[3]:.2f}, {radians_1[4]:.2f}, {radians_1[5]:.2f}], a={a}, v={v})\n"
+        
+        # format joint vectors with two decimal places
+        wp1_str = ", ".join(f"{r:.2f}" for r in radians_1)
+        wp2_str = ", ".join(f"{r:.2f}" for r in radians_2)
+        
+        cmd = f"movec([{wp1_str}], [{wp2_str}], a={a}, v={v})\n"
         self.send_command(cmd, delay)
 
     def open_gripper(self):
@@ -54,90 +59,52 @@ class Scripter:
         # set digital output 0 to True
         self.send_command("set_tool_digital_out(0, True)\n", 0.5)
 
-
-    def move_down_collect_pt_1(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [90.18, -106.50, 146.41, -126.55, -91.51, -90.40]   
-        self._send_movel_degrees(degrees, delay=wait_time)
-
-    def movej_up_collect_pt_1(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [90.33, -120.05, 120.56, -87.16, -91.26, -90.78]   
-        self._send_movej_degrees(degrees, delay=wait_time)
-
-    def movel_up_collect_pt_1(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [90.33, -120.05, 120.56, -87.16, -91.26, -90.78]    
-        self._send_movel_degrees(degrees, delay=wait_time)
-
-
-    def move_down_collect_pt_2(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [114.18, -95, 138.4, -129.46, -90, -66.4] 
-        self._send_movel_degrees(degrees, delay=wait_time) 
-
-    def movel_up_collect_pt_2(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [114.28, -108.98, 119.48, -96.55, -89.75, -66.73]  
-        self._send_movel_degrees(degrees, delay=wait_time)
-
-    def movej_up_collect_pt_2(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [114.28, -108.98, 119.48, -96.55, -89.75, -66.73]     
-        self._send_movej_degrees(degrees, delay=wait_time)
-
-
-    def move_down_collect_pt_3(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [128.75, -83.96, 126.75, -128.84, -89.01, -51.85] 
-        self._send_movel_degrees(degrees, delay=wait_time)  
-
-    def movej_up_collect_pt_3(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [128.83, -97.30, 107.55, -96.28, -88.75, -52.20]  
-        self._send_movej_degrees(degrees, delay=wait_time)
-
-    def movel_up_collect_pt_3(self, wait_time: float = 2.00):
-        # define your down position in degrees
-        degrees = [128.83, -97.30, 107.55, -96.28, -88.75, -52.20]    
-        self._send_movel_degrees(degrees, delay=wait_time)
-       
     # Home position
     def move_home(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [143.85, -106.87, 116.87, -96.27, -87.73, -35.21] 
+        degrees = [112.76, -103.21, 114.67, -100.47, -86.53, -63.79] 
         self._send_movej_degrees(degrees, delay=wait_time) 
 
     # Collection movements
     def move_left_up(self, wait_time: float = 2.00):
-            # define your down position in degrees
-            degrees = [128.66, -50.45, 39.38, -77.93, -87.86, -51.88] 
-            self._send_movej_degrees(degrees, delay=wait_time)
+        # define your down position in degrees
+        degrees = [128.66, -50.45, 39.38, -77.93, -87.86, -51.88] 
+        self._send_movej_degrees(degrees, delay=wait_time)
+
+    def movel_left_up(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [128.66, -50.45, 39.38, -77.93, -87.86, -51.88] 
+        self._send_movel_degrees(degrees, delay=wait_time)
 
     def move_left_down(self, wait_time: float = 2.00):
-                # define your down position in degrees
-                degrees = [128.6, -46.09, 68.87, -111.79, -87.97, -51.47] 
-                self._send_movel_degrees(degrees, delay=wait_time)
+        # define your down position in degrees
+        degrees = [128.61, -46.97, 68.62, -111.26, -89.09, -50.83] 
+        self._send_movel_degrees(degrees, delay=wait_time)
 
     def move_right_up(self, wait_time: float = 2.00):
-            # define your down position in degrees
-            degrees = [157.98, -79.92, 90.30, -100.16, -87.56, -22.26] 
-            self._send_movej_degrees(degrees, delay=wait_time)
+        # define your down position in degrees
+        degrees = [157.98, -79.92, 90.30, -100.16, -87.56, -22.26] 
+        self._send_movej_degrees(degrees, delay=wait_time)
+
+    def movel_right_up(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [157.98, -79.92, 90.30, -100.16, -87.56, -22.26] 
+        self._send_movel_degrees(degrees, delay=wait_time)
 
     def move_right_down(self, wait_time: float = 2.00):
-            # define your down position in degrees
-            degrees = [157.92, -68.53, 107.44, -128.70, -87.78, -21.95] 
-            self._send_movel_degrees(degrees, delay=wait_time)
+        # define your down position in degrees
+        degrees = [158.14, -70.42, 106.62, -126.15, -87.63, -21.80] 
+        self._send_movel_degrees(degrees, delay=wait_time)
 
-    def move_ramp_disposal_up(self, wait_time: float = 2.00):
-            # define your down position in degrees
-            degrees = [181.08, -97.95, 99.50, -90.62, -89.51, 91.38] 
-            self._send_movej_degrees(degrees, delay=wait_time)
+    def move_disposal_up(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [22.80, -89.08, 103.10, -103.70, -89.89, -156.67] 
+        self._send_movej_degrees(degrees, delay=wait_time)
 
-    def move_ramp_disposal_down(self, wait_time: float = 2.00):
-            # define your down position in degrees
-            degrees = [181.04, -95.01, 114.02, -108.08, -89.59, 91.58] 
-            self._send_movel_degrees(degrees, delay=wait_time)
+    def move_disposal_down(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [22.86, -78.30, 117.68, -128.76, -90.17, -156.16] 
+        self._send_movel_degrees(degrees, delay=wait_time)
 
     def close(self):
         # clean up script socket
@@ -175,17 +142,18 @@ def main():
             s.move_home(wait_time=5)
 
             # Going to first collection point
-            s.move_left_up(wait_time=5)
+            s.move_left_up(wait_time=3)
             wait_for_gui_signal()
             s.move_left_down(wait_time=2.5)
             s.close_gripper()
-            #going to the ramp
-            s.move_left_up(wait_time=2.5)
-            s.move_ramp_disposal_up(wait_time=5)
-            s.move_ramp_disposal_down(wait_time=2.5)
-            
+            s.movel_left_up(wait_time=2.5)
+            s.move_home(wait_time=3)
+
+            # Going to bring back piece
+            s.move_disposal_up(wait_time=4)
+            s.move_disposal_down(wait_time=2.5)
             s.open_gripper()
-            s.move_ramp_disposal_up(wait_time=5)
+            s.move_disposal_up(wait_time=2)
 
             s.move_home(wait_time=5)
             
@@ -194,12 +162,14 @@ def main():
             wait_for_gui_signal()
             s.move_right_down(wait_time=2.5)
             s.close_gripper()
-            #going to the ramp
-            s.move_right_up(wait_time=2.5)
-            s.move_ramp_disposal_up(wait_time=4)
-            s.move_ramp_disposal_down(wait_time=2.5)
+            s.movel_right_up(wait_time=2.5)
+            s.move_home(wait_time=3)
+
+            # Going to bring back piece
+            s.move_disposal_up(wait_time=4)
+            s.move_disposal_down(wait_time=2.5)
             s.open_gripper()
-            s.move_ramp_disposal_up(wait_time=2.5)
+            s.move_disposal_up(wait_time=2)
 
         # End of cycle  
         s.move_home(wait_time=8)
