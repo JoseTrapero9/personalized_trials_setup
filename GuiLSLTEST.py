@@ -19,8 +19,8 @@ import soundfile as sf
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, 
                              QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QStackedWidget,
                              QShortcut, QComboBox, QGridLayout, QCheckBox, QGroupBox)
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QFont, QKeySequence
+from PyQt5.QtCore import Qt, QTimer, QRectF
+from PyQt5.QtGui import QFont, QKeySequence, QPainter, QBrush, QPen, QColor
 from pylsl import StreamInfo, StreamOutlet
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -169,6 +169,30 @@ current_condition = "training"
 active_scenarios_list = []
 robot_process = None
 
+# --- Generador de Secuencias Balanceadas de 5 piezas ---
+ALL_COLORS = ["green", "red", "yellow", "black", "gray", "white"]
+
+def generate_balanced_sequence(seed_val, total_trials=45):
+    rng = random.Random(seed_val)
+    sequence = []
+    for _ in range(total_trials):
+        # 5 colores únicos por combinación de 5 piezas
+        pattern = rng.sample(ALL_COLORS, 5)
+        sequence.append(pattern)
+    return sequence
+
+# 5 Secuencias Pre-programadas
+SEQUENCES_POOL = {
+    "SECUENCIA A": generate_balanced_sequence(101),
+    "SECUENCIA B": generate_balanced_sequence(202),
+    "SECUENCIA C": generate_balanced_sequence(303),
+    "SECUENCIA D": generate_balanced_sequence(404),
+    "SECUENCIA E": generate_balanced_sequence(505)
+}
+
+selected_sequence_id = "SECUENCIA A"
+selected_sequence_patterns = SEQUENCES_POOL["SECUENCIA A"]
+
 def get_equation_for_target(target, is_x=False):
     if difficulty == "easy":
         if is_x:
@@ -218,6 +242,63 @@ def get_equation_for_target(target, is_x=False):
             c = target + div_val
             return f"{c} - ({a} / {b})"
 
+# --- Canvas de Dibujo Vectorial para 5 Bloques Lego ---
+class LegoAssemblyWidget(QWidget):
+    COLOR_MAP = {
+        "green":  QColor("#2E7D32"),
+        "red":    QColor("#D32F2F"),
+        "yellow": QColor("#FBC02D"),
+        "black":  QColor("#212121"),
+        "gray":   QColor("#757575"),
+        "white":  QColor("#ECEFF1"),
+    }
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.pattern = []
+        # Tamaño ajustado para acomodar 5 bloques apilados
+        self.setFixedSize(int(360 * font_size_multiplier), int(290 * font_size_multiplier))
+
+    def set_pattern(self, pattern):
+        self.pattern = [c.lower() for c in pattern]
+        self.update()
+
+    def paintEvent(self, event):
+        if not self.pattern:
+            return
+
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # Dimensiones optimizadas para 5 piezas
+        brick_w = 150 * (font_size_multiplier / 1.6)
+        brick_h = 42 * (font_size_multiplier / 1.6)
+        stud_r = 7 * (font_size_multiplier / 1.6)
+        stud_h = 6 * (font_size_multiplier / 1.6)
+
+        center_x = self.width() / 2
+        base_y = self.height() - 20
+
+        for layer_idx, color_name in enumerate(self.pattern):
+            fill_color = self.COLOR_MAP.get(color_name, QColor("gray"))
+            border_color = fill_color.darker(140) if color_name != "black" else QColor("#424242")
+
+            bx = center_x - (brick_w / 2)
+            by = base_y - ((layer_idx + 1) * brick_h)
+
+            # Bloque rectangular
+            painter.setPen(QPen(border_color, 2))
+            painter.setBrush(QBrush(fill_color))
+            painter.drawRoundedRect(QRectF(bx, by, brick_w, brick_h), 4, 4)
+
+            # Studs superiores
+            stud_brush = QBrush(fill_color.lighter(120) if color_name != "white" else QColor("#CFD8DC"))
+            painter.setBrush(stud_brush)
+            for s in range(4):
+                sx = bx + 16 + s * (brick_w - 32) / 3
+                sy = by - stud_h
+                painter.drawRoundedRect(QRectF(sx - stud_r, sy, stud_r * 2, stud_h + 1), 2, 2)
+
 class setupscreen(QWidget):
     def __init__(self, switch_callback):
         super().__init__()
@@ -233,15 +314,13 @@ class setupscreen(QWidget):
         main_font = QFont("Helvetica", int(18 * font_size_multiplier))
         title_font = QFont("Helvetica", int(20 * font_size_multiplier), QFont.Bold)
         
-        self.title_label = QLabel("Experiment Configuration")
+        self.title_label = QLabel("Configuración del Experimento")
         self.title_label.setFont(title_font)
-        self.title_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.title_label)
+        layout.addWidget(self.title_label, alignment=Qt.AlignCenter)
         
-        self.subj_label = QLabel("Subject Number:")
+        self.subj_label = QLabel("Número de Sujeto:")
         self.subj_label.setFont(main_font)
-        self.subj_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.subj_label)
+        layout.addWidget(self.subj_label, alignment=Qt.AlignCenter)
         
         self.subj_combo = QComboBox()
         self.subj_combo.setFont(main_font)
@@ -250,10 +329,9 @@ class setupscreen(QWidget):
             self.subj_combo.addItem(str(i))
         layout.addWidget(self.subj_combo, alignment=Qt.AlignCenter)
         
-        self.cond_label = QLabel("Condition:")
+        self.cond_label = QLabel("Condición:")
         self.cond_label.setFont(main_font)
-        self.cond_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.cond_label)
+        layout.addWidget(self.cond_label, alignment=Qt.AlignCenter)
         
         self.cond_combo = QComboBox()
         self.cond_combo.setFont(main_font)
@@ -262,7 +340,7 @@ class setupscreen(QWidget):
         self.cond_combo.currentTextChanged.connect(self.on_condition_changed)
         layout.addWidget(self.cond_combo, alignment=Qt.AlignCenter)
         
-        self.scenario_group = QGroupBox("Select Scenarios (Manual Mode Only)")
+        self.scenario_group = QGroupBox("Seleccionar Escenarios (Solo Modo Manual)")
         self.scenario_group.setFont(main_font)
         scenario_layout = QGridLayout()
         
@@ -278,7 +356,7 @@ class setupscreen(QWidget):
         self.scenario_group.setEnabled(False)
         layout.addWidget(self.scenario_group, alignment=Qt.AlignCenter)
         
-        self.continue_button = QPushButton("continue")
+        self.continue_button = QPushButton("Continuar")
         self.continue_button.setFont(main_font)
         self.continue_button.setFixedWidth(int(300 * font_size_multiplier))
         self.continue_button.setFixedHeight(int(70 * font_size_multiplier))
@@ -291,10 +369,14 @@ class setupscreen(QWidget):
         self.scenario_group.setEnabled(text == "manual")
         
     def save_and_continue(self):
-        global difficulty, subject_number, current_condition, active_scenarios_list
+        global difficulty, subject_number, current_condition, active_scenarios_list, selected_sequence_id, selected_sequence_patterns
         
         subject_number = self.subj_combo.currentText()
         current_condition = self.cond_combo.currentText()
+        
+        # Selección aleatoria de una de las 5 secuencias preestablecidas
+        selected_sequence_id = random.choice(list(SEQUENCES_POOL.keys()))
+        selected_sequence_patterns = SEQUENCES_POOL[selected_sequence_id]
         
         if current_condition == "hard":
             difficulty = "hard"
@@ -303,13 +385,13 @@ class setupscreen(QWidget):
             difficulty = "hard"
             active_scenarios_list = [sc for sc, cb in self.scenario_checkboxes.items() if cb.isChecked()]
             if not active_scenarios_list:
-                QMessageBox.warning(self, "Error", "Please select at least one scenario for manual mode.")
+                QMessageBox.warning(self, "Error", "Seleccione al menos un escenario en modo manual.")
                 return
         else:
             difficulty = "easy"
             active_scenarios_list = ["baseline"]
             
-        send_marker(f"Setup_Complete_Subj_{subject_number}_Cond_{current_condition}_Diff_{difficulty}")
+        send_marker(f"Setup_Complete_Subj_{subject_number}_Cond_{current_condition}_Seq_{selected_sequence_id}")
         self.switch_callback()
 
 class startscreen(QWidget):
@@ -324,20 +406,19 @@ class startscreen(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(40 * font_size_multiplier))
+        layout.setSpacing(int(30 * font_size_multiplier))
         
         main_font = QFont("Helvetica", int(20 * font_size_multiplier))
         button_font = QFont("Helvetica", int(18 * font_size_multiplier))
         timer_font = QFont("Helvetica", int(48 * font_size_multiplier), QFont.Bold)
+        alert_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
         
-        intro_text = ("This is the start of the paradigm.<br><br>"
-                      "<b>Flow:</b><br>"
-                      "1. Pick the pieces from Container I or II (20s).<br>"
-                      "2. Calculate the coordinates from equations (15s).<br>"
-                      "3. Assemble the piece and place at designated collection position.<br><br>"
-                      "Press <b>F13</b> when placed at <b>Point 1 (Left)</b><br>"
-                      "Press <b>F14</b> when placed at <b>Point 2 (Right)</b><br>"
-                      "The robot will pick the piece up and dispose it on the ramp.")
+        intro_text = ("<b>Inicio del Paradigma</b><br><br>"
+                      "1. Toma las piezas del Contenedor I o II (20s).<br>"
+                      "2. Resuelve la ecuación en pantalla (15s).<br>"
+                      "3. Ensambla la figura de 5 piezas Lego mostrada.<br><br>"
+                      "Presiona <b>F13</b> para Punto 1 (Izquierda)<br>"
+                      "Presiona <b>F14</b> para Punto 2 (Derecha)")
         
         self.message_label = QLabel(intro_text)
         self.message_label.setFont(main_font)
@@ -345,13 +426,21 @@ class startscreen(QWidget):
         self.message_label.setWordWrap(True)
         layout.addWidget(self.message_label)
         
+        # Etiqueta para avisar la secuencia al investigador
+        self.seq_display_label = QLabel("")
+        self.seq_display_label.setFont(alert_font)
+        self.seq_display_label.setStyleSheet("color: #D32F2F;")
+        self.seq_display_label.setAlignment(Qt.AlignCenter)
+        self.seq_display_label.hide()
+        layout.addWidget(self.seq_display_label)
+        
         self.countdown_label = QLabel("")
         self.countdown_label.setFont(timer_font)
         self.countdown_label.setAlignment(Qt.AlignCenter)
         self.countdown_label.hide()
         layout.addWidget(self.countdown_label)
 
-        self.start_button = QPushButton("begin paradigm")
+        self.start_button = QPushButton("Comenzar Paradigma")
         self.start_button.setFont(button_font)
         self.start_button.setFixedWidth(int(300 * font_size_multiplier))
         self.start_button.setFixedHeight(int(70 * font_size_multiplier))
@@ -362,7 +451,15 @@ class startscreen(QWidget):
         
     def on_start_clicked(self):
         global robot_process
-        send_marker("Robot_Started_Waiting_30s")
+        send_marker(f"Robot_Started_Waiting_30s_{selected_sequence_id}")
+        
+        # Mostrar secuencia al investigador
+        print("\n" + "#"*60)
+        print(f"--> REGISTRO: UTILIZAR LA HOJA DE '{selected_sequence_id}' <--")
+        print("#"*60 + "\n")
+        
+        self.seq_display_label.setText(f"HOJA DE REGISTRO: {selected_sequence_id}")
+        self.seq_display_label.show()
         
         robot_process = subprocess.Popen(
             [sys.executable, "robot_sequence.py"],
@@ -371,7 +468,7 @@ class startscreen(QWidget):
         )
         
         self.start_button.hide()
-        self.message_label.setText("Preparing experimental sequence.<br><br>Please wait for the retrieval phase.")
+        self.message_label.setText("Preparando los componentes experimentales...<br>Anota la secuencia en tu hoja de registro.")
         self.countdown_label.setText(f"{self.ticks_left} s")
         self.countdown_label.show()
         self.timer.start(1000)
@@ -400,7 +497,7 @@ class restscreen(QWidget):
         main_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
         timer_font = QFont("Helvetica", int(60 * font_size_multiplier), QFont.Bold)
         
-        self.message_label = QLabel("Great job! Please take a quick rest.<br><br>The next scenario will begin shortly.")
+        self.message_label = QLabel("¡Gran trabajo! Toma un breve descanso.<br><br>El siguiente escenario comenzará pronto.")
         self.message_label.setFont(main_font)
         self.message_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.message_label)
@@ -440,12 +537,12 @@ class longrestscreen(QWidget):
         main_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
         button_font = QFont("Helvetica", int(18 * font_size_multiplier))
         
-        self.message_label = QLabel("You have completed 3 scenarios.<br><br>Please take a longer rest.<br>Press the button below when ready to continue.")
+        self.message_label = QLabel("Has completado un bloque de 3 escenarios.<br><br>Toma un descanso más largo.<br>Presiona el botón cuando estés listo para continuar.")
         self.message_label.setFont(main_font)
         self.message_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.message_label)
         
-        self.resume_button = QPushButton("Continue Measurements")
+        self.resume_button = QPushButton("Continuar Mediciones")
         self.resume_button.setFont(button_font)
         self.resume_button.setFixedWidth(int(400 * font_size_multiplier))
         self.resume_button.setFixedHeight(int(80 * font_size_multiplier))
@@ -496,7 +593,7 @@ class retrievalscreen(QWidget):
     def start_retrieval(self):
         self.ticks_left = 20
         target_container = "I" if self.container_toggle else "II"
-        self.instruction_label.setText(f"Please pick the pieces from <b>Container {target_container}</b>")
+        self.instruction_label.setText(f"Toma las piezas del <b>Contenedor {target_container}</b>")
         self.timer_label.setText(f"{self.ticks_left} s")
 
         current_scenario = self.get_scenario_cb()
@@ -535,22 +632,20 @@ class assemblyscreen(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(25 * font_size_multiplier))
+        layout.setSpacing(int(15 * font_size_multiplier))
 
-        header_font = QFont("Helvetica", int(26 * font_size_multiplier), QFont.Bold)
-        label_font = QFont("Helvetica", int(20 * font_size_multiplier))
-        timer_font = QFont("Helvetica", int(60 * font_size_multiplier), QFont.Bold)
+        header_font = QFont("Helvetica", int(22 * font_size_multiplier), QFont.Bold)
+        label_font = QFont("Helvetica", int(18 * font_size_multiplier))
+        timer_font = QFont("Helvetica", int(45 * font_size_multiplier), QFont.Bold)
 
-        self.header_label = QLabel("Building Part")
+        self.header_label = QLabel("Ensamblar Pieza (5 Bloques)")
         self.header_label.setFont(header_font)
         self.header_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.header_label)
 
-        self.graphic_box = QLabel("[ Graphic representation of assembled piece ]\n\nAssemble the piece now.")
-        self.graphic_box.setFont(label_font)
-        self.graphic_box.setAlignment(Qt.AlignCenter)
-        self.graphic_box.setStyleSheet("border: 2px dashed gray; padding: 25px;")
-        layout.addWidget(self.graphic_box)
+        # Canvas de bloques Lego
+        self.lego_canvas = LegoAssemblyWidget(self)
+        layout.addWidget(self.lego_canvas, alignment=Qt.AlignCenter)
 
         self.pt_label = QLabel("")
         self.pt_label.setFont(label_font)
@@ -564,10 +659,12 @@ class assemblyscreen(QWidget):
 
         self.setLayout(layout)
 
-    def start_assembly(self, target_pt):
+    def start_assembly(self, target_pt, pattern):
         self.active_collection_pt = target_pt
         self.alarm_triggered = False
         
+        self.lego_canvas.set_pattern(pattern)
+
         scenario = self.get_scenario_cb()
         if scenario == "robot_fast":
             self.ticks_left = 8
@@ -576,16 +673,16 @@ class assemblyscreen(QWidget):
         else:
             self.ticks_left = 10
 
-        pt_name = "Point 1 (Left)" if self.active_collection_pt == 1 else "Point 2 (Right)"
+        pt_name = "Punto 1 (Izquierda)" if self.active_collection_pt == 1 else "Punto 2 (Derecha)"
         key_hint = "F13" if self.active_collection_pt == 1 else "F14"
 
         self.pt_label.setText(
-            f"Deliver the assembly to <b>{pt_name}</b>.<br><br>"
-            f"Press <b>{key_hint}</b> to signal the robot to pick it up."
+            f"Coloca la pieza en <b>{pt_name}</b>.<br>"
+            f"Presiona <b>{key_hint}</b> para indicar al robot que la recoja."
         )
         self.timer_label.setStyleSheet("color: black;")
         self.timer_label.setText(f"{self.ticks_left} s")
-        send_marker(f"Assembly_Phase_Started_TargetPt_{self.active_collection_pt}_Limit_{self.ticks_left}s")
+        send_marker(f"Assembly_Phase_Started_TargetPt_{self.active_collection_pt}_Pattern_{'-'.join(pattern)}")
         self.timer.start(1000)
 
     def timer_tick(self):
@@ -601,7 +698,6 @@ class assemblyscreen(QWidget):
             self.timer_label.setText(f"{self.ticks_left} s")
 
     def handover_received(self, point_pressed):
-        # Only accept the key corresponding to the current target point
         if self.active_collection_pt is None or point_pressed != self.active_collection_pt:
             return
         
@@ -653,7 +749,7 @@ class coordinatechallengeapp(QWidget):
         title_font = QFont("Helvetica", int(20 * font_size_multiplier), QFont.Bold)
         time_value_font = QFont("Helvetica", int(90 * font_size_multiplier), QFont.Bold)
         
-        self.instructions_label = QLabel("calculate coordinates (1 to 16) to place the piece.")
+        self.instructions_label = QLabel("Calcula las coordenadas (1 a 16).")
         self.instructions_label.setFont(title_font)
         self.instructions_label.setAlignment(Qt.AlignCenter)
         center_layout.addWidget(self.instructions_label)
@@ -666,7 +762,7 @@ class coordinatechallengeapp(QWidget):
         self.x_entry = QLineEdit()
         self.x_entry.setFont(main_font)
         self.x_entry.setAlignment(Qt.AlignCenter)
-        self.x_entry.setPlaceholderText("x coordinate")
+        self.x_entry.setPlaceholderText("Coordenada X")
         self.x_entry.setFixedWidth(int(250 * font_size_multiplier))
         self.x_entry.setFixedHeight(int(50 * font_size_multiplier))
         center_layout.addWidget(self.x_entry, alignment=Qt.AlignCenter)
@@ -679,7 +775,7 @@ class coordinatechallengeapp(QWidget):
         self.y_entry = QLineEdit()
         self.y_entry.setFont(main_font)
         self.y_entry.setAlignment(Qt.AlignCenter)
-        self.y_entry.setPlaceholderText("y coordinate")
+        self.y_entry.setPlaceholderText("Coordenada Y")
         self.y_entry.setFixedWidth(int(250 * font_size_multiplier))
         self.y_entry.setFixedHeight(int(50 * font_size_multiplier))
         center_layout.addWidget(self.y_entry, alignment=Qt.AlignCenter)
@@ -690,14 +786,14 @@ class coordinatechallengeapp(QWidget):
         self.status_label.setStyleSheet("color: red;")
         center_layout.addWidget(self.status_label)
         
-        self.submit_button = QPushButton("submit placement")
+        self.submit_button = QPushButton("Comprobar")
         self.submit_button.setFont(main_font)
         self.submit_button.setFixedWidth(int(250 * font_size_multiplier))
         self.submit_button.setFixedHeight(int(60 * font_size_multiplier))
         self.submit_button.clicked.connect(self.check_answer)
         center_layout.addWidget(self.submit_button, alignment=Qt.AlignCenter)
         
-        self.timer_text_label = QLabel("time remaining:")
+        self.timer_text_label = QLabel("Tiempo restante:")
         self.timer_text_label.setFont(title_font)
         self.timer_text_label.setAlignment(Qt.AlignCenter)
         center_layout.addWidget(self.timer_text_label)
@@ -709,7 +805,7 @@ class coordinatechallengeapp(QWidget):
         
         master_layout.addWidget(center_widget, 0, 1, alignment=Qt.AlignCenter)
         
-        self.exit_button = QPushButton("exit paradigm")
+        self.exit_button = QPushButton("Salir")
         self.exit_button.setFont(main_font)
         self.exit_button.setFixedWidth(int(250 * font_size_multiplier))
         self.exit_button.setFixedHeight(int(60 * font_size_multiplier))
@@ -722,7 +818,7 @@ class coordinatechallengeapp(QWidget):
         
         self.setLayout(master_layout)
         
-    def save_to_csv(self, time_taken, is_correct):
+    def save_to_csv(self, time_taken, is_correct, current_pattern_str=""):
         log_dir = os.path.join(base_dir, "logs")
         os.makedirs(log_dir, exist_ok=True)
         
@@ -739,8 +835,8 @@ class coordinatechallengeapp(QWidget):
         with open(filepath, mode='a', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             if not file_exists:
-                writer.writerow(["subject", "condition", "difficulty", "time_taken_s", "correct", "attempts", "equation_x", "equation_y", "is_fake_error"])
-            writer.writerow([subject_number, current_condition, difficulty, round(time_taken, 3), is_correct, self.attempts, self.current_eq_x, self.current_eq_y, self.is_fake_error_trial])
+                writer.writerow(["subject", "condition", "difficulty", "sequence_id", "time_taken_s", "correct", "attempts", "equation_x", "equation_y", "is_fake_error", "lego_pattern"])
+            writer.writerow([subject_number, current_condition, difficulty, selected_sequence_id, round(time_taken, 3), is_correct, self.attempts, self.current_eq_x, self.current_eq_y, self.is_fake_error_trial, current_pattern_str])
 
     def play_feedback_audio(self, is_correct):
         audio_file = correct_audio if is_correct else incorrect_audio
@@ -758,8 +854,8 @@ class coordinatechallengeapp(QWidget):
         eq_x = get_equation_for_target(self.target_x, is_x=True)
         eq_y = get_equation_for_target(self.target_y, is_x=False)
         
-        self.x_equation_label.setText(f"x equation:  {eq_x}")
-        self.y_equation_label.setText(f"y equation:  {eq_y}")
+        self.x_equation_label.setText(f"Ecuación X:  {eq_x}")
+        self.y_equation_label.setText(f"Ecuación Y:  {eq_y}")
         self.x_entry.clear()
         self.y_entry.clear()
         self.status_label.setText("")
@@ -837,7 +933,7 @@ class coordinatechallengeapp(QWidget):
             
             if not (1 <= user_x <= 16) or not (1 <= user_y <= 16):
                 send_marker("MathTask_InvalidBounds")
-                self.status_label.setText("coordinates must be between 1 and 16.")
+                self.status_label.setText("Coordenadas deben ser entre 1 y 16.")
                 return
                 
             self.attempts += 1
@@ -845,7 +941,7 @@ class coordinatechallengeapp(QWidget):
             if user_x == self.target_x and user_y == self.target_y:
                 if self.is_fake_error_trial:
                     send_marker(f"MathTask_FakeIncorrect_Attempt_{self.attempts}")
-                    self.status_label.setText("incorrect, please try again.")
+                    self.status_label.setText("Incorrecto, intenta de nuevo.")
                     self.play_feedback_audio(is_correct=False)
                     return
                 
@@ -858,18 +954,18 @@ class coordinatechallengeapp(QWidget):
                 self.finish_callback()
             else:
                 send_marker(f"MathTask_Incorrect_Attempt_{self.attempts}")
-                self.status_label.setText("incorrect, please try again.")
+                self.status_label.setText("Incorrecto, intenta de nuevo.")
                 if difficulty == "hard":
                     self.play_feedback_audio(is_correct=False)
                 
         except ValueError:
             send_marker("MathTask_InvalidInput")
-            self.status_label.setText("invalid input, please enter integers.")
+            self.status_label.setText("Entrada inválida.")
 
 class paradigmcontroller(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("coordinate placement paradigm")
+        self.setWindowTitle("Paradigma de Ensamble y Colaboración")
         self.current_trial = 0
         self.max_trials = 10 
         
@@ -912,11 +1008,10 @@ class paradigmcontroller(QWidget):
         self.mistake_shortcut = QShortcut(QKeySequence("F12"), self)
         self.mistake_shortcut.activated.connect(self.trigger_mistake)
         
-        # Point 1 (Left) Trigger
+        # Puntos de recolección
         self.f13_shortcut = QShortcut(QKeySequence("F13"), self)
         self.f13_shortcut.activated.connect(lambda: self.assembly_screen.handover_received(1))
 
-        # Point 2 (Right) Trigger
         self.f14_shortcut = QShortcut(QKeySequence("F14"), self)
         self.f14_shortcut.activated.connect(lambda: self.assembly_screen.handover_received(2))
 
@@ -927,7 +1022,7 @@ class paradigmcontroller(QWidget):
         random.shuffle(self.scenarios)
         
         print("\n" + "="*50)
-        print("SCENARIO ORDER FOR THIS SESSION:")
+        print("ORDEN DE ESCENARIOS:")
         for i, s in enumerate(self.scenarios):
             print(f"  {i+1}. {s.upper()}")
         print("="*50 + "\n")
@@ -950,6 +1045,7 @@ class paradigmcontroller(QWidget):
     def master_timer_tick(self):
         self.scenario_active_seconds += 1
         
+        # 300 segundos = 5 minutos por escenario
         if self.scenario_active_seconds >= 300:
             if self.current_scenario_idx + 1 >= len(self.scenarios):
                 send_marker("Experiment_Complete_Time_Limit")
@@ -1028,16 +1124,20 @@ class paradigmcontroller(QWidget):
         self.stacked_widget.setCurrentIndex(3)
 
     def show_assembly_task(self):
-        # Alternates target point: Trial 1 -> Point 1 (Left), Trial 2 -> Point 2 (Right)
         target_pt = 1 if (self.current_trial % 2 != 0) else 2
-        self.assembly_screen.start_assembly(target_pt)
+
+        # Extrae el patrón balanceado de 5 bloques de la secuencia asignada
+        pattern_index = (self.current_trial - 1) % len(selected_sequence_patterns)
+        pattern = selected_sequence_patterns[pattern_index]
+
+        self.assembly_screen.start_assembly(target_pt, pattern)
         self.stacked_widget.setCurrentIndex(4)
 
     def on_handover_complete(self, point_pressed):
         global robot_process
         if robot_process is not None and robot_process.poll() is None:
             try:
-                # Transmit the point selected directly to robot stdin ('1\n' or '2\n')
+                # Escribe '1\n' o '2\n' directamente a stdin de robot_sequence.py
                 robot_process.stdin.write(f"{point_pressed}\n")
                 robot_process.stdin.flush()
             except Exception:
@@ -1074,7 +1174,7 @@ def run_paradigm():
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(cleanup_resources)
     
-    audio_sys.setup_devices(participant_keyword="Realtek", researcher_keyword="Realtek")
+    audio_sys.setup_devices(participant_keyword="Beats", researcher_keyword="Realtek")
     
     controller = paradigmcontroller()
     
