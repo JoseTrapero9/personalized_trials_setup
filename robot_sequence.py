@@ -172,11 +172,12 @@ def main():
             s.move_pickup_empty_piece_up(wait_time=2)
             s.move_pickup_empty_piece_down(wait_time=2)
             s.close_gripper()
-            s.move_return_empty_piece_up(wait_time=5)
-            s.move_pickup_empty_piece_down(wait_time=2)
-            s.open_gripper()
-            s.move_return_empty_piece_up(wait_time=5)
+            s.move_pickup_empty_piece_up(wait_time=2)
 
+            s.move_return_empty_piece_up(wait_time=8)
+            s.move_return_empty_piece_down(wait_time=5)
+            s.open_gripper()
+            s.move_return_empty_piece_up(wait_time=2)
             s.move_home(wait_time=5)
             
             # Going to second collection point
@@ -195,10 +196,12 @@ def main():
             s.move_pickup_empty_piece_up(wait_time=2)
             s.move_pickup_empty_piece_down(wait_time=2)
             s.close_gripper()
-            s.move_return_empty_piece_up(wait_time=5)
-            s.move_pickup_empty_piece_down(wait_time=2)
+            s.move_pickup_empty_piece_up(wait_time=2)
+
+            s.move_return_empty_piece_up(wait_time=8)
+            s.move_return_empty_piece_down(wait_time=5)
             s.open_gripper()
-            s.move_return_empty_piece_up(wait_time=5)
+            s.move_return_empty_piece_up(wait_time=2)
             
 
         # End of cycle  
