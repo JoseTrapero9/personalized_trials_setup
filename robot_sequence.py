@@ -98,12 +98,12 @@ class Scripter:
 
     def move_disposal_up(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [22.80, -89.08, 103.10, -103.70, -89.89, -156.67] 
+        degrees = [10.21,-93.89,119.48,-114.19,-90.94,-170.21] 
         self._send_movej_degrees(degrees, delay=wait_time)
 
     def move_disposal_down(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [22.86, -78.30, 117.68, -128.76, -90.17, -156.16] 
+        degrees = [10.17,-85.72,127.29,-130.16,-91.10,-170.06] 
         self._send_movel_degrees(degrees, delay=wait_time)
     def move_return_empty_piece_down(self, wait_time: float = 2.00):
         # define your down position in degrees
@@ -152,10 +152,9 @@ def main():
         s.open_gripper()
         s.close_gripper()
         s.open_gripper()
+        s.move_home(wait_time=5)
 
         for i in range(3):  # repeat the sequence 3 times
-            s.move_home(wait_time=5)
-
             # Going to first collection point
             s.move_left_up(wait_time=3)
             wait_for_gui_signal()
@@ -166,19 +165,19 @@ def main():
 
             # Going to bring back piece
             s.move_disposal_up(wait_time=5)
-            s.move_disposal_down(wait_time=2.5)
+            s.move_disposal_down(wait_time=2)
             s.open_gripper()
             s.move_disposal_up(wait_time=2)
             s.move_pickup_empty_piece_up(wait_time=2)
-            s.move_pickup_empty_piece_down(wait_time=2)
+            s.move_pickup_empty_piece_down(wait_time=1.8)
             s.close_gripper()
             s.move_pickup_empty_piece_up(wait_time=2)
 
-            s.move_return_empty_piece_up(wait_time=8)
-            s.move_return_empty_piece_down(wait_time=5)
+            s.move_return_empty_piece_up(wait_time=6)
+            s.move_return_empty_piece_down(wait_time=2)
             s.open_gripper()
             s.move_return_empty_piece_up(wait_time=2)
-            s.move_home(wait_time=5)
+            s.move_home(wait_time=2)
             
             # Going to second collection point
             s.move_right_up(wait_time=5)
@@ -189,19 +188,20 @@ def main():
             s.move_home(wait_time=3)
 
             # Going to bring back piece
-            s.move_disposal_up(wait_time=4)
-            s.move_disposal_down(wait_time=2.5)
+            s.move_disposal_up(wait_time=5)
+            s.move_disposal_down(wait_time=2)
             s.open_gripper()
             s.move_disposal_up(wait_time=2)
             s.move_pickup_empty_piece_up(wait_time=2)
-            s.move_pickup_empty_piece_down(wait_time=2)
+            s.move_pickup_empty_piece_down(wait_time=1.8)
             s.close_gripper()
             s.move_pickup_empty_piece_up(wait_time=2)
 
-            s.move_return_empty_piece_up(wait_time=8)
-            s.move_return_empty_piece_down(wait_time=5)
+            s.move_return_empty_piece_up(wait_time=6)
+            s.move_return_empty_piece_down(wait_time=2)
             s.open_gripper()
             s.move_return_empty_piece_up(wait_time=2)
+            s.move_home(wait_time=2)
             
 
         # End of cycle  
