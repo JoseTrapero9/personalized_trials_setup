@@ -140,7 +140,7 @@ async def init_haptics():
     print("bHaptics background connection established.")
 
 async def trigger_vest_async():
-    full_vest_pattern = [50] * 40
+    full_vest_pattern = [0] * 20 + [50] * 20
     await bhaptics_python.play_dot(0, 500, full_vest_pattern)
     
 async def close_haptics():

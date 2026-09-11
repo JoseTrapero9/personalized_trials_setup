@@ -9,3 +9,8 @@ subject,condition,difficulty,time_taken_s,correct,attempts,equation_x,equation_y
 1,manual,hard,SECUENCIA C,15.01,False,0,6 - (16 / 4),(10 * 7) - 59,False,
 1,manual,hard,sum_9_Assemble accordingly,40.067,1,True
 1,manual,hard,sum_7_Assemble accordingly,28.396,1,True
+1,manual,hard,sum_6_Assemble accordingly,28.801,1,True
+1,manual,hard,sum_9_Assemble accordingly,27.82,1,True
+1,manual,hard,sum_8_Assemble accordingly,30.479,2,True
+1,manual,hard,sum_6_Assemble accordingly,58.172,1,True
+1,manual,hard,sum_6_Assemble accordingly,29.948,2,True
