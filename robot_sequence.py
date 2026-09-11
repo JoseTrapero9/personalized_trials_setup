@@ -112,7 +112,7 @@ class Scripter:
     def move_return_empty_piece_up(self, wait_time: float = 2.00):
         # define your down position in degrees
         degrees = [129.6,-88.67 ,108.05 ,-108.22 ,-87.68 ,-51.06] 
-        self._send_movel_degrees(degrees, delay=wait_time)
+        self._send_movej_degrees(degrees, delay=wait_time)
     def move_pickup_empty_piece_down(self, wait_time: float = 2.00):
             # define your down position in degrees
             degrees = [23.95,-78.61 ,119.66 ,-129.85 ,-90.93,-156.41] 
@@ -120,7 +120,7 @@ class Scripter:
     def move_pickup_empty_piece_up(self, wait_time: float = 2.00):
              # define your down position in degrees
             degrees = [24.00,-88.49,108.69,-109.02,-90.73,-156.62] 
-            self._send_movel_degrees(degrees, delay=wait_time)
+            self._send_movej_degrees(degrees, delay=wait_time)
     def close(self):
         # clean up script socket
         self.sock.close()
@@ -169,6 +169,13 @@ def main():
             s.move_disposal_down(wait_time=2.5)
             s.open_gripper()
             s.move_disposal_up(wait_time=2)
+            s.move_pickup_empty_piece_up(wait_time=2)
+            s.move_pickup_empty_piece_down(wait_time=2)
+            s.close_gripper()
+            s.move_return_empty_piece_up(wait_time=5)
+            s.move_pickup_empty_piece_down(wait_time=2)
+            s.open_gripper()
+            s.move_return_empty_piece_up(wait_time=5)
 
             s.move_home(wait_time=5)
             
@@ -185,6 +192,14 @@ def main():
             s.move_disposal_down(wait_time=2.5)
             s.open_gripper()
             s.move_disposal_up(wait_time=2)
+            s.move_pickup_empty_piece_up(wait_time=2)
+            s.move_pickup_empty_piece_down(wait_time=2)
+            s.close_gripper()
+            s.move_return_empty_piece_up(wait_time=5)
+            s.move_pickup_empty_piece_down(wait_time=2)
+            s.open_gripper()
+            s.move_return_empty_piece_up(wait_time=5)
+            
 
         # End of cycle  
         s.move_home(wait_time=8)
