@@ -150,7 +150,7 @@ def main():
             s.move_home(wait_time=3)
 
             # Going to bring back piece
-            s.move_disposal_up(wait_time=4)
+            s.move_disposal_up(wait_time=5)
             s.move_disposal_down(wait_time=2.5)
             s.open_gripper()
             s.move_disposal_up(wait_time=2)

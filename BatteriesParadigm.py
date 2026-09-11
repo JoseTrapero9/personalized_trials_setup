@@ -279,7 +279,7 @@ class startscreen(QWidget):
     def __init__(self, switch_callback):
         super().__init__()
         self.switch_callback = switch_callback
-        self.ticks_left = 30
+        self.ticks_left = 20
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.timer_tick)
         self.init_ui()
@@ -323,7 +323,7 @@ class startscreen(QWidget):
         
     def on_start_clicked(self):
         global robot_process
-        send_marker("Robot_Started_Waiting_30s")
+        send_marker("Robot_Started_Waiting")
         
         robot_process = subprocess.Popen(
             [sys.executable, "robot_sequence.py"],
@@ -366,7 +366,7 @@ class restscreen(QWidget):
         self.message_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.message_label)
         
-        self.countdown_label = QLabel("30 s")
+        self.countdown_label = QLabel("20 s")
         self.countdown_label.setFont(timer_font)
         self.countdown_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.countdown_label)
@@ -374,7 +374,7 @@ class restscreen(QWidget):
         
     def start_rest(self):
         send_marker("Screen_Short_Rest_Started")
-        self.ticks_left = 30
+        self.ticks_left = 20
         self.countdown_label.setText(f"{self.ticks_left} s")
         self.timer.start(1000)
         
@@ -486,14 +486,21 @@ class workpiecetaskscreen(QWidget):
         self.finish_callback = finish_callback
         self.get_scenario_cb = get_scenario_cb
         
-        self.ticks_left = 20
+        self.ticks_left = 25
         self.alarm_triggered = False
         self.active_collection_pt = None
         self.task_start_time = 0.0
         self.current_task_info = ""
+        self.warn_visible = False
 
+        # main 1-second countdown timer
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.timer_tick)
+        
+        # 500 ms timer for blinking warning text
+        self.blink_timer = QTimer(self)
+        self.blink_timer.timeout.connect(self.toggle_warning_blink)
+        
         self.init_ui()
 
     def init_ui(self):
@@ -511,6 +518,7 @@ class workpiecetaskscreen(QWidget):
         title_font = QFont("Helvetica", int(22 * font_size_multiplier), QFont.Bold)
         body_font = QFont("Helvetica", int(18 * font_size_multiplier))
         timer_font = QFont("Helvetica", int(48 * font_size_multiplier), QFont.Bold)
+        warn_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
 
         self.header_label = QLabel("CURRENT WORKPIECE")
         self.header_label.setFont(title_font)
@@ -519,6 +527,14 @@ class workpiecetaskscreen(QWidget):
         self.timer_label = QLabel("25 s")
         self.timer_label.setFont(timer_font)
         left_layout.addWidget(self.timer_label, alignment=Qt.AlignCenter)
+
+        # blinking warning label
+        self.warning_label = QLabel("")
+        self.warning_label.setFont(warn_font)
+        self.warning_label.setStyleSheet("color: red;")
+        self.warning_label.setFixedHeight(int(35 * font_size_multiplier))
+        self.warning_label.setAlignment(Qt.AlignCenter)
+        left_layout.addWidget(self.warning_label, alignment=Qt.AlignCenter)
 
         self.image_label = QLabel()
         self.image_label.setAlignment(Qt.AlignCenter)
@@ -566,10 +582,11 @@ class workpiecetaskscreen(QWidget):
         self.setLayout(main_layout)
 
     def start_task(self, trial_num, target_pt):
-        self.ticks_left = 25  # 25 seconds before alarm
+        self.ticks_left = 25
         self.alarm_triggered = False
         self.active_collection_pt = target_pt
         self.task_start_time = time.perf_counter()
+        self.warn_visible = False
 
         idx = (trial_num - 1) % len(WORKPIECE_SEQUENCE)
         mode, p1, p2 = WORKPIECE_SEQUENCE[idx]
@@ -598,15 +615,33 @@ class workpiecetaskscreen(QWidget):
 
         self.timer_label.setStyleSheet("color: black;")
         self.timer_label.setText(f"{self.ticks_left} s")
+        self.warning_label.setText("")
+        self.blink_timer.stop()
         
         send_marker(f"Workpiece_Task_Started_Trial_{trial_num}_Type_{self.current_task_info}")
         self.timer.start(1000)
 
+    def toggle_warning_blink(self):
+        self.warn_visible = not self.warn_visible
+        self.warning_label.setText("WARNING - FINISH" if self.warn_visible else "")
+
     def timer_tick(self):
         self.ticks_left -= 1
+        
+        # switch to red and start blinking in the last 10 seconds
+        if 0 < self.ticks_left <= 10:
+            self.timer_label.setStyleSheet("color: red;")
+            if not self.blink_timer.isActive():
+                self.warn_visible = True
+                self.warning_label.setText("WARNING - FINISH")
+                self.blink_timer.start(250)
+        
         if self.ticks_left <= 0:
             self.timer_label.setText("0 s")
             self.timer_label.setStyleSheet("color: red;")
+            self.blink_timer.stop()
+            self.warning_label.setText("WARNING - FINISH")
+            
             if not self.alarm_triggered:
                 self.alarm_triggered = True
                 send_marker("Workpiece_Task_Overtime_Alarm_Started")
@@ -619,6 +654,9 @@ class workpiecetaskscreen(QWidget):
             return
 
         self.timer.stop()
+        self.blink_timer.stop()
+        self.warning_label.setText("")
+        
         elapsed = time.perf_counter() - self.task_start_time
 
         if self.alarm_triggered:
@@ -650,6 +688,7 @@ class workpiecetaskscreen(QWidget):
             if not file_exists:
                 writer.writerow(["subject", "condition", "difficulty", "task_info", "time_taken_s", "handover_point", "overtime_alarm"])
             writer.writerow([subject_number, current_condition, difficulty, self.current_task_info, round(elapsed, 3), point_pressed, self.alarm_triggered])
+
 
 class paradigmcontroller(QWidget):
     def __init__(self):
