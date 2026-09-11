@@ -14,7 +14,8 @@ import soundfile as sf
 
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, 
                              QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QStackedWidget,
-                             QShortcut, QComboBox, QGridLayout, QCheckBox, QGroupBox, QFrame)
+                             QShortcut, QComboBox, QGridLayout, QCheckBox, QGroupBox, QFrame,
+                             QListWidget, QAbstractItemView, QListWidgetItem)
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont, QKeySequence, QPixmap
 from pylsl import StreamInfo, StreamOutlet
@@ -188,7 +189,6 @@ class setupscreen(QWidget):
     def __init__(self, switch_callback):
         super().__init__()
         self.switch_callback = switch_callback
-        self.scenario_checkboxes = {}
         self.init_ui()
         
     def init_ui(self):
@@ -225,19 +225,27 @@ class setupscreen(QWidget):
         self.cond_combo.currentTextChanged.connect(self.on_condition_changed)
         layout.addWidget(self.cond_combo, alignment=Qt.AlignCenter)
         
-        self.scenario_group = QGroupBox("Select Scenarios (Manual Mode Only)")
+        # Scenario selection & ordering group
+        self.scenario_group = QGroupBox("Order Scenarios (Drag & Drop, Check to Include)")
         self.scenario_group.setFont(main_font)
-        scenario_layout = QGridLayout()
-        
+        group_layout = QVBoxLayout()
+
+        self.scenario_list_widget = QListWidget()
+        self.scenario_list_widget.setFont(main_font)
+        self.scenario_list_widget.setDragDropMode(QAbstractItemView.InternalMove)
+        self.scenario_list_widget.setDefaultDropAction(Qt.MoveAction)
+        self.scenario_list_widget.setFixedWidth(int(380 * font_size_multiplier))
+        self.scenario_list_widget.setFixedHeight(int(180 * font_size_multiplier))
+
         scenarios = ["audio", "haptic", "audio_haptic", "robot_fast", "robot_slow", "baseline"]
-        for i, sc in enumerate(scenarios):
-            cb = QCheckBox(sc)
-            cb.setFont(main_font)
-            cb.setChecked(True)
-            self.scenario_checkboxes[sc] = cb
-            scenario_layout.addWidget(cb, i // 2, i % 2)
-            
-        self.scenario_group.setLayout(scenario_layout)
+        for sc in scenarios:
+            item = QListWidgetItem(sc)
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsDragEnabled)
+            item.setCheckState(Qt.Checked)
+            self.scenario_list_widget.addItem(item)
+
+        group_layout.addWidget(self.scenario_list_widget)
+        self.scenario_group.setLayout(group_layout)
         self.scenario_group.setEnabled(False)
         layout.addWidget(self.scenario_group, alignment=Qt.AlignCenter)
         
@@ -264,7 +272,11 @@ class setupscreen(QWidget):
             active_scenarios_list = ["audio", "haptic", "audio_haptic", "robot_fast", "robot_slow", "baseline"]
         elif current_condition == "manual":
             difficulty = "hard"
-            active_scenarios_list = [sc for sc, cb in self.scenario_checkboxes.items() if cb.isChecked()]
+            active_scenarios_list = []
+            for i in range(self.scenario_list_widget.count()):
+                item = self.scenario_list_widget.item(i)
+                if item.checkState() == Qt.Checked:
+                    active_scenarios_list.append(item.text())
             if not active_scenarios_list:
                 QMessageBox.warning(self, "Error", "Please select at least one scenario in manual mode.")
                 return
@@ -751,7 +763,8 @@ class paradigmcontroller(QWidget):
         
     def setup_finished_callback(self):
         self.scenarios = active_scenarios_list.copy()
-        random.shuffle(self.scenarios)
+        if current_condition != "manual":
+            random.shuffle(self.scenarios)
         
         print("\n" + "="*50)
         print("SCENARIO ORDER:")
