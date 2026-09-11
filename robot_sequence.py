@@ -105,7 +105,22 @@ class Scripter:
         # define your down position in degrees
         degrees = [22.86, -78.30, 117.68, -128.76, -90.17, -156.16] 
         self._send_movel_degrees(degrees, delay=wait_time)
-
+    def move_return_empty_piece_down(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [129.55,-78.49 ,119.6 ,-129.96 ,-87.88 ,-50.84] 
+        self._send_movel_degrees(degrees, delay=wait_time)
+    def move_return_empty_piece_up(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [129.6,-88.67 ,108.05 ,-108.22 ,-87.68 ,-51.06] 
+        self._send_movel_degrees(degrees, delay=wait_time)
+    def move_pickup_empty_piece_down(self, wait_time: float = 2.00):
+            # define your down position in degrees
+            degrees = [23.95,-78.61 ,119.66 ,-129.85 ,-90.93,-156.41] 
+            self._send_movel_degrees(degrees, delay=wait_time)
+    def move_pickup_empty_piece_up(self, wait_time: float = 2.00):
+             # define your down position in degrees
+            degrees = [24.00,-88.49,108.69,-109.02,-90.73,-156.62] 
+            self._send_movel_degrees(degrees, delay=wait_time)
     def close(self):
         # clean up script socket
         self.sock.close()

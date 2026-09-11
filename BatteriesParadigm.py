@@ -582,7 +582,14 @@ class workpiecetaskscreen(QWidget):
         self.setLayout(main_layout)
 
     def start_task(self, trial_num, target_pt):
-        self.ticks_left = 25
+        scenario = self.get_scenario_cb()
+        if scenario == "robot_fast":
+            self.ticks_left = 20  # 25s - 3s
+        elif scenario == "robot_slow":
+            self.ticks_left = 30  # 25s + 3s
+        else:
+            self.ticks_left = 25
+
         self.alarm_triggered = False
         self.active_collection_pt = target_pt
         self.task_start_time = time.perf_counter()
