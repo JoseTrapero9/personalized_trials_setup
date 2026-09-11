@@ -11,9 +11,15 @@ outlet = StreamOutlet(info)
 cam = xiapi.Camera()
 cam.open_device()
 
-# set camera parameters
-cam.set_exposure(10000)
+# --- Hardware Image Quality Configuration ---
 cam.set_imgdataformat('XI_RGB24')
+
+# Values calibrated from your tuner
+cam.set_exposure(31000)
+cam.set_gain(8.0)
+cam.set_gammaY(0.47)
+cam.set_param('wb_kr', 1.00)
+cam.set_param('wb_kb', 1.90)
 
 # start data acquisition
 cam.start_acquisition()
@@ -41,35 +47,28 @@ display_frame_skip = 2
 loop_counter = 0
 
 try:
-    # begin the continuous capture loop
     while True:
-        # retrieve the latest image from the camera buffer
+        # retrieve the latest image directly
         cam.get_image(img)
         frame = img.get_image_data_numpy()
 
-        # extract the hardware frame number
+        # extract and push hardware frame number
         current_frame = img.nframe
-
-        # push the frame number to the lsl stream
         outlet.push_sample([current_frame])
 
-        # write the full resolution frame to the local video file
+        # Write and display the frame directly (identical to calibration tool)
         out.write(frame)
 
-        # update display at a reduced frame rate
         if loop_counter % display_frame_skip == 0:
-            # resize the frame for display purposes only
             display_frame = cv2.resize(frame, (0, 0), fx=display_scale, fy=display_scale)
             cv2.imshow('ximea stream', display_frame)
-        
+
         loop_counter += 1
 
-        # exit the loop if the 'q' key is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
 finally:
-    # release all hardware and software resources safely
     cam.stop_acquisition()
     cam.close_device()
     out.release()

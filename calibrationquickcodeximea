@@ -1,0 +1,83 @@
+import cv2
+from ximea import xiapi
+
+cam = xiapi.Camera()
+cam.open_device()
+cam.set_imgdataformat('XI_RGB24')
+
+# Initial baseline values
+cur_exp = 20000     # 20 ms
+cur_gain = 2.0      # 2 dB
+cur_kr = 1.4        # Red gain
+cur_kb = 1.0        # Blue gain
+
+cam.set_exposure(cur_exp)
+cam.set_gain(cur_gain)
+cam.set_gammaY(0.47)
+cam.set_param('wb_kr', cur_kr)
+cam.set_param('wb_kb', cur_kb)
+
+cam.start_acquisition()
+img = xiapi.Image()
+
+cv2.namedWindow('Tuner', cv2.WINDOW_NORMAL)
+cv2.resizeWindow('Tuner', 850, 500)
+
+def nothing(x):
+    pass
+
+cv2.createTrackbar('Red Gain (kr x10)', 'Tuner', int(cur_kr * 10), 35, nothing)
+cv2.createTrackbar('Blue Gain (kb x10)', 'Tuner', int(cur_kb * 10), 30, nothing)
+cv2.createTrackbar('Exposure (ms)', 'Tuner', int(cur_exp // 1000), 33, nothing)
+cv2.createTrackbar('Analog Gain (dB)', 'Tuner', int(cur_gain), 12, nothing)
+
+print("\n--- INSTRUCTIONS ---")
+print("Move sliders until the table and arm look natural.")
+print("Press 's' to print the final calibrated code.")
+print("Press 'q' to exit.\n")
+
+try:
+    while True:
+        new_kr = max(0.5, cv2.getTrackbarPos('Red Gain (kr x10)', 'Tuner') / 10.0)
+        new_kb = max(0.5, cv2.getTrackbarPos('Blue Gain (kb x10)', 'Tuner') / 10.0)
+        new_exp = max(1, cv2.getTrackbarPos('Exposure (ms)', 'Tuner')) * 1000
+        new_gain = float(cv2.getTrackbarPos('Analog Gain (dB)', 'Tuner'))
+
+        # Only update hardware registers when a slider actually changes
+        if (new_kr != cur_kr or new_kb != cur_kb or 
+            new_exp != cur_exp or new_gain != cur_gain):
+            
+            cur_kr, cur_kb = new_kr, new_kb
+            cur_exp, cur_gain = new_exp, new_gain
+
+            # Pause acquisition to prevent ERROR 40
+            cam.stop_acquisition()
+            cam.set_exposure(cur_exp)
+            cam.set_gain(cur_gain)
+            cam.set_param('wb_kr', cur_kr)
+            cam.set_param('wb_kb', cur_kb)
+            cam.start_acquisition()
+
+        cam.get_image(img)
+        frame = img.get_image_data_numpy()
+
+        display = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+        cv2.imshow('Tuner', display)
+
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('s'):
+            print("\n================ COPY INTO YOUR MAIN SCRIPT ================")
+            print(f"cam.set_exposure({cur_exp})")
+            print(f"cam.set_gain({cur_gain})")
+            print(f"cam.set_gammaY(0.47)")
+            print(f"cam.set_param('wb_kr', {cur_kr:.2f})")
+            print(f"cam.set_param('wb_kb', {cur_kb:.2f})")
+            print("============================================================\n")
+            break
+        elif key == ord('q'):
+            break
+
+finally:
+    cam.stop_acquisition()
+    cam.close_device()
+    cv2.destroyAllWindows()
