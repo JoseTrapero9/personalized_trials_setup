@@ -225,7 +225,7 @@ class setupscreen(QWidget):
         self.cond_combo.currentTextChanged.connect(self.on_condition_changed)
         layout.addWidget(self.cond_combo, alignment=Qt.AlignCenter)
         
-        # Scenario selection & ordering group
+        # scenario selection and ordering group
         self.scenario_group = QGroupBox("Order Scenarios (Drag & Drop, Check to Include)")
         self.scenario_group.setFont(main_font)
         group_layout = QVBoxLayout()
@@ -309,8 +309,7 @@ class startscreen(QWidget):
                       "1. Retrieve parts from Container I or II.<br>"
                       "2. Observe the objective and assemble according to color and slot rules.<br>"
                       "3. You have <b>25 seconds</b> before the alarm triggers.<br><br>"
-                      "Press <b>F13</b> for Point 1 (Left)<br>"
-                      "Press <b>F14</b> for Point 2 (Right)")
+                      "Click the <b>Submit</b> button upon completion.")
         
         self.message_label = QLabel(intro_text)
         self.message_label.setFont(main_font)
@@ -504,6 +503,7 @@ class workpiecetaskscreen(QWidget):
         self.task_start_time = 0.0
         self.current_task_info = ""
         self.warn_visible = False
+        self.assembly_status = "none"
 
         # main 1-second countdown timer
         self.timer = QTimer(self)
@@ -519,7 +519,7 @@ class workpiecetaskscreen(QWidget):
         main_layout = QHBoxLayout()
         main_layout.setSpacing(int(20 * font_size_multiplier))
         
-        # left panel (task content & counter)
+        # left panel
         self.left_panel = QFrame()
         self.left_panel.setFrameShape(QFrame.StyledPanel)
         self.left_panel.setStyleSheet("background-color: white; border-radius: 8px;")
@@ -531,6 +531,7 @@ class workpiecetaskscreen(QWidget):
         body_font = QFont("Helvetica", int(18 * font_size_multiplier))
         timer_font = QFont("Helvetica", int(48 * font_size_multiplier), QFont.Bold)
         warn_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
+        submit_btn_font = QFont("Helvetica", int(20 * font_size_multiplier), QFont.Bold)
 
         self.header_label = QLabel("CURRENT WORKPIECE")
         self.header_label.setFont(title_font)
@@ -563,7 +564,15 @@ class workpiecetaskscreen(QWidget):
         self.handover_label.setAlignment(Qt.AlignCenter)
         left_layout.addWidget(self.handover_label, alignment=Qt.AlignCenter)
 
-        # right panel (rules)
+        # ui submit button for participant
+        self.submit_button = QPushButton("Submit")
+        self.submit_button.setFont(submit_btn_font)
+        self.submit_button.setFixedWidth(int(250 * font_size_multiplier))
+        self.submit_button.setFixedHeight(int(70 * font_size_multiplier))
+        self.submit_button.clicked.connect(self.on_submit_clicked)
+        left_layout.addWidget(self.submit_button, alignment=Qt.AlignCenter)
+
+        # right panel
         self.right_panel = QFrame()
         self.right_panel.setFrameShape(QFrame.StyledPanel)
         self.right_panel.setStyleSheet("background-color: #FAFAFA; border-radius: 8px;")
@@ -596,9 +605,9 @@ class workpiecetaskscreen(QWidget):
     def start_task(self, trial_num, target_pt):
         scenario = self.get_scenario_cb()
         if scenario == "robot_fast":
-            self.ticks_left = 20  # 25s - 3s
+            self.ticks_left = 20
         elif scenario == "robot_slow":
-            self.ticks_left = 30  # 25s + 3s
+            self.ticks_left = 30
         else:
             self.ticks_left = 25
 
@@ -606,6 +615,7 @@ class workpiecetaskscreen(QWidget):
         self.active_collection_pt = target_pt
         self.task_start_time = time.perf_counter()
         self.warn_visible = False
+        self.assembly_status = "none"
 
         idx = (trial_num - 1) % len(WORKPIECE_SEQUENCE)
         mode, p1, p2 = WORKPIECE_SEQUENCE[idx]
@@ -625,11 +635,10 @@ class workpiecetaskscreen(QWidget):
             self.instruction_label.setText(f"Sum must be {p1}\n{p2}")
 
         pt_name = "Point 1 (Left)" if target_pt == 1 else "Point 2 (Right)"
-        key_hint = "F13" if target_pt == 1 else "F14"
 
         self.handover_label.setText(
             f"Place the workpiece at <b>{pt_name}</b>.<br>"
-            f"Press <b>{key_hint}</b> upon completion."
+            f"Click <b>Submit</b> upon completion."
         )
 
         self.timer_label.setStyleSheet("color: black;")
@@ -639,6 +648,16 @@ class workpiecetaskscreen(QWidget):
         
         send_marker(f"Workpiece_Task_Started_Trial_{trial_num}_Type_{self.current_task_info}")
         self.timer.start(1000)
+
+    def record_evaluation(self, is_correct):
+        # only register evaluation if we are actively in a task measurement
+        if self.active_collection_pt is not None:
+            self.assembly_status = "correct" if is_correct else "incorrect"
+            send_marker(f"Assembly_Evaluated_{self.assembly_status}")
+
+    def on_submit_clicked(self):
+        if self.active_collection_pt is not None:
+            self.handover_received(self.active_collection_pt)
 
     def toggle_warning_blink(self):
         self.warn_visible = not self.warn_visible
@@ -669,7 +688,7 @@ class workpiecetaskscreen(QWidget):
             self.timer_label.setText(f"{self.ticks_left} s")
 
     def handover_received(self, point_pressed):
-        if self.active_collection_pt is None or point_pressed != self.active_collection_pt:
+        if self.active_collection_pt is None:
             return
 
         self.timer.stop()
@@ -705,8 +724,8 @@ class workpiecetaskscreen(QWidget):
         with open(filepath, mode='a', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             if not file_exists:
-                writer.writerow(["subject", "condition", "difficulty", "task_info", "time_taken_s", "handover_point", "overtime_alarm"])
-            writer.writerow([subject_number, current_condition, difficulty, self.current_task_info, round(elapsed, 3), point_pressed, self.alarm_triggered])
+                writer.writerow(["subject", "condition", "difficulty", "task_info", "time_taken_s", "handover_point", "overtime_alarm", "assembly_status"])
+            writer.writerow([subject_number, current_condition, difficulty, self.current_task_info, round(elapsed, 3), point_pressed, self.alarm_triggered, self.assembly_status])
 
 
 class paradigmcontroller(QWidget):
@@ -752,12 +771,13 @@ class paradigmcontroller(QWidget):
         
         self.mistake_shortcut = QShortcut(QKeySequence("F12"), self)
         self.mistake_shortcut.activated.connect(self.trigger_mistake)
-        
-        self.f13_shortcut = QShortcut(QKeySequence("F13"), self)
-        self.f13_shortcut.activated.connect(lambda: self.task_screen.handover_received(1))
 
-        self.f14_shortcut = QShortcut(QKeySequence("F14"), self)
-        self.f14_shortcut.activated.connect(lambda: self.task_screen.handover_received(2))
+        # mapping observation shortcuts to the task screen
+        self.y_shortcut = QShortcut(QKeySequence("y"), self)
+        self.y_shortcut.activated.connect(lambda: self.task_screen.record_evaluation(True))
+
+        self.c_shortcut = QShortcut(QKeySequence("c"), self)
+        self.c_shortcut.activated.connect(lambda: self.task_screen.record_evaluation(False))
 
         send_marker("Screen_Setup")
         
@@ -789,7 +809,7 @@ class paradigmcontroller(QWidget):
 
     def master_timer_tick(self):
         self.scenario_active_seconds += 1
-        if self.scenario_active_seconds >= 300:  # 5 minutes per condition
+        if self.scenario_active_seconds >= 300:
             if self.current_scenario_idx + 1 >= len(self.scenarios):
                 send_marker("Experiment_Complete_Time_Limit")
                 QApplication.instance().quit()
@@ -920,3 +940,4 @@ def run_paradigm():
 
 if __name__ == "__main__":
     run_paradigm()
+    

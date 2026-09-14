@@ -14,3 +14,7 @@ subject,condition,difficulty,time_taken_s,correct,attempts,equation_x,equation_y
 1,manual,hard,sum_8_Assemble accordingly,30.479,2,True
 1,manual,hard,sum_6_Assemble accordingly,58.172,1,True
 1,manual,hard,sum_6_Assemble accordingly,29.948,2,True
+1,manual,hard,sum_9_Assemble accordingly,4.613,1,False,none
+1,manual,hard,sum_6_Assemble accordingly,2.997,2,False,none
+1,manual,hard,sum_7_Assemble accordingly,40.448,1,True,none
+1,manual,hard,sum_9_Assemble accordingly,81.191,2,True,correct
