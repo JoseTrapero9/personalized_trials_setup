@@ -18,3 +18,6 @@ subject,condition,difficulty,time_taken_s,correct,attempts,equation_x,equation_y
 1,manual,hard,sum_6_Assemble accordingly,2.997,2,False,none
 1,manual,hard,sum_7_Assemble accordingly,40.448,1,True,none
 1,manual,hard,sum_9_Assemble accordingly,81.191,2,True,correct
+1,manual,hard,sum_6_Assemble accordingly,8.846,1,False,correct
+1,manual,hard,sum_6_Assemble accordingly,5.879,2,False,incorrect
+1,manual,hard,sum_7_Assemble accordingly,11.608,1,False,correct

@@ -45,6 +45,7 @@ ROBOT_OWN_IP = "192.168.29.61"
 DIFFICULTY_PORT = 50001
 
 marker_outlet = None
+controller = None
 
 def init_lsl():
     global marker_outlet
@@ -503,7 +504,12 @@ class workpiecetaskscreen(QWidget):
         self.task_start_time = 0.0
         self.current_task_info = ""
         self.warn_visible = False
+        
+        # evaluation tracking per workpiece
+        self.current_trial_num = 0
+        self.evaluated = False
         self.assembly_status = "none"
+        self.pending_log = None
 
         # main 1-second countdown timer
         self.timer = QTimer(self)
@@ -564,7 +570,7 @@ class workpiecetaskscreen(QWidget):
         self.handover_label.setAlignment(Qt.AlignCenter)
         left_layout.addWidget(self.handover_label, alignment=Qt.AlignCenter)
 
-        # ui submit button for participant
+        # submit button for participant
         self.submit_button = QPushButton("Submit")
         self.submit_button.setFont(submit_btn_font)
         self.submit_button.setFixedWidth(int(250 * font_size_multiplier))
@@ -603,6 +609,9 @@ class workpiecetaskscreen(QWidget):
         self.setLayout(main_layout)
 
     def start_task(self, trial_num, target_pt):
+        # flush any unwritten pending log from the previous trial
+        self.flush_pending_log()
+
         scenario = self.get_scenario_cb()
         if scenario == "robot_fast":
             self.ticks_left = 20
@@ -611,11 +620,15 @@ class workpiecetaskscreen(QWidget):
         else:
             self.ticks_left = 25
 
+        self.current_trial_num = trial_num
+        self.evaluated = False
+        self.assembly_status = "none"
+        self.pending_log = None
+
         self.alarm_triggered = False
         self.active_collection_pt = target_pt
         self.task_start_time = time.perf_counter()
         self.warn_visible = False
-        self.assembly_status = "none"
 
         idx = (trial_num - 1) % len(WORKPIECE_SEQUENCE)
         mode, p1, p2 = WORKPIECE_SEQUENCE[idx]
@@ -650,10 +663,19 @@ class workpiecetaskscreen(QWidget):
         self.timer.start(1000)
 
     def record_evaluation(self, is_correct):
-        # only register evaluation if we are actively in a task measurement
-        if self.active_collection_pt is not None:
-            self.assembly_status = "correct" if is_correct else "incorrect"
-            send_marker(f"Assembly_Evaluated_{self.assembly_status}")
+        # allow evaluation once per piece either during the task or in subsequent transitions
+        if self.current_trial_num == 0 or self.evaluated:
+            return
+
+        self.evaluated = True
+        self.assembly_status = "correct" if is_correct else "incorrect"
+        send_marker(f"Assembly_Evaluated_{self.assembly_status}")
+
+        # if task was already submitted, update and write the pending log immediately
+        if self.pending_log is not None:
+            self.pending_log["assembly_status"] = self.assembly_status
+            self._write_csv_row(self.pending_log)
+            self.pending_log = None
 
     def on_submit_clicked(self):
         if self.active_collection_pt is not None:
@@ -702,12 +724,32 @@ class workpiecetaskscreen(QWidget):
             send_marker("Workpiece_Task_Overtime_Alarm_Stopped")
 
         send_marker(f"Handover_Confirmed_Point_{point_pressed}_Duration_{round(elapsed, 3)}")
-        self.save_log(elapsed, point_pressed)
+        
+        log_data = {
+            "task_info": self.current_task_info,
+            "elapsed": elapsed,
+            "point_pressed": point_pressed,
+            "alarm_triggered": self.alarm_triggered,
+            "assembly_status": self.assembly_status
+        }
+
+        # if observer already pressed y or c during the task, write log immediately
+        if self.evaluated:
+            self._write_csv_row(log_data)
+            self.pending_log = None
+        else:
+            # hold pending log to allow observer to evaluate during retrieval/rest
+            self.pending_log = log_data
         
         self.active_collection_pt = None
         self.finish_callback(point_pressed)
 
-    def save_log(self, elapsed, point_pressed):
+    def flush_pending_log(self):
+        if self.pending_log is not None:
+            self._write_csv_row(self.pending_log)
+            self.pending_log = None
+
+    def _write_csv_row(self, log_dict):
         log_dir = os.path.join(base_dir, "logs")
         os.makedirs(log_dir, exist_ok=True)
         
@@ -725,7 +767,16 @@ class workpiecetaskscreen(QWidget):
             writer = csv.writer(f)
             if not file_exists:
                 writer.writerow(["subject", "condition", "difficulty", "task_info", "time_taken_s", "handover_point", "overtime_alarm", "assembly_status"])
-            writer.writerow([subject_number, current_condition, difficulty, self.current_task_info, round(elapsed, 3), point_pressed, self.alarm_triggered, self.assembly_status])
+            writer.writerow([
+                subject_number,
+                current_condition,
+                difficulty,
+                log_dict["task_info"],
+                round(log_dict["elapsed"], 3),
+                log_dict["point_pressed"],
+                log_dict["alarm_triggered"],
+                log_dict["assembly_status"]
+            ])
 
 
 class paradigmcontroller(QWidget):
@@ -772,7 +823,7 @@ class paradigmcontroller(QWidget):
         self.mistake_shortcut = QShortcut(QKeySequence("F12"), self)
         self.mistake_shortcut.activated.connect(self.trigger_mistake)
 
-        # mapping observation shortcuts to the task screen
+        # global shortcuts across all screens for observer evaluation
         self.y_shortcut = QShortcut(QKeySequence("y"), self)
         self.y_shortcut.activated.connect(lambda: self.task_screen.record_evaluation(True))
 
@@ -905,9 +956,12 @@ class paradigmcontroller(QWidget):
         self.start_trial_cycle()
 
 def cleanup_resources():
-    global robot_process
+    global robot_process, controller
     send_marker("Application_Closing")
     
+    if controller is not None:
+        controller.task_screen.flush_pending_log()
+
     if robot_process is not None:
         robot_process.terminate()
         
@@ -920,6 +974,7 @@ def cleanup_resources():
         haptic_loop.call_soon_threadsafe(haptic_loop.stop)
 
 def run_paradigm():
+    global controller
     init_lsl()
     start_haptic_thread()
     
@@ -940,4 +995,3 @@ def run_paradigm():
 
 if __name__ == "__main__":
     run_paradigm()
-    
