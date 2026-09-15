@@ -601,7 +601,7 @@ class workpiecetaskscreen(QWidget):
         left_layout.addStretch(1)
 
         # Header title
-        self.header_label = QLabel("CURRENT WORKPIECE")
+        self.header_label = QLabel("INPUT CORRECT CONFIGURATION")
         self.header_label.setFont(QFont("Helvetica", 30, QFont.Bold))
         self.header_label.setStyleSheet("color: #777; letter-spacing: 2px;")
         self.header_label.setAlignment(Qt.AlignCenter)
@@ -616,12 +616,14 @@ class workpiecetaskscreen(QWidget):
         self.timer_label.setStyleSheet("color: #111;")
         left_layout.addWidget(self.timer_label)
 
-        # Centered Warning indicator (28pt bold)
+        # Centered Warning indicator
         self.warning_label = QLabel("")
-        self.warning_label.setFont(QFont("Helvetica", 45, QFont.Bold))
+        self.warning_label.setFont(QFont("Helvetica", 60, QFont.Bold))  # Increased font size
         self.warning_label.setStyleSheet("color: red; letter-spacing: 1px;")
         self.warning_label.setAlignment(Qt.AlignCenter)
-        self.warning_label.setFixedHeight(45)
+        
+        # Set height to 75–80px to accommodate a 50–55pt font without clipping
+        self.warning_label.setFixedHeight(80) 
         left_layout.addWidget(self.warning_label)
 
         left_layout.addSpacing(15)
@@ -771,6 +773,7 @@ class workpiecetaskscreen(QWidget):
     def timer_tick(self):
         self.ticks_left -= 1
         
+        # Start blinking when 10 seconds or fewer remain
         if 0 < self.ticks_left <= 10:
             self.timer_label.setStyleSheet("color: red;")
             if not self.blink_timer.isActive():
@@ -778,11 +781,16 @@ class workpiecetaskscreen(QWidget):
                 self.warning_label.setText("WARNING - FINISH")
                 self.blink_timer.start(250)
         
+        # When time runs out, keep blinking active
         if self.ticks_left <= 0:
             self.timer_label.setText("0 s")
             self.timer_label.setStyleSheet("color: red;")
-            self.blink_timer.stop()
-            self.warning_label.setText("WARNING - FINISH")
+            
+            # Ensure the blink timer stays active if time ran out without triggering 10s warning
+            if not self.blink_timer.isActive():
+                self.warn_visible = True
+                self.warning_label.setText("WARNING - FINISH")
+                self.blink_timer.start(250)
             
             if not self.alarm_triggered:
                 self.alarm_triggered = True
