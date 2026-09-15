@@ -1,0 +1,9 @@
+subject,condition,difficulty,task_info,time_taken_s,handover_point,overtime_alarm,assembly_status
+1,training,easy,sum_7_Assemble accordingly,11.037,1,False,none
+1,training,easy,sum_7_Assemble accordingly,67.052,1,True,none
+1,training,easy,sum_8_Assemble accordingly,29.62,2,True,none
+1,training,easy,sum_9_Assemble accordingly,23.019,1,False,none
+1,training,easy,sum_6_Assemble accordingly,16.791,1,False,none
+1,training,easy,sum_7_Assemble accordingly,23.387,2,False,none
+1,training,easy,sum_9_Assemble accordingly,24.733,1,False,none
+1,training,easy,sum_9_Assemble accordingly,22.599,2,False,none

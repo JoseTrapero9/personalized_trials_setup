@@ -310,7 +310,8 @@ class startscreen(QWidget):
                       "1. Retrieve parts from Container I or II.<br>"
                       "2. Observe the objective and assemble according to color and slot rules.<br>"
                       "3. You have <b>25 seconds</b> before the alarm triggers.<br><br>"
-                      "Click the <b>Submit</b> button upon completion.")
+                      "Press <b>Left</b> for Point 1<br>"
+                      "Press <b>Right</b> for Point 2")
         
         self.message_label = QLabel(intro_text)
         self.message_label.setFont(main_font)
@@ -537,7 +538,6 @@ class workpiecetaskscreen(QWidget):
         body_font = QFont("Helvetica", int(18 * font_size_multiplier))
         timer_font = QFont("Helvetica", int(48 * font_size_multiplier), QFont.Bold)
         warn_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
-        submit_btn_font = QFont("Helvetica", int(20 * font_size_multiplier), QFont.Bold)
 
         self.header_label = QLabel("CURRENT WORKPIECE")
         self.header_label.setFont(title_font)
@@ -569,14 +569,6 @@ class workpiecetaskscreen(QWidget):
         self.handover_label.setFont(body_font)
         self.handover_label.setAlignment(Qt.AlignCenter)
         left_layout.addWidget(self.handover_label, alignment=Qt.AlignCenter)
-
-        # submit button for participant
-        self.submit_button = QPushButton("Submit")
-        self.submit_button.setFont(submit_btn_font)
-        self.submit_button.setFixedWidth(int(250 * font_size_multiplier))
-        self.submit_button.setFixedHeight(int(70 * font_size_multiplier))
-        self.submit_button.clicked.connect(self.on_submit_clicked)
-        left_layout.addWidget(self.submit_button, alignment=Qt.AlignCenter)
 
         # right panel
         self.right_panel = QFrame()
@@ -647,11 +639,12 @@ class workpiecetaskscreen(QWidget):
             self.current_task_info = f"sum_{p1}_{p2}"
             self.instruction_label.setText(f"Sum must be {p1}\n{p2}")
 
-        pt_name = "Point 1 (Left)" if target_pt == 1 else "Point 2 (Right)"
+        pt_name = "Point 1" if target_pt == 1 else "Point 2"
+        key_hint = "Left" if target_pt == 1 else "Right"
 
         self.handover_label.setText(
             f"Place the workpiece at <b>{pt_name}</b>.<br>"
-            f"Click <b>Submit</b> upon completion."
+            f"Press <b>{key_hint}</b> upon completion."
         )
 
         self.timer_label.setStyleSheet("color: black;")
@@ -676,10 +669,6 @@ class workpiecetaskscreen(QWidget):
             self.pending_log["assembly_status"] = self.assembly_status
             self._write_csv_row(self.pending_log)
             self.pending_log = None
-
-    def on_submit_clicked(self):
-        if self.active_collection_pt is not None:
-            self.handover_received(self.active_collection_pt)
 
     def toggle_warning_blink(self):
         self.warn_visible = not self.warn_visible
@@ -710,7 +699,7 @@ class workpiecetaskscreen(QWidget):
             self.timer_label.setText(f"{self.ticks_left} s")
 
     def handover_received(self, point_pressed):
-        if self.active_collection_pt is None:
+        if self.active_collection_pt is None or point_pressed != self.active_collection_pt:
             return
 
         self.timer.stop()
@@ -822,6 +811,13 @@ class paradigmcontroller(QWidget):
         
         self.mistake_shortcut = QShortcut(QKeySequence("F12"), self)
         self.mistake_shortcut.activated.connect(self.trigger_mistake)
+
+        # completion shortcuts for participant
+        self.f13_shortcut = QShortcut(QKeySequence("F13"), self)
+        self.f13_shortcut.activated.connect(lambda: self.task_screen.handover_received(1))
+
+        self.f14_shortcut = QShortcut(QKeySequence("F14"), self)
+        self.f14_shortcut.activated.connect(lambda: self.task_screen.handover_received(2))
 
         # global shortcuts across all screens for observer evaluation
         self.y_shortcut = QShortcut(QKeySequence("y"), self)
@@ -981,7 +977,7 @@ def run_paradigm():
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(cleanup_resources)
     
-    audio_sys.setup_devices(participant_keyword="Realtek", researcher_keyword="Realtek")
+    audio_sys.setup_devices(participant_keyword="Beats", researcher_keyword="Realtek")
     
     controller = paradigmcontroller()
     
@@ -995,4 +991,3 @@ def run_paradigm():
 
 if __name__ == "__main__":
     run_paradigm()
- 
