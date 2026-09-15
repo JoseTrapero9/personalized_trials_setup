@@ -181,7 +181,7 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
 
     for line in raw_lines:
         lower_line = line.lower()
-        if lower_line.startswith(("piece", "mode", "trial")):[cite: 1]
+        if lower_line.startswith(("piece", "mode", "trial")):
             continue
 
         if "\t" in line:
