@@ -121,17 +121,17 @@ def main():
         s.close_gripper()
         s.open_gripper()
 
-        s.move_left_up(wait_time=8)
-        # s.move_home(wait_time=8)
+        # s.move_left_up(wait_time=8)
+        s.move_home(wait_time=8)
 
-        s.move_left_down(wait_time=2)
-        s.close_gripper()
-        s.move_left_up(wait_time=4)
+        # s.move_left_down(wait_time=2)
+        # s.close_gripper()
+        # s.move_left_up(wait_time=4)
         
-        # s.move_home(wait_time=5.5)
+        # # s.move_home(wait_time=5.5)
         
-        s.move_disposal_down(wait_time=2)
-        s.move_disposal_up(wait_time=8)
+        # s.move_disposal_down(wait_time=2)
+        # s.move_disposal_up(wait_time=8)
 
     finally:
         # closing streams
