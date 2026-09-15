@@ -162,7 +162,7 @@ def activate_haptic_vest():
     if haptic_loop is not None:
         asyncio.run_coroutine_threadsafe(trigger_vest_async(), haptic_loop)
 
-font_size_multiplier = 1.4
+font_size_multiplier = 1.3
 difficulty = "hard"
 subject_number = "1"
 current_condition = "training"
@@ -569,65 +569,88 @@ class workpiecetaskscreen(QWidget):
 
     def init_ui(self):
         main_layout = QHBoxLayout()
-        main_layout.setContentsMargins(10, 10, 10, 10)
-        main_layout.setSpacing(int(15 * font_size_multiplier))
+        main_layout.setContentsMargins(15, 15, 15, 15)
+        main_layout.setSpacing(20)
         
+        # Left Panel (Task Display)
         self.left_panel = QFrame()
         self.left_panel.setFrameShape(QFrame.StyledPanel)
         self.left_panel.setStyleSheet("background-color: white; border-radius: 8px;")
         
         left_layout = QVBoxLayout(self.left_panel)
-        left_layout.setContentsMargins(15, 10, 15, 10)
-        left_layout.setAlignment(Qt.AlignCenter)
-        left_layout.setSpacing(int(6 * font_size_multiplier))
+        left_layout.setContentsMargins(20, 15, 20, 15)
+        
+        header_font = QFont("Helvetica", 22, QFont.Bold)
+        timer_font = QFont("Helvetica", 46, QFont.Bold)
+        warn_font = QFont("Helvetica", 20, QFont.Bold)
+        target_sum_font = QFont("Helvetica", 30, QFont.Bold)
+        instruction_font = QFont("Helvetica", 28, QFont.Bold)
+        body_font = QFont("Helvetica", 18)
 
-        title_font = QFont("Helvetica", int(21 * font_size_multiplier), QFont.Bold)
-        body_font = QFont("Helvetica", int(17 * font_size_multiplier))
-        timer_font = QFont("Helvetica", int(42 * font_size_multiplier), QFont.Bold)
-        warn_font = QFont("Helvetica", int(20 * font_size_multiplier), QFont.Bold)
+        # 1. Top flexible stretch pushes content to center
+        left_layout.addStretch(1)
 
         self.header_label = QLabel("CURRENT WORKPIECE")
-        self.header_label.setFont(title_font)
-        left_layout.addWidget(self.header_label, alignment=Qt.AlignCenter)
+        self.header_label.setFont(header_font)
+        self.header_label.setAlignment(Qt.AlignCenter)
+        left_layout.addWidget(self.header_label)
 
         self.timer_label = QLabel("25 s")
         self.timer_label.setFont(timer_font)
-        left_layout.addWidget(self.timer_label, alignment=Qt.AlignCenter)
+        self.timer_label.setAlignment(Qt.AlignCenter)
+        left_layout.addWidget(self.timer_label)
 
         self.warning_label = QLabel("")
         self.warning_label.setFont(warn_font)
         self.warning_label.setStyleSheet("color: red;")
-        self.warning_label.setFixedHeight(int(28 * font_size_multiplier))
+        self.warning_label.setFixedHeight(30)
         self.warning_label.setAlignment(Qt.AlignCenter)
-        left_layout.addWidget(self.warning_label, alignment=Qt.AlignCenter)
+        left_layout.addWidget(self.warning_label)
 
         self.image_label = QLabel()
         self.image_label.setAlignment(Qt.AlignCenter)
-        left_layout.addWidget(self.image_label, alignment=Qt.AlignCenter)
+        left_layout.addWidget(self.image_label)
 
+        # Target Sum Label (Dedicated, large, never wraps)
+        self.target_sum_label = QLabel()
+        self.target_sum_label.setFont(target_sum_font)
+        self.target_sum_label.setAlignment(Qt.AlignCenter)
+        self.target_sum_label.setWordWrap(False)
+        left_layout.addWidget(self.target_sum_label)
+
+        left_layout.addSpacing(6)
+
+        # Instruction Text Label (Dedicated, large, never wraps or clips)
         self.instruction_label = QLabel()
-        self.instruction_label.setFont(title_font)
+        self.instruction_label.setFont(instruction_font)
         self.instruction_label.setAlignment(Qt.AlignCenter)
-        self.instruction_label.setWordWrap(True)
-        left_layout.addWidget(self.instruction_label, alignment=Qt.AlignCenter)
+        self.instruction_label.setStyleSheet("color: #0D47A1;")
+        self.instruction_label.setWordWrap(False)
+        left_layout.addWidget(self.instruction_label)
+
+        left_layout.addSpacing(16)
 
         self.handover_label = QLabel()
         self.handover_label.setFont(body_font)
         self.handover_label.setAlignment(Qt.AlignCenter)
-        left_layout.addWidget(self.handover_label, alignment=Qt.AlignCenter)
+        left_layout.addWidget(self.handover_label)
 
+        # 2. Bottom flexible stretch
+        left_layout.addStretch(1)
+
+        # Right Panel (Rules)
         self.right_panel = QFrame()
         self.right_panel.setFrameShape(QFrame.StyledPanel)
         self.right_panel.setStyleSheet("background-color: #FAFAFA; border-radius: 8px;")
-        self.right_panel.setMaximumWidth(int(340 * font_size_multiplier))
+        self.right_panel.setMaximumWidth(320)
         
         right_layout = QVBoxLayout(self.right_panel)
-        right_layout.setContentsMargins(15, 15, 15, 15)
+        right_layout.setContentsMargins(15, 20, 15, 20)
         right_layout.setAlignment(Qt.AlignTop)
-        right_layout.setSpacing(int(6 * font_size_multiplier))
+        right_layout.setSpacing(10)
 
         rules_head = QLabel("Rules")
-        rules_head.setFont(title_font)
+        rules_head.setFont(header_font)
         right_layout.addWidget(rules_head)
 
         rules_colors = QLabel(
@@ -673,6 +696,7 @@ class workpiecetaskscreen(QWidget):
         mode, p1, p2 = WORKPIECE_SEQUENCE[idx]
 
         if mode == "image":
+            self.target_sum_label.hide()
             self.instruction_label.hide()
             self.image_label.show()
             self.current_task_info = f"image_{p1}"
@@ -685,9 +709,11 @@ class workpiecetaskscreen(QWidget):
         else:
             self.image_label.clear()
             self.image_label.hide()
+            self.target_sum_label.show()
             self.instruction_label.show()
             self.current_task_info = f"sum_{p1}_{p2}"
-            self.instruction_label.setText(f"Sum must be {p1}\n{p2}")
+            self.target_sum_label.setText(f"Sum must be {p1}")
+            self.instruction_label.setText(str(p2))
 
         pt_name = "Point 1" if target_pt == 1 else "Point 2"
         key_hint = "F13" if target_pt == 1 else "F14"
@@ -1025,21 +1051,14 @@ def run_paradigm():
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(cleanup_resources)
     
-    screens = app.screens()
-    target_screen = screens[1] if len(screens) > 1 else screens[0]
-    geo = target_screen.geometry()
-    
-    # Scale proportionally: ~1.36 on 1680x1050, ~1.55 on 1920x1080
-    scale_factor = min(geo.width() / 1920.0, geo.height() / 1080.0)
-    font_size_multiplier = max(1.15, scale_factor * 1.55)
-    print(f"Target Screen: {geo.width()}x{geo.height()} -> Scaled Multiplier: {font_size_multiplier:.3f}")
-    
     audio_sys.setup_devices(participant_keyword="Beats", researcher_keyword="Realtek")
     
     controller = paradigmcontroller()
     
+    screens = app.screens()
     if len(screens) > 1:
-        controller.move(geo.left(), geo.top())
+        second_screen = screens[1].geometry()
+        controller.move(second_screen.left(), second_screen.top())
         
     controller.showFullScreen()
     sys.exit(app.exec_())
