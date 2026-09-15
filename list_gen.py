@@ -4,8 +4,8 @@ import csv
 import os
 
 # configuration: total number of workpieces and cycle length
-NUM_WORKPIECES = 40
-LOOP_LENGTH    = 4
+NUM_WORKPIECES = 16
+LOOP_LENGTH    = 1
 
 # mapping of image index → correct color order
 image_answers = {
