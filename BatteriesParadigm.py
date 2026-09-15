@@ -8,6 +8,7 @@ import subprocess
 import threading
 import asyncio
 import socket
+import re
 import bhaptics_python
 import sounddevice as sd
 import soundfile as sf
@@ -130,7 +131,7 @@ class AudioController:
                 sd.play(data, samplerate=fs, device=device_id)
                 sd.wait()
         except Exception as e:
-            print(f"Alarm loop error: {e}")
+                print(f"Alarm loop error: {e}")
 
 audio_sys = AudioController()
 haptic_loop = None
@@ -168,20 +169,76 @@ current_condition = "training"
 active_scenarios_list = []
 robot_process = None
 
-def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s14_no_llm_sequence.txt")):
+def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt")):
     sequence = []
     if os.path.exists(path):
-        with open(path, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f, delimiter="\t")
-            for row in reader:
-                if row["mode"] == "image":
-                    sequence.append(("image", row["param1"], None))
-                else:
-                    sequence.append(("text", int(row["param1"]), row["param2"]))
-    else:
-        # fallback sequence if file is missing
+        with open(path, "r", encoding="utf-8-sig") as f:
+            raw_lines = [line.strip() for line in f if line.strip()]
+
+        for line in raw_lines:
+            # skip header lines
+            lower_line = line.lower()
+            if lower_line.startswith("piece") or lower_line.startswith("mode") or lower_line.startswith("trial"):
+                continue
+
+            # split by tabs if available, otherwise by multiple spaces or comma
+            if "\t" in line:
+                tokens = [t.strip() for t in line.split("\t") if t.strip()]
+            elif "," in line:
+                reader = csv.reader([line])
+                tokens = [t.strip() for t in next(reader) if t.strip()]
+            else:
+                tokens = [t.strip() for t in re.split(r'\s{2,}', line) if t.strip()]
+
+            if not tokens:
+                continue
+
+            # handle image modality
+            if tokens[0].lower() == "image" and len(tokens) >= 2:
+                sequence.append(("image", tokens[1], None))
+                continue
+            elif len(tokens) >= 3 and tokens[1].lower() == "image":
+                sequence.append(("image", tokens[2], None))
+                continue
+
+            # handle explicit text keyword
+            if tokens[0].lower() == "text" and len(tokens) >= 3:
+                try:
+                    sequence.append(("text", int(tokens[1]), tokens[2]))
+                    continue
+                except ValueError:
+                    pass
+
+            # handle standard format: piece_num, sum, instruction, optional_answer
+            if len(tokens) >= 3:
+                try:
+                    target_sum = int(tokens[1])
+                    instruction_text = tokens[2]
+                    sequence.append(("text", target_sum, instruction_text))
+                    continue
+                except ValueError:
+                    pass
+
+            # fallback regex for space-delimited formats
+            match = re.match(r'^\s*(\d+)\s+(\d+)\s+(.+?)(?:\s{2,}|\t)(.+)$', line)
+            if match:
+                try:
+                    target_sum = int(match.group(2))
+                    instruction_text = match.group(3).strip()
+                    sequence.append(("text", target_sum, instruction_text))
+                    continue
+                except ValueError:
+                    pass
+
+    if not sequence:
+        # fallback sequence if file is missing or unparseable
         for i in range(1, 41):
             sequence.append(("text", random.choice([6, 7, 8, 9]), "Assemble accordingly"))
+            
+    print(f"Loaded {len(sequence)} tasks from sequence file:")
+    for i, (m, p1, p2) in enumerate(sequence[:3]):
+        print(f"  Item {i+1}: mode={m}, sum={p1}, instruction='{p2}'")
+        
     return sequence
 
 WORKPIECE_SEQUENCE = load_synch_sequence()
@@ -310,8 +367,8 @@ class startscreen(QWidget):
                       "1. Retrieve parts from Container I or II.<br>"
                       "2. Observe the objective and assemble according to color and slot rules.<br>"
                       "3. You have <b>25 seconds</b> before the alarm triggers.<br><br>"
-                      "Press <b>Left</b> for Point 1<br>"
-                      "Press <b>Right</b> for Point 2")
+                      "Press <b>F13</b> for Point 1<br>"
+                      "Press <b>F14</b> for Point 2")
         
         self.message_label = QLabel(intro_text)
         self.message_label.setFont(main_font)
@@ -640,7 +697,7 @@ class workpiecetaskscreen(QWidget):
             self.instruction_label.setText(f"Sum must be {p1}\n{p2}")
 
         pt_name = "Point 1" if target_pt == 1 else "Point 2"
-        key_hint = "Left" if target_pt == 1 else "Right"
+        key_hint = "F13" if target_pt == 1 else "F14"
 
         self.handover_label.setText(
             f"Place the workpiece at <b>{pt_name}</b>.<br>"
@@ -664,16 +721,16 @@ class workpiecetaskscreen(QWidget):
         self.assembly_status = "correct" if is_correct else "incorrect"
         send_marker(f"Assembly_Evaluated_{self.assembly_status}")
 
-        # Negative reinforcement on incorrect answer
+        # negative reinforcement on incorrect answer
         if not is_correct:
             audio_sys.play_participant(incorrect_audio)
-        
 
         # if task was already submitted, update and write the pending log immediately
         if self.pending_log is not None:
             self.pending_log["assembly_status"] = self.assembly_status
             self._write_csv_row(self.pending_log)
             self.pending_log = None
+
     def toggle_warning_blink(self):
         self.warn_visible = not self.warn_visible
         self.warning_label.setText("WARNING - FINISH" if self.warn_visible else "")
@@ -771,7 +828,6 @@ class workpiecetaskscreen(QWidget):
                 log_dict["assembly_status"]
             ])
 
-
 class paradigmcontroller(QWidget):
     def __init__(self):
         super().__init__()
@@ -824,10 +880,9 @@ class paradigmcontroller(QWidget):
         self.f14_shortcut.activated.connect(lambda: self.task_screen.handover_received(2))
 
         # global shortcuts across all screens for observer evaluation
-        #y is correct
         self.y_shortcut = QShortcut(QKeySequence("y"), self)
         self.y_shortcut.activated.connect(lambda: self.task_screen.record_evaluation(True))
-        #c is incorrect
+
         self.c_shortcut = QShortcut(QKeySequence("c"), self)
         self.c_shortcut.activated.connect(lambda: self.task_screen.record_evaluation(False))
 
