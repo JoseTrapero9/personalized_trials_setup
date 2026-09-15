@@ -664,12 +664,16 @@ class workpiecetaskscreen(QWidget):
         self.assembly_status = "correct" if is_correct else "incorrect"
         send_marker(f"Assembly_Evaluated_{self.assembly_status}")
 
+        # Negative reinforcement on incorrect answer
+        if not is_correct:
+            audio_sys.play_participant(incorrect_audio)
+        
+
         # if task was already submitted, update and write the pending log immediately
         if self.pending_log is not None:
             self.pending_log["assembly_status"] = self.assembly_status
             self._write_csv_row(self.pending_log)
             self.pending_log = None
-
     def toggle_warning_blink(self):
         self.warn_visible = not self.warn_visible
         self.warning_label.setText("WARNING - FINISH" if self.warn_visible else "")
@@ -820,9 +824,10 @@ class paradigmcontroller(QWidget):
         self.f14_shortcut.activated.connect(lambda: self.task_screen.handover_received(2))
 
         # global shortcuts across all screens for observer evaluation
+        #y is correct
         self.y_shortcut = QShortcut(QKeySequence("y"), self)
         self.y_shortcut.activated.connect(lambda: self.task_screen.record_evaluation(True))
-
+        #c is incorrect
         self.c_shortcut = QShortcut(QKeySequence("c"), self)
         self.c_shortcut.activated.connect(lambda: self.task_screen.record_evaluation(False))
 
