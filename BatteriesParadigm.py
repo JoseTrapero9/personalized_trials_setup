@@ -162,7 +162,7 @@ def activate_haptic_vest():
     if haptic_loop is not None:
         asyncio.run_coroutine_threadsafe(trigger_vest_async(), haptic_loop)
 
-font_size_multiplier = 1.8
+font_size_multiplier = 1.5
 difficulty = "hard"
 subject_number = "1"
 current_condition = "training"
@@ -180,7 +180,6 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
             if lower_line.startswith(("piece", "mode", "trial")):
                 continue
 
-            # Prioritize tab separation (TSV) over commas and space splits
             if "\t" in line:
                 tokens = [t.strip() for t in line.split("\t") if t.strip()]
             elif "," in line and not re.search(r'\s{2,}', line):
@@ -191,7 +190,6 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
             if not tokens:
                 continue
 
-            # Handle image modality
             if tokens[0].lower() == "image" and len(tokens) >= 2:
                 sequence.append(("image", tokens[1], None))
                 continue
@@ -199,7 +197,6 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
                 sequence.append(("image", tokens[2], None))
                 continue
 
-            # Handle explicit text keyword
             if tokens[0].lower() == "text" and len(tokens) >= 3:
                 try:
                     sequence.append(("text", int(tokens[1]), tokens[2]))
@@ -207,7 +204,6 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
                 except ValueError:
                     pass
 
-            # Handle standard format: piece_num, sum, instruction, optional_answer
             if len(tokens) >= 3:
                 try:
                     target_sum = int(tokens[1])
@@ -217,7 +213,6 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
                 except ValueError:
                     pass
 
-            # Fallback regex for spaced format
             match = re.match(r'^\s*(\d+)\s+(\d+)\s+(.+?)(?:\s{2,}|\t)(.+)$', line)
             if match:
                 try:
@@ -1014,15 +1009,24 @@ def cleanup_resources():
         haptic_loop.call_soon_threadsafe(haptic_loop.stop)
 
 def run_paradigm():
-    global controller
+    global controller, font_size_multiplier
     init_lsl()
     start_haptic_thread()
     
+    # 1. High-DPI attributes must be set before creating QApplication
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(cleanup_resources)
     
+    # 2. Dynamic font scaling based on actual screen height
+    screen = app.primaryScreen().geometry()
+    font_size_multiplier = max(1.0, (screen.height() / 1080.0) * 1.5)
+    
     audio_sys.setup_devices(participant_keyword="Beats", researcher_keyword="Realtek")
     
+    # 3. Initialize controller and widgets using the scaled multiplier
     controller = paradigmcontroller()
     
     screens = app.screens()
