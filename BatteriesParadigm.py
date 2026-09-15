@@ -597,22 +597,26 @@ class workpiecetaskscreen(QWidget):
         left_layout = QVBoxLayout(self.left_panel)
         left_layout.setContentsMargins(30, 20, 30, 20)
         
-        # Top Bar: Header and Timer
-        top_bar = QHBoxLayout()
-        self.header_label = QLabel("CURRENT WORKPIECE")
-        self.header_label.setFont(QFont("Helvetica", 18, QFont.Bold))
-        self.header_label.setStyleSheet("color: #444;")
-        
-        self.timer_label = QLabel("25 s")
-        self.timer_label.setFont(QFont("Helvetica", 36, QFont.Bold))
-        self.timer_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        
-        top_bar.addWidget(self.header_label)
-        top_bar.addStretch()
-        top_bar.addWidget(self.timer_label)
-        left_layout.addLayout(top_bar)
+        # Top flexible spacer
+        left_layout.addStretch(1)
 
-        # Warning indicator (Enlarged to 28pt Bold with 45px height)
+        # Header title
+        self.header_label = QLabel("CURRENT WORKPIECE")
+        self.header_label.setFont(QFont("Helvetica", 16, QFont.Bold))
+        self.header_label.setStyleSheet("color: #777; letter-spacing: 2px;")
+        self.header_label.setAlignment(Qt.AlignCenter)
+        left_layout.addWidget(self.header_label)
+
+        left_layout.addSpacing(4)
+
+        # Centered Huge Countdown Timer (Immediate visibility)
+        self.timer_label = QLabel("25 s")
+        self.timer_label.setFont(QFont("Helvetica", 64, QFont.Bold))
+        self.timer_label.setAlignment(Qt.AlignCenter)
+        self.timer_label.setStyleSheet("color: #111;")
+        left_layout.addWidget(self.timer_label)
+
+        # Centered Warning indicator (28pt bold)
         self.warning_label = QLabel("")
         self.warning_label.setFont(QFont("Helvetica", 28, QFont.Bold))
         self.warning_label.setStyleSheet("color: red; letter-spacing: 1px;")
@@ -620,8 +624,7 @@ class workpiecetaskscreen(QWidget):
         self.warning_label.setFixedHeight(45)
         left_layout.addWidget(self.warning_label)
 
-        # Vertical stretch pushes items toward center
-        left_layout.addStretch(1)
+        left_layout.addSpacing(15)
 
         self.image_label = QLabel()
         self.image_label.setAlignment(Qt.AlignCenter)
@@ -630,21 +633,22 @@ class workpiecetaskscreen(QWidget):
         # Dedicated Target Sum Label
         self.target_sum_label = QLabel()
         self.target_sum_label.setAlignment(Qt.AlignCenter)
-        self.target_sum_label.setStyleSheet("font-weight: bold; color: #111;")
+        self.target_sum_label.setStyleSheet("font-weight: bold; color: #222;")
         left_layout.addWidget(self.target_sum_label)
 
-        left_layout.addSpacing(12)
+        left_layout.addSpacing(10)
 
-        # Dedicated Instruction Label (Large font size up to 46pt, single line)
+        # Dedicated Instruction Label (Dynamic auto-fit up to 46pt, single line)
         self.instruction_label = QLabel()
         self.instruction_label.setAlignment(Qt.AlignCenter)
         self.instruction_label.setStyleSheet("font-weight: bold; color: #0056B3;")
         self.instruction_label.setWordWrap(False)
         left_layout.addWidget(self.instruction_label)
 
+        # Bottom flexible spacer
         left_layout.addStretch(1)
 
-        # Handover confirmation bar
+        # Handover instructions
         self.handover_label = QLabel()
         self.handover_label.setFont(QFont("Helvetica", 18))
         self.handover_label.setAlignment(Qt.AlignCenter)
@@ -726,7 +730,6 @@ class workpiecetaskscreen(QWidget):
             self.instruction_label.show()
             self.current_task_info = f"sum_{p1}_{p2}"
             
-            # Big, clearly readable sizes for subject viewing
             auto_fit_label(self.target_sum_label, f"Sum must be {p1}", max_size=36, min_size=24)
             auto_fit_label(self.instruction_label, str(p2), max_size=46, min_size=24)
 
