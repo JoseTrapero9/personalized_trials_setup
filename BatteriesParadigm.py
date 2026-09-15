@@ -181,7 +181,7 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
 
     for line in raw_lines:
         lower_line = line.lower()
-        if lower_line.startswith(("piece", "mode", "trial")):[cite: 1]
+        if lower_line.startswith(("piece", "mode", "trial")):
             continue
 
         if "\t" in line:
@@ -235,12 +235,12 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
 
 WORKPIECE_SEQUENCE = load_synch_sequence()
 
-def auto_fit_label(label, text, max_size=32, min_size=16, margin=40):
+def auto_fit_label(label, text, max_size=46, min_size=18, margin=40):
     """Dynamically scales font size to guarantee text fits on a single line."""
     label.setText(text)
     available_width = label.width()
     if available_width <= 100:
-        available_width = 900  # Safe initial guess prior to first full render
+        available_width = 1000
     
     target_width = max(available_width - margin, 100)
     font = label.font()
@@ -597,7 +597,7 @@ class workpiecetaskscreen(QWidget):
         left_layout = QVBoxLayout(self.left_panel)
         left_layout.setContentsMargins(30, 20, 30, 20)
         
-        # 1. Top Bar: Header and Timer Side-by-Side (Saves massive vertical space)
+        # Top Bar: Header and Timer
         top_bar = QHBoxLayout()
         self.header_label = QLabel("CURRENT WORKPIECE")
         self.header_label.setFont(QFont("Helvetica", 18, QFont.Bold))
@@ -612,15 +612,15 @@ class workpiecetaskscreen(QWidget):
         top_bar.addWidget(self.timer_label)
         left_layout.addLayout(top_bar)
 
-        # Warning indicator
+        # Warning indicator (Enlarged to 28pt Bold with 45px height)
         self.warning_label = QLabel("")
-        self.warning_label.setFont(QFont("Helvetica", 18, QFont.Bold))
-        self.warning_label.setStyleSheet("color: red;")
+        self.warning_label.setFont(QFont("Helvetica", 28, QFont.Bold))
+        self.warning_label.setStyleSheet("color: red; letter-spacing: 1px;")
         self.warning_label.setAlignment(Qt.AlignCenter)
-        self.warning_label.setFixedHeight(26)
+        self.warning_label.setFixedHeight(45)
         left_layout.addWidget(self.warning_label)
 
-        # Flexible vertical spacer pushing content toward center
+        # Vertical stretch pushes items toward center
         left_layout.addStretch(1)
 
         self.image_label = QLabel()
@@ -633,9 +633,9 @@ class workpiecetaskscreen(QWidget):
         self.target_sum_label.setStyleSheet("font-weight: bold; color: #111;")
         left_layout.addWidget(self.target_sum_label)
 
-        left_layout.addSpacing(10)
+        left_layout.addSpacing(12)
 
-        # Dedicated Instruction Label (Never wraps; dynamically auto-fitted)
+        # Dedicated Instruction Label (Large font size up to 46pt, single line)
         self.instruction_label = QLabel()
         self.instruction_label.setAlignment(Qt.AlignCenter)
         self.instruction_label.setStyleSheet("font-weight: bold; color: #0056B3;")
@@ -644,14 +644,14 @@ class workpiecetaskscreen(QWidget):
 
         left_layout.addStretch(1)
 
-        # Handover confirmation text
+        # Handover confirmation bar
         self.handover_label = QLabel()
-        self.handover_label.setFont(QFont("Helvetica", 16))
+        self.handover_label.setFont(QFont("Helvetica", 18))
         self.handover_label.setAlignment(Qt.AlignCenter)
-        self.handover_label.setStyleSheet("color: #222; padding: 8px; background-color: #F0F4F8; border-radius: 6px;")
+        self.handover_label.setStyleSheet("color: #222; padding: 10px; background-color: #F0F4F8; border-radius: 6px;")
         left_layout.addWidget(self.handover_label)
 
-        # Right Panel (Fixed width rules card)
+        # Right Panel (Rules Card)
         self.right_panel = QFrame()
         self.right_panel.setFrameShape(QFrame.StyledPanel)
         self.right_panel.setStyleSheet("background-color: #FAFAFA; border-radius: 10px;")
@@ -726,9 +726,9 @@ class workpiecetaskscreen(QWidget):
             self.instruction_label.show()
             self.current_task_info = f"sum_{p1}_{p2}"
             
-            # Dynamic auto-fitting guarantees 100% of the sentence fits without clipping
-            auto_fit_label(self.target_sum_label, f"Sum must be {p1}", max_size=32, min_size=20)
-            auto_fit_label(self.instruction_label, str(p2), max_size=30, min_size=18)
+            # Big, clearly readable sizes for subject viewing
+            auto_fit_label(self.target_sum_label, f"Sum must be {p1}", max_size=36, min_size=24)
+            auto_fit_label(self.instruction_label, str(p2), max_size=46, min_size=24)
 
         pt_name = "Point 1" if target_pt == 1 else "Point 2"
         key_hint = "F13" if target_pt == 1 else "F14"
