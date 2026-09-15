@@ -204,7 +204,6 @@ class XimeaWorker(threading.Thread):
         lsl_info = StreamInfo(preset["lsl_stream_name"], 'Markers', 1, 0, 'int32', preset["lsl_source_id"])
         self.outlet = StreamOutlet(lsl_info)
 
-        # Retrieve frame dimensions
         img = xiapi.Image()
         self.cam.get_image(img)
         frame = img.get_image_data_numpy()
@@ -245,12 +244,12 @@ class XimeaWorker(threading.Thread):
                 if recording_active and out:
                     out.write(frame)
 
-                # Downsample preview display
+                # Generate a 480x270 preview tile without extra color conversions
                 if loop_counter % 2 == 0:
-                    scale = 360.0 / self.height
-                    preview = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
-                    cv2.putText(preview, f"{self.model_name} ({'REC' if recording_active else 'IDLE'})",
-                                (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6,
+                    preview = cv2.resize(frame, (480, 270))
+                    status_text = f"{self.model_name} [{'REC' if recording_active else 'IDLE'}]"
+                    cv2.putText(preview, status_text, (10, 25),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6,
                                 (0, 0, 255) if recording_active else (0, 255, 0), 2)
                     with data_lock:
                         shared_data["ximea_previews"][self.preset["id"]] = preview
@@ -265,11 +264,10 @@ class XimeaWorker(threading.Thread):
 
 
 def init_and_configure_ximea():
-    """Initializes each camera sequentially in the main thread to avoid USB conflicts."""
     probe = xiapi.Camera()
     num_devices = probe.get_number_devices()
     print(f"\n[DISCOVERY] Detected {num_devices} XIMEA camera(s).")
-    
+
     configured_workers = []
 
     for i in range(num_devices):
@@ -294,7 +292,6 @@ def init_and_configure_ximea():
 
         print(f" -> Configured [{matched_preset['id']}] on {model_name} (SN: {sn}, dev_id: {i})")
 
-        # Apply calibrated parameters
         cam.set_imgdataformat('XI_RGB24')
         cam.set_exposure(matched_preset["exposure"])
         cam.set_gain(matched_preset["gain"])
@@ -326,6 +323,8 @@ if __name__ == "__main__":
             shared_data["is_recording"] = True
             shared_data["session_timestamp"] = datetime.now().strftime("%Y%m%d_%H%M%S")
 
+    cv2.namedWindow("Multi-Camera Dashboard (ZED + XIMEA)", cv2.WINDOW_NORMAL)
+
     print("\n--------------------------------------------------")
     print(f"Destination: {RECORDINGS_DIR}")
     print("CONTROLS:")
@@ -346,34 +345,54 @@ if __name__ == "__main__":
                     local_bodies = shared_data["bodies"]
                     capture_fps = shared_data["capture_fps"]
                     is_recording_active = shared_data["is_recording"]
-                ximea_frames = list(shared_data["ximea_previews"].values())
+                previews = shared_data["ximea_previews"].copy()
 
-            # 1. ZED View
+            # --- 1. Left Panel: ZED Feed (960x540) ---
             if local_image is not None:
-                fps_text = f"Capture: {capture_fps:.1f} FPS"
-                cv2.rectangle(local_image, (10, 10), (280, 45), (0, 0, 0), -1)
-                cv2.putText(local_image, fps_text, (15, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+                if local_image.shape[2] == 4:
+                    zed_frame = cv2.cvtColor(local_image, cv2.COLOR_BGRA2BGR)
+                else:
+                    zed_frame = local_image
+
+                fps_text = f"ZED FPS: {capture_fps:.1f} (1080p)"
+                cv2.rectangle(zed_frame, (10, 10), (320, 45), (0, 0, 0), -1)
+                cv2.putText(zed_frame, fps_text, (15, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
                 if is_recording_active:
-                    h, w = local_image.shape[:2]
-                    cv2.circle(local_image, (w - 110, 30), 10, (0, 0, 255), -1)
-                    cv2.putText(local_image, "REC", (w - 90, 38), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+                    h, w = zed_frame.shape[:2]
+                    cv2.circle(zed_frame, (w - 110, 30), 10, (0, 0, 255), -1)
+                    cv2.putText(zed_frame, "REC", (w - 90, 38), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
 
                 for person in local_bodies:
                     for kp in person['keypoints_2d']:
                         if not np.isnan(kp[0]) and not np.isnan(kp[1]):
-                            cv2.circle(local_image, (int(kp[0]), int(kp[1])), 4, (0, 255, 0), -1)
+                            cv2.circle(zed_frame, (int(kp[0]), int(kp[1])), 4, (0, 255, 0), -1)
 
-                cv2.imshow("ZED - 38 Point Tracking", local_image)
+                zed_display = cv2.resize(zed_frame, (960, 540))
+            else:
+                zed_display = np.zeros((540, 960, 3), dtype=np.uint8)
+                cv2.putText(zed_display, "Waiting for ZED...", (300, 270),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
 
-            # 2. XIMEA Dual View (Aligned vertically)
-            if len(ximea_frames) >= 2:
-                cv2.imshow("XIMEA Feeds (MQ013 & MC050)", np.hstack(ximea_frames))
-            elif len(ximea_frames) == 1:
-                cv2.imshow("XIMEA Feeds (MQ013 & MC050)", ximea_frames[0])
+            # --- 2. Right Panel: Vertically Stacked XIMEA Feeds (480x540 total) ---
+            ximea_tiles = []
+            for preset_info in XIMEA_PRESETS.values():
+                pid = preset_info["id"]
+                if pid in previews:
+                    ximea_tiles.append(previews[pid])
+                else:
+                    blank = np.zeros((270, 480, 3), dtype=np.uint8)
+                    cv2.putText(blank, f"Connecting {preset_info['name_match']}...", (60, 135),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 100, 100), 2)
+                    ximea_tiles.append(blank)
+
+            right_column = np.vstack(ximea_tiles)
+
+            # --- 3. Combined Canvas (1440x540) ---
+            dashboard = np.hstack([zed_display, right_column])
+            cv2.imshow("Multi-Camera Dashboard (ZED + XIMEA)", dashboard)
 
             key = cv2.waitKey(20) & 0xFF
-
             if key == 27:
                 is_running = False
                 break
