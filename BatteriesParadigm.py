@@ -162,7 +162,7 @@ def activate_haptic_vest():
     if haptic_loop is not None:
         asyncio.run_coroutine_threadsafe(trigger_vest_async(), haptic_loop)
 
-font_size_multiplier = 1.2
+font_size_multiplier = 1.4
 difficulty = "hard"
 subject_number = "1"
 current_condition = "training"
@@ -246,8 +246,8 @@ class setupscreen(QWidget):
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(int(15 * font_size_multiplier))
         
-        main_font = QFont("Helvetica", int(15 * font_size_multiplier))
-        title_font = QFont("Helvetica", int(18 * font_size_multiplier), QFont.Bold)
+        main_font = QFont("Helvetica", int(16 * font_size_multiplier))
+        title_font = QFont("Helvetica", int(20 * font_size_multiplier), QFont.Bold)
         
         self.title_label = QLabel("Experiment Configuration")
         self.title_label.setFont(title_font)
@@ -259,7 +259,7 @@ class setupscreen(QWidget):
         
         self.subj_combo = QComboBox()
         self.subj_combo.setFont(main_font)
-        self.subj_combo.setFixedWidth(int(280 * font_size_multiplier))
+        self.subj_combo.setFixedWidth(int(300 * font_size_multiplier))
         for i in range(1, 100):
             self.subj_combo.addItem(str(i))
         layout.addWidget(self.subj_combo, alignment=Qt.AlignCenter)
@@ -270,7 +270,7 @@ class setupscreen(QWidget):
         
         self.cond_combo = QComboBox()
         self.cond_combo.setFont(main_font)
-        self.cond_combo.setFixedWidth(int(280 * font_size_multiplier))
+        self.cond_combo.setFixedWidth(int(300 * font_size_multiplier))
         self.cond_combo.addItems(["training", "baseline", "easy", "hard", "manual"])
         self.cond_combo.currentTextChanged.connect(self.on_condition_changed)
         layout.addWidget(self.cond_combo, alignment=Qt.AlignCenter)
@@ -283,8 +283,8 @@ class setupscreen(QWidget):
         self.scenario_list_widget.setFont(main_font)
         self.scenario_list_widget.setDragDropMode(QAbstractItemView.InternalMove)
         self.scenario_list_widget.setDefaultDropAction(Qt.MoveAction)
-        self.scenario_list_widget.setFixedWidth(int(360 * font_size_multiplier))
-        self.scenario_list_widget.setFixedHeight(int(160 * font_size_multiplier))
+        self.scenario_list_widget.setFixedWidth(int(380 * font_size_multiplier))
+        self.scenario_list_widget.setFixedHeight(int(170 * font_size_multiplier))
 
         scenarios = ["audio", "haptic", "audio_haptic", "robot_fast", "robot_slow", "baseline"]
         for sc in scenarios:
@@ -300,8 +300,8 @@ class setupscreen(QWidget):
         
         self.continue_button = QPushButton("Continue")
         self.continue_button.setFont(main_font)
-        self.continue_button.setFixedWidth(int(280 * font_size_multiplier))
-        self.continue_button.setFixedHeight(int(55 * font_size_multiplier))
+        self.continue_button.setFixedWidth(int(300 * font_size_multiplier))
+        self.continue_button.setFixedHeight(int(60 * font_size_multiplier))
         self.continue_button.clicked.connect(self.save_and_continue)
         layout.addWidget(self.continue_button, alignment=Qt.AlignCenter)
         
@@ -348,11 +348,11 @@ class startscreen(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(25 * font_size_multiplier))
+        layout.setSpacing(int(20 * font_size_multiplier))
         
-        main_font = QFont("Helvetica", int(18 * font_size_multiplier))
-        button_font = QFont("Helvetica", int(16 * font_size_multiplier))
-        timer_font = QFont("Helvetica", int(42 * font_size_multiplier), QFont.Bold)
+        main_font = QFont("Helvetica", int(20 * font_size_multiplier))
+        button_font = QFont("Helvetica", int(18 * font_size_multiplier))
+        timer_font = QFont("Helvetica", int(46 * font_size_multiplier), QFont.Bold)
         
         intro_text = ("<b>Paradigm Start</b><br><br>"
                       "1. Retrieve parts from Container I or II.<br>"
@@ -375,8 +375,8 @@ class startscreen(QWidget):
 
         self.start_button = QPushButton("Start Paradigm")
         self.start_button.setFont(button_font)
-        self.start_button.setFixedWidth(int(280 * font_size_multiplier))
-        self.start_button.setFixedHeight(int(65 * font_size_multiplier))
+        self.start_button.setFixedWidth(int(300 * font_size_multiplier))
+        self.start_button.setFixedHeight(int(70 * font_size_multiplier))
         self.start_button.clicked.connect(self.on_start_clicked)
         layout.addWidget(self.start_button, alignment=Qt.AlignCenter)
         
@@ -418,9 +418,9 @@ class restscreen(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(35 * font_size_multiplier))
-        main_font = QFont("Helvetica", int(22 * font_size_multiplier), QFont.Bold)
-        timer_font = QFont("Helvetica", int(50 * font_size_multiplier), QFont.Bold)
+        layout.setSpacing(int(25 * font_size_multiplier))
+        main_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
+        timer_font = QFont("Helvetica", int(55 * font_size_multiplier), QFont.Bold)
         
         self.message_label = QLabel("Great job! Take a short break.<br><br>The next scenario will start soon.")
         self.message_label.setFont(main_font)
@@ -457,10 +457,10 @@ class longrestscreen(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(35 * font_size_multiplier))
+        layout.setSpacing(int(25 * font_size_multiplier))
         
-        main_font = QFont("Helvetica", int(22 * font_size_multiplier), QFont.Bold)
-        button_font = QFont("Helvetica", int(16 * font_size_multiplier))
+        main_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
+        button_font = QFont("Helvetica", int(18 * font_size_multiplier))
         
         self.message_label = QLabel("You have completed a block of 3 scenarios.<br><br>Please take a longer break.<br>Press the button when you are ready to continue.")
         self.message_label.setFont(main_font)
@@ -469,8 +469,8 @@ class longrestscreen(QWidget):
         
         self.resume_button = QPushButton("Continue Measurements")
         self.resume_button.setFont(button_font)
-        self.resume_button.setFixedWidth(int(360 * font_size_multiplier))
-        self.resume_button.setFixedHeight(int(70 * font_size_multiplier))
+        self.resume_button.setFixedWidth(int(380 * font_size_multiplier))
+        self.resume_button.setFixedHeight(int(75 * font_size_multiplier))
         self.resume_button.clicked.connect(self.on_resume_clicked)
         layout.addWidget(self.resume_button, alignment=Qt.AlignCenter)
         
@@ -498,10 +498,10 @@ class retrievalscreen(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(25 * font_size_multiplier))
+        layout.setSpacing(int(20 * font_size_multiplier))
 
-        main_font = QFont("Helvetica", int(20 * font_size_multiplier))
-        timer_font = QFont("Helvetica", int(50 * font_size_multiplier), QFont.Bold)
+        main_font = QFont("Helvetica", int(22 * font_size_multiplier))
+        timer_font = QFont("Helvetica", int(55 * font_size_multiplier), QFont.Bold)
 
         self.instruction_label = QLabel("")
         self.instruction_label.setFont(main_font)
@@ -569,21 +569,22 @@ class workpiecetaskscreen(QWidget):
 
     def init_ui(self):
         main_layout = QHBoxLayout()
-        main_layout.setContentsMargins(15, 15, 15, 15)
+        main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(int(15 * font_size_multiplier))
         
         self.left_panel = QFrame()
         self.left_panel.setFrameShape(QFrame.StyledPanel)
         self.left_panel.setStyleSheet("background-color: white; border-radius: 8px;")
+        
         left_layout = QVBoxLayout(self.left_panel)
-        left_layout.setContentsMargins(20, 15, 20, 15)
+        left_layout.setContentsMargins(15, 10, 15, 10)
         left_layout.setAlignment(Qt.AlignCenter)
-        left_layout.setSpacing(int(8 * font_size_multiplier))
+        left_layout.setSpacing(int(6 * font_size_multiplier))
 
-        title_font = QFont("Helvetica", int(18 * font_size_multiplier), QFont.Bold)
-        body_font = QFont("Helvetica", int(14 * font_size_multiplier))
-        timer_font = QFont("Helvetica", int(36 * font_size_multiplier), QFont.Bold)
-        warn_font = QFont("Helvetica", int(18 * font_size_multiplier), QFont.Bold)
+        title_font = QFont("Helvetica", int(21 * font_size_multiplier), QFont.Bold)
+        body_font = QFont("Helvetica", int(17 * font_size_multiplier))
+        timer_font = QFont("Helvetica", int(42 * font_size_multiplier), QFont.Bold)
+        warn_font = QFont("Helvetica", int(20 * font_size_multiplier), QFont.Bold)
 
         self.header_label = QLabel("CURRENT WORKPIECE")
         self.header_label.setFont(title_font)
@@ -596,7 +597,7 @@ class workpiecetaskscreen(QWidget):
         self.warning_label = QLabel("")
         self.warning_label.setFont(warn_font)
         self.warning_label.setStyleSheet("color: red;")
-        self.warning_label.setFixedHeight(int(25 * font_size_multiplier))
+        self.warning_label.setFixedHeight(int(28 * font_size_multiplier))
         self.warning_label.setAlignment(Qt.AlignCenter)
         left_layout.addWidget(self.warning_label, alignment=Qt.AlignCenter)
 
@@ -604,12 +605,10 @@ class workpiecetaskscreen(QWidget):
         self.image_label.setAlignment(Qt.AlignCenter)
         left_layout.addWidget(self.image_label, alignment=Qt.AlignCenter)
 
-        # Dedicated sizing to prevent line truncation
         self.instruction_label = QLabel()
         self.instruction_label.setFont(title_font)
         self.instruction_label.setAlignment(Qt.AlignCenter)
         self.instruction_label.setWordWrap(True)
-        self.instruction_label.setMinimumHeight(int(75 * font_size_multiplier))
         left_layout.addWidget(self.instruction_label, alignment=Qt.AlignCenter)
 
         self.handover_label = QLabel()
@@ -620,12 +619,12 @@ class workpiecetaskscreen(QWidget):
         self.right_panel = QFrame()
         self.right_panel.setFrameShape(QFrame.StyledPanel)
         self.right_panel.setStyleSheet("background-color: #FAFAFA; border-radius: 8px;")
-        self.right_panel.setMaximumWidth(int(320 * font_size_multiplier))
+        self.right_panel.setMaximumWidth(int(340 * font_size_multiplier))
         
         right_layout = QVBoxLayout(self.right_panel)
-        right_layout.setContentsMargins(15, 20, 15, 20)
+        right_layout.setContentsMargins(15, 15, 15, 15)
         right_layout.setAlignment(Qt.AlignTop)
-        right_layout.setSpacing(int(8 * font_size_multiplier))
+        right_layout.setSpacing(int(6 * font_size_multiplier))
 
         rules_head = QLabel("Rules")
         rules_head.setFont(title_font)
@@ -645,7 +644,6 @@ class workpiecetaskscreen(QWidget):
         rules_colors.setFont(body_font)
         right_layout.addWidget(rules_colors)
 
-        # Allocate 80% width to left_panel, 20% to right_panel
         main_layout.addWidget(self.left_panel, 4)
         main_layout.addWidget(self.right_panel, 1)
         self.setLayout(main_layout)
@@ -1027,14 +1025,13 @@ def run_paradigm():
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(cleanup_resources)
     
-    # Identify target display (external monitor screens[1] if present, otherwise primary)
     screens = app.screens()
     target_screen = screens[1] if len(screens) > 1 else screens[0]
     geo = target_screen.geometry()
     
-    # Compute proportional 2D multiplier based on target display resolution
+    # Scale proportionally: ~1.36 on 1680x1050, ~1.55 on 1920x1080
     scale_factor = min(geo.width() / 1920.0, geo.height() / 1080.0)
-    font_size_multiplier = max(1.0, scale_factor * 1.35)
+    font_size_multiplier = max(1.15, scale_factor * 1.55)
     print(f"Target Screen: {geo.width()}x{geo.height()} -> Scaled Multiplier: {font_size_multiplier:.3f}")
     
     audio_sys.setup_devices(participant_keyword="Beats", researcher_keyword="Realtek")
