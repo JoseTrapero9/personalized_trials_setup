@@ -131,7 +131,7 @@ class AudioController:
                 sd.play(data, samplerate=fs, device=device_id)
                 sd.wait()
         except Exception as e:
-                print(f"Alarm loop error: {e}")
+            print(f"Alarm loop error: {e}")
 
 audio_sys = AudioController()
 haptic_loop = None
@@ -176,24 +176,22 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
             raw_lines = [line.strip() for line in f if line.strip()]
 
         for line in raw_lines:
-            # skip header lines
             lower_line = line.lower()
-            if lower_line.startswith("piece") or lower_line.startswith("mode") or lower_line.startswith("trial"):
+            if lower_line.startswith(("piece", "mode", "trial")):
                 continue
 
-            # split by tabs if available, otherwise by multiple spaces or comma
+            # Prioritize tab separation (TSV) over commas and space splits
             if "\t" in line:
                 tokens = [t.strip() for t in line.split("\t") if t.strip()]
-            elif "," in line:
-                reader = csv.reader([line])
-                tokens = [t.strip() for t in next(reader) if t.strip()]
+            elif "," in line and not re.search(r'\s{2,}', line):
+                tokens = [t.strip() for t in next(csv.reader([line])) if t.strip()]
             else:
                 tokens = [t.strip() for t in re.split(r'\s{2,}', line) if t.strip()]
 
             if not tokens:
                 continue
 
-            # handle image modality
+            # Handle image modality
             if tokens[0].lower() == "image" and len(tokens) >= 2:
                 sequence.append(("image", tokens[1], None))
                 continue
@@ -201,7 +199,7 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
                 sequence.append(("image", tokens[2], None))
                 continue
 
-            # handle explicit text keyword
+            # Handle explicit text keyword
             if tokens[0].lower() == "text" and len(tokens) >= 3:
                 try:
                     sequence.append(("text", int(tokens[1]), tokens[2]))
@@ -209,7 +207,7 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
                 except ValueError:
                     pass
 
-            # handle standard format: piece_num, sum, instruction, optional_answer
+            # Handle standard format: piece_num, sum, instruction, optional_answer
             if len(tokens) >= 3:
                 try:
                     target_sum = int(tokens[1])
@@ -219,7 +217,7 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
                 except ValueError:
                     pass
 
-            # fallback regex for space-delimited formats
+            # Fallback regex for spaced format
             match = re.match(r'^\s*(\d+)\s+(\d+)\s+(.+?)(?:\s{2,}|\t)(.+)$', line)
             if match:
                 try:
@@ -231,7 +229,6 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt"
                     pass
 
     if not sequence:
-        # fallback sequence if file is missing or unparseable
         for i in range(1, 41):
             sequence.append(("text", random.choice([6, 7, 8, 9]), "Assemble accordingly"))
             
@@ -283,7 +280,6 @@ class setupscreen(QWidget):
         self.cond_combo.currentTextChanged.connect(self.on_condition_changed)
         layout.addWidget(self.cond_combo, alignment=Qt.AlignCenter)
         
-        # scenario selection and ordering group
         self.scenario_group = QGroupBox("Order Scenarios (Drag & Drop, Check to Include)")
         self.scenario_group.setFont(main_font)
         group_layout = QVBoxLayout()
@@ -563,17 +559,14 @@ class workpiecetaskscreen(QWidget):
         self.current_task_info = ""
         self.warn_visible = False
         
-        # evaluation tracking per workpiece
         self.current_trial_num = 0
         self.evaluated = False
         self.assembly_status = "none"
         self.pending_log = None
 
-        # main 1-second countdown timer
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.timer_tick)
         
-        # 500 ms timer for blinking warning text
         self.blink_timer = QTimer(self)
         self.blink_timer.timeout.connect(self.toggle_warning_blink)
         
@@ -583,18 +576,17 @@ class workpiecetaskscreen(QWidget):
         main_layout = QHBoxLayout()
         main_layout.setSpacing(int(20 * font_size_multiplier))
         
-        # left panel
         self.left_panel = QFrame()
         self.left_panel.setFrameShape(QFrame.StyledPanel)
         self.left_panel.setStyleSheet("background-color: white; border-radius: 8px;")
         left_layout = QVBoxLayout(self.left_panel)
         left_layout.setAlignment(Qt.AlignCenter)
-        left_layout.setSpacing(int(15 * font_size_multiplier))
+        left_layout.setSpacing(int(10 * font_size_multiplier))
 
-        title_font = QFont("Helvetica", int(22 * font_size_multiplier), QFont.Bold)
-        body_font = QFont("Helvetica", int(18 * font_size_multiplier))
-        timer_font = QFont("Helvetica", int(48 * font_size_multiplier), QFont.Bold)
-        warn_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
+        title_font = QFont("Helvetica", int(20 * font_size_multiplier), QFont.Bold)
+        body_font = QFont("Helvetica", int(16 * font_size_multiplier))
+        timer_font = QFont("Helvetica", int(44 * font_size_multiplier), QFont.Bold)
+        warn_font = QFont("Helvetica", int(22 * font_size_multiplier), QFont.Bold)
 
         self.header_label = QLabel("CURRENT WORKPIECE")
         self.header_label.setFont(title_font)
@@ -604,11 +596,10 @@ class workpiecetaskscreen(QWidget):
         self.timer_label.setFont(timer_font)
         left_layout.addWidget(self.timer_label, alignment=Qt.AlignCenter)
 
-        # blinking warning label
         self.warning_label = QLabel("")
         self.warning_label.setFont(warn_font)
         self.warning_label.setStyleSheet("color: red;")
-        self.warning_label.setFixedHeight(int(35 * font_size_multiplier))
+        self.warning_label.setFixedHeight(int(30 * font_size_multiplier))
         self.warning_label.setAlignment(Qt.AlignCenter)
         left_layout.addWidget(self.warning_label, alignment=Qt.AlignCenter)
 
@@ -627,7 +618,6 @@ class workpiecetaskscreen(QWidget):
         self.handover_label.setAlignment(Qt.AlignCenter)
         left_layout.addWidget(self.handover_label, alignment=Qt.AlignCenter)
 
-        # right panel
         self.right_panel = QFrame()
         self.right_panel.setFrameShape(QFrame.StyledPanel)
         self.right_panel.setStyleSheet("background-color: #FAFAFA; border-radius: 8px;")
@@ -658,7 +648,6 @@ class workpiecetaskscreen(QWidget):
         self.setLayout(main_layout)
 
     def start_task(self, trial_num, target_pt):
-        # flush any unwritten pending log from the previous trial
         self.flush_pending_log()
 
         scenario = self.get_scenario_cb()
@@ -683,7 +672,8 @@ class workpiecetaskscreen(QWidget):
         mode, p1, p2 = WORKPIECE_SEQUENCE[idx]
 
         if mode == "image":
-            self.instruction_label.setText("")
+            self.instruction_label.hide()
+            self.image_label.show()
             self.current_task_info = f"image_{p1}"
             img_path = os.path.join(base_dir, "workpieces", p1)
             if os.path.exists(img_path):
@@ -693,6 +683,8 @@ class workpiecetaskscreen(QWidget):
                 self.image_label.setText(f"[Image: {p1}]")
         else:
             self.image_label.clear()
+            self.image_label.hide()
+            self.instruction_label.show()
             self.current_task_info = f"sum_{p1}_{p2}"
             self.instruction_label.setText(f"Sum must be {p1}\n{p2}")
 
@@ -713,7 +705,6 @@ class workpiecetaskscreen(QWidget):
         self.timer.start(1000)
 
     def record_evaluation(self, is_correct):
-        # allow evaluation once per piece either during the task or in subsequent transitions
         if self.current_trial_num == 0 or self.evaluated:
             return
 
@@ -721,11 +712,9 @@ class workpiecetaskscreen(QWidget):
         self.assembly_status = "correct" if is_correct else "incorrect"
         send_marker(f"Assembly_Evaluated_{self.assembly_status}")
 
-        # negative reinforcement on incorrect answer
         if not is_correct:
             audio_sys.play_participant(incorrect_audio)
 
-        # if task was already submitted, update and write the pending log immediately
         if self.pending_log is not None:
             self.pending_log["assembly_status"] = self.assembly_status
             self._write_csv_row(self.pending_log)
@@ -738,7 +727,6 @@ class workpiecetaskscreen(QWidget):
     def timer_tick(self):
         self.ticks_left -= 1
         
-        # switch to red and start blinking in the last 10 seconds
         if 0 < self.ticks_left <= 10:
             self.timer_label.setStyleSheet("color: red;")
             if not self.blink_timer.isActive():
@@ -783,12 +771,10 @@ class workpiecetaskscreen(QWidget):
             "assembly_status": self.assembly_status
         }
 
-        # if observer already pressed y or c during the task, write log immediately
         if self.evaluated:
             self._write_csv_row(log_data)
             self.pending_log = None
         else:
-            # hold pending log to allow observer to evaluate during retrieval/rest
             self.pending_log = log_data
         
         self.active_collection_pt = None
@@ -872,14 +858,12 @@ class paradigmcontroller(QWidget):
         self.mistake_shortcut = QShortcut(QKeySequence("F12"), self)
         self.mistake_shortcut.activated.connect(self.trigger_mistake)
 
-        # completion shortcuts for participant
         self.f13_shortcut = QShortcut(QKeySequence("F13"), self)
         self.f13_shortcut.activated.connect(lambda: self.task_screen.handover_received(1))
 
         self.f14_shortcut = QShortcut(QKeySequence("F14"), self)
         self.f14_shortcut.activated.connect(lambda: self.task_screen.handover_received(2))
 
-        # global shortcuts across all screens for observer evaluation
         self.y_shortcut = QShortcut(QKeySequence("y"), self)
         self.y_shortcut.activated.connect(lambda: self.task_screen.record_evaluation(True))
 
