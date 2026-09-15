@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit,
                              QShortcut, QComboBox, QGridLayout, QCheckBox, QGroupBox, QFrame,
                              QListWidget, QAbstractItemView, QListWidgetItem)
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QFont, QKeySequence, QPixmap
+from PyQt5.QtGui import QFont, QKeySequence, QPixmap, QFontMetrics
 from pylsl import StreamInfo, StreamOutlet
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -162,7 +162,6 @@ def activate_haptic_vest():
     if haptic_loop is not None:
         asyncio.run_coroutine_threadsafe(trigger_vest_async(), haptic_loop)
 
-font_size_multiplier = 1.3
 difficulty = "hard"
 subject_number = "1"
 current_condition = "training"
@@ -171,69 +170,87 @@ robot_process = None
 
 def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt")):
     sequence = []
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8-sig") as f:
-            raw_lines = [line.strip() for line in f if line.strip()]
-
-        for line in raw_lines:
-            lower_line = line.lower()
-            if lower_line.startswith(("piece", "mode", "trial")):
-                continue
-
-            if "\t" in line:
-                tokens = [t.strip() for t in line.split("\t") if t.strip()]
-            elif "," in line and not re.search(r'\s{2,}', line):
-                tokens = [t.strip() for t in next(csv.reader([line])) if t.strip()]
-            else:
-                tokens = [t.strip() for t in re.split(r'\s{2,}', line) if t.strip()]
-
-            if not tokens:
-                continue
-
-            if tokens[0].lower() == "image" and len(tokens) >= 2:
-                sequence.append(("image", tokens[1], None))
-                continue
-            elif len(tokens) >= 3 and tokens[1].lower() == "image":
-                sequence.append(("image", tokens[2], None))
-                continue
-
-            if tokens[0].lower() == "text" and len(tokens) >= 3:
-                try:
-                    sequence.append(("text", int(tokens[1]), tokens[2]))
-                    continue
-                except ValueError:
-                    pass
-
-            if len(tokens) >= 3:
-                try:
-                    target_sum = int(tokens[1])
-                    instruction_text = tokens[2]
-                    sequence.append(("text", target_sum, instruction_text))
-                    continue
-                except ValueError:
-                    pass
-
-            match = re.match(r'^\s*(\d+)\s+(\d+)\s+(.+?)(?:\s{2,}|\t)(.+)$', line)
-            if match:
-                try:
-                    target_sum = int(match.group(2))
-                    instruction_text = match.group(3).strip()
-                    sequence.append(("text", target_sum, instruction_text))
-                    continue
-                except ValueError:
-                    pass
-
-    if not sequence:
+    if not os.path.exists(path):
+        print(f"Warning: File not found at {path}. Using fallback sequence.")
         for i in range(1, 41):
             sequence.append(("text", random.choice([6, 7, 8, 9]), "Assemble accordingly"))
-            
-    print(f"Loaded {len(sequence)} tasks from sequence file:")
+        return sequence
+
+    with open(path, "r", encoding="utf-8-sig") as f:
+        raw_lines = [line.strip() for line in f if line.strip()]
+
+    for line in raw_lines:
+        lower_line = line.lower()
+        if lower_line.startswith(("piece", "mode", "trial")):[cite: 1]
+            continue
+
+        if "\t" in line:
+            tokens = [t.strip() for t in line.split("\t") if t.strip()]
+        elif "," in line and not re.search(r'\s{2,}', line):
+            tokens = [t.strip() for t in next(csv.reader([line])) if t.strip()]
+        else:
+            tokens = [t.strip() for t in re.split(r'\s{2,}', line) if t.strip()]
+
+        if not tokens:
+            continue
+
+        if tokens[0].lower() == "image" and len(tokens) >= 2:
+            sequence.append(("image", tokens[1], None))
+            continue
+        elif len(tokens) >= 3 and tokens[1].lower() == "image":
+            sequence.append(("image", tokens[2], None))
+            continue
+
+        if tokens[0].lower() == "text" and len(tokens) >= 3:
+            try:
+                sequence.append(("text", int(tokens[1]), tokens[2]))
+                continue
+            except ValueError:
+                pass
+
+        if len(tokens) >= 3:
+            try:
+                target_sum = int(tokens[1])
+                instruction_text = tokens[2]
+                sequence.append(("text", target_sum, instruction_text))
+                continue
+            except ValueError:
+                pass
+
+        match = re.match(r'^\s*(\d+)\s+(\d+)\s+(.+?)(?:\s{2,}|\t)(.+)$', line)
+        if match:
+            try:
+                target_sum = int(match.group(2))
+                instruction_text = match.group(3).strip()
+                sequence.append(("text", target_sum, instruction_text))
+                continue
+            except ValueError:
+                pass
+
+    print(f"\n--- Loaded {len(sequence)} Tasks From Sequence ---")
     for i, (m, p1, p2) in enumerate(sequence[:3]):
-        print(f"  Item {i+1}: mode={m}, sum={p1}, instruction='{p2}'")
-        
+        print(f"Task {i+1}: Sum={p1}, Instruction='{p2}'")
+    print("------------------------------------------\n")
     return sequence
 
 WORKPIECE_SEQUENCE = load_synch_sequence()
+
+def auto_fit_label(label, text, max_size=32, min_size=16, margin=40):
+    """Dynamically scales font size to guarantee text fits on a single line."""
+    label.setText(text)
+    available_width = label.width()
+    if available_width <= 100:
+        available_width = 900  # Safe initial guess prior to first full render
+    
+    target_width = max(available_width - margin, 100)
+    font = label.font()
+    for size in range(max_size, min_size - 1, -1):
+        font.setPointSize(size)
+        fm = QFontMetrics(font)
+        text_width = fm.horizontalAdvance(text) if hasattr(fm, 'horizontalAdvance') else fm.width(text)
+        if text_width <= target_width:
+            break
+    label.setFont(font)
 
 class setupscreen(QWidget):
     def __init__(self, switch_callback):
@@ -244,10 +261,10 @@ class setupscreen(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(15 * font_size_multiplier))
+        layout.setSpacing(15)
         
-        main_font = QFont("Helvetica", int(16 * font_size_multiplier))
-        title_font = QFont("Helvetica", int(20 * font_size_multiplier), QFont.Bold)
+        main_font = QFont("Helvetica", 14)
+        title_font = QFont("Helvetica", 18, QFont.Bold)
         
         self.title_label = QLabel("Experiment Configuration")
         self.title_label.setFont(title_font)
@@ -259,7 +276,7 @@ class setupscreen(QWidget):
         
         self.subj_combo = QComboBox()
         self.subj_combo.setFont(main_font)
-        self.subj_combo.setFixedWidth(int(300 * font_size_multiplier))
+        self.subj_combo.setFixedWidth(280)
         for i in range(1, 100):
             self.subj_combo.addItem(str(i))
         layout.addWidget(self.subj_combo, alignment=Qt.AlignCenter)
@@ -270,7 +287,7 @@ class setupscreen(QWidget):
         
         self.cond_combo = QComboBox()
         self.cond_combo.setFont(main_font)
-        self.cond_combo.setFixedWidth(int(300 * font_size_multiplier))
+        self.cond_combo.setFixedWidth(280)
         self.cond_combo.addItems(["training", "baseline", "easy", "hard", "manual"])
         self.cond_combo.currentTextChanged.connect(self.on_condition_changed)
         layout.addWidget(self.cond_combo, alignment=Qt.AlignCenter)
@@ -283,8 +300,8 @@ class setupscreen(QWidget):
         self.scenario_list_widget.setFont(main_font)
         self.scenario_list_widget.setDragDropMode(QAbstractItemView.InternalMove)
         self.scenario_list_widget.setDefaultDropAction(Qt.MoveAction)
-        self.scenario_list_widget.setFixedWidth(int(380 * font_size_multiplier))
-        self.scenario_list_widget.setFixedHeight(int(170 * font_size_multiplier))
+        self.scenario_list_widget.setFixedWidth(360)
+        self.scenario_list_widget.setFixedHeight(150)
 
         scenarios = ["audio", "haptic", "audio_haptic", "robot_fast", "robot_slow", "baseline"]
         for sc in scenarios:
@@ -300,8 +317,8 @@ class setupscreen(QWidget):
         
         self.continue_button = QPushButton("Continue")
         self.continue_button.setFont(main_font)
-        self.continue_button.setFixedWidth(int(300 * font_size_multiplier))
-        self.continue_button.setFixedHeight(int(60 * font_size_multiplier))
+        self.continue_button.setFixedWidth(280)
+        self.continue_button.setFixedHeight(50)
         self.continue_button.clicked.connect(self.save_and_continue)
         layout.addWidget(self.continue_button, alignment=Qt.AlignCenter)
         
@@ -348,11 +365,11 @@ class startscreen(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(20 * font_size_multiplier))
+        layout.setSpacing(25)
         
-        main_font = QFont("Helvetica", int(20 * font_size_multiplier))
-        button_font = QFont("Helvetica", int(18 * font_size_multiplier))
-        timer_font = QFont("Helvetica", int(46 * font_size_multiplier), QFont.Bold)
+        main_font = QFont("Helvetica", 18)
+        button_font = QFont("Helvetica", 16)
+        timer_font = QFont("Helvetica", 42, QFont.Bold)
         
         intro_text = ("<b>Paradigm Start</b><br><br>"
                       "1. Retrieve parts from Container I or II.<br>"
@@ -375,8 +392,8 @@ class startscreen(QWidget):
 
         self.start_button = QPushButton("Start Paradigm")
         self.start_button.setFont(button_font)
-        self.start_button.setFixedWidth(int(300 * font_size_multiplier))
-        self.start_button.setFixedHeight(int(70 * font_size_multiplier))
+        self.start_button.setFixedWidth(280)
+        self.start_button.setFixedHeight(60)
         self.start_button.clicked.connect(self.on_start_clicked)
         layout.addWidget(self.start_button, alignment=Qt.AlignCenter)
         
@@ -418,9 +435,9 @@ class restscreen(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(25 * font_size_multiplier))
-        main_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
-        timer_font = QFont("Helvetica", int(55 * font_size_multiplier), QFont.Bold)
+        layout.setSpacing(25)
+        main_font = QFont("Helvetica", 22, QFont.Bold)
+        timer_font = QFont("Helvetica", 50, QFont.Bold)
         
         self.message_label = QLabel("Great job! Take a short break.<br><br>The next scenario will start soon.")
         self.message_label.setFont(main_font)
@@ -457,10 +474,10 @@ class longrestscreen(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(25 * font_size_multiplier))
+        layout.setSpacing(25)
         
-        main_font = QFont("Helvetica", int(24 * font_size_multiplier), QFont.Bold)
-        button_font = QFont("Helvetica", int(18 * font_size_multiplier))
+        main_font = QFont("Helvetica", 22, QFont.Bold)
+        button_font = QFont("Helvetica", 16)
         
         self.message_label = QLabel("You have completed a block of 3 scenarios.<br><br>Please take a longer break.<br>Press the button when you are ready to continue.")
         self.message_label.setFont(main_font)
@@ -469,8 +486,8 @@ class longrestscreen(QWidget):
         
         self.resume_button = QPushButton("Continue Measurements")
         self.resume_button.setFont(button_font)
-        self.resume_button.setFixedWidth(int(380 * font_size_multiplier))
-        self.resume_button.setFixedHeight(int(75 * font_size_multiplier))
+        self.resume_button.setFixedWidth(340)
+        self.resume_button.setFixedHeight(70)
         self.resume_button.clicked.connect(self.on_resume_clicked)
         layout.addWidget(self.resume_button, alignment=Qt.AlignCenter)
         
@@ -498,10 +515,10 @@ class retrievalscreen(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(int(20 * font_size_multiplier))
+        layout.setSpacing(25)
 
-        main_font = QFont("Helvetica", int(22 * font_size_multiplier))
-        timer_font = QFont("Helvetica", int(55 * font_size_multiplier), QFont.Bold)
+        main_font = QFont("Helvetica", 20)
+        timer_font = QFont("Helvetica", 50, QFont.Bold)
 
         self.instruction_label = QLabel("")
         self.instruction_label.setFont(main_font)
@@ -570,87 +587,83 @@ class workpiecetaskscreen(QWidget):
     def init_ui(self):
         main_layout = QHBoxLayout()
         main_layout.setContentsMargins(15, 15, 15, 15)
-        main_layout.setSpacing(20)
+        main_layout.setSpacing(15)
         
-        # Left Panel (Task Display)
+        # Left Panel (Task Workspace)
         self.left_panel = QFrame()
         self.left_panel.setFrameShape(QFrame.StyledPanel)
-        self.left_panel.setStyleSheet("background-color: white; border-radius: 8px;")
+        self.left_panel.setStyleSheet("background-color: white; border-radius: 10px;")
         
         left_layout = QVBoxLayout(self.left_panel)
-        left_layout.setContentsMargins(20, 15, 20, 15)
+        left_layout.setContentsMargins(30, 20, 30, 20)
         
-        header_font = QFont("Helvetica", 22, QFont.Bold)
-        timer_font = QFont("Helvetica", 46, QFont.Bold)
-        warn_font = QFont("Helvetica", 20, QFont.Bold)
-        target_sum_font = QFont("Helvetica", 30, QFont.Bold)
-        instruction_font = QFont("Helvetica", 28, QFont.Bold)
-        body_font = QFont("Helvetica", 18)
-
-        # 1. Top flexible stretch pushes content to center
-        left_layout.addStretch(1)
-
+        # 1. Top Bar: Header and Timer Side-by-Side (Saves massive vertical space)
+        top_bar = QHBoxLayout()
         self.header_label = QLabel("CURRENT WORKPIECE")
-        self.header_label.setFont(header_font)
-        self.header_label.setAlignment(Qt.AlignCenter)
-        left_layout.addWidget(self.header_label)
-
+        self.header_label.setFont(QFont("Helvetica", 18, QFont.Bold))
+        self.header_label.setStyleSheet("color: #444;")
+        
         self.timer_label = QLabel("25 s")
-        self.timer_label.setFont(timer_font)
-        self.timer_label.setAlignment(Qt.AlignCenter)
-        left_layout.addWidget(self.timer_label)
+        self.timer_label.setFont(QFont("Helvetica", 36, QFont.Bold))
+        self.timer_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        
+        top_bar.addWidget(self.header_label)
+        top_bar.addStretch()
+        top_bar.addWidget(self.timer_label)
+        left_layout.addLayout(top_bar)
 
+        # Warning indicator
         self.warning_label = QLabel("")
-        self.warning_label.setFont(warn_font)
+        self.warning_label.setFont(QFont("Helvetica", 18, QFont.Bold))
         self.warning_label.setStyleSheet("color: red;")
-        self.warning_label.setFixedHeight(30)
         self.warning_label.setAlignment(Qt.AlignCenter)
+        self.warning_label.setFixedHeight(26)
         left_layout.addWidget(self.warning_label)
+
+        # Flexible vertical spacer pushing content toward center
+        left_layout.addStretch(1)
 
         self.image_label = QLabel()
         self.image_label.setAlignment(Qt.AlignCenter)
         left_layout.addWidget(self.image_label)
 
-        # Target Sum Label (Dedicated, large, never wraps)
+        # Dedicated Target Sum Label
         self.target_sum_label = QLabel()
-        self.target_sum_label.setFont(target_sum_font)
         self.target_sum_label.setAlignment(Qt.AlignCenter)
-        self.target_sum_label.setWordWrap(False)
+        self.target_sum_label.setStyleSheet("font-weight: bold; color: #111;")
         left_layout.addWidget(self.target_sum_label)
 
-        left_layout.addSpacing(6)
+        left_layout.addSpacing(10)
 
-        # Instruction Text Label (Dedicated, large, never wraps or clips)
+        # Dedicated Instruction Label (Never wraps; dynamically auto-fitted)
         self.instruction_label = QLabel()
-        self.instruction_label.setFont(instruction_font)
         self.instruction_label.setAlignment(Qt.AlignCenter)
-        self.instruction_label.setStyleSheet("color: #0D47A1;")
+        self.instruction_label.setStyleSheet("font-weight: bold; color: #0056B3;")
         self.instruction_label.setWordWrap(False)
         left_layout.addWidget(self.instruction_label)
 
-        left_layout.addSpacing(16)
-
-        self.handover_label = QLabel()
-        self.handover_label.setFont(body_font)
-        self.handover_label.setAlignment(Qt.AlignCenter)
-        left_layout.addWidget(self.handover_label)
-
-        # 2. Bottom flexible stretch
         left_layout.addStretch(1)
 
-        # Right Panel (Rules)
+        # Handover confirmation text
+        self.handover_label = QLabel()
+        self.handover_label.setFont(QFont("Helvetica", 16))
+        self.handover_label.setAlignment(Qt.AlignCenter)
+        self.handover_label.setStyleSheet("color: #222; padding: 8px; background-color: #F0F4F8; border-radius: 6px;")
+        left_layout.addWidget(self.handover_label)
+
+        # Right Panel (Fixed width rules card)
         self.right_panel = QFrame()
         self.right_panel.setFrameShape(QFrame.StyledPanel)
-        self.right_panel.setStyleSheet("background-color: #FAFAFA; border-radius: 8px;")
-        self.right_panel.setMaximumWidth(320)
+        self.right_panel.setStyleSheet("background-color: #FAFAFA; border-radius: 10px;")
+        self.right_panel.setFixedWidth(260)
         
         right_layout = QVBoxLayout(self.right_panel)
-        right_layout.setContentsMargins(15, 20, 15, 20)
+        right_layout.setContentsMargins(20, 20, 20, 20)
         right_layout.setAlignment(Qt.AlignTop)
         right_layout.setSpacing(10)
 
         rules_head = QLabel("Rules")
-        rules_head.setFont(header_font)
+        rules_head.setFont(QFont("Helvetica", 18, QFont.Bold))
         right_layout.addWidget(rules_head)
 
         rules_colors = QLabel(
@@ -664,11 +677,11 @@ class workpiecetaskscreen(QWidget):
             "Slot 2 = x 2<br>"
             "Slot 3 = x 3"
         )
-        rules_colors.setFont(body_font)
+        rules_colors.setFont(QFont("Helvetica", 14))
         right_layout.addWidget(rules_colors)
 
-        main_layout.addWidget(self.left_panel, 4)
-        main_layout.addWidget(self.right_panel, 1)
+        main_layout.addWidget(self.left_panel, 1)
+        main_layout.addWidget(self.right_panel)
         self.setLayout(main_layout)
 
     def start_task(self, trial_num, target_pt):
@@ -703,7 +716,7 @@ class workpiecetaskscreen(QWidget):
             img_path = os.path.join(base_dir, "workpieces", p1)
             if os.path.exists(img_path):
                 pixmap = QPixmap(img_path)
-                self.image_label.setPixmap(pixmap.scaledToWidth(int(320 * font_size_multiplier), Qt.SmoothTransformation))
+                self.image_label.setPixmap(pixmap.scaledToWidth(320, Qt.SmoothTransformation))
             else:
                 self.image_label.setText(f"[Image: {p1}]")
         else:
@@ -712,15 +725,16 @@ class workpiecetaskscreen(QWidget):
             self.target_sum_label.show()
             self.instruction_label.show()
             self.current_task_info = f"sum_{p1}_{p2}"
-            self.target_sum_label.setText(f"Sum must be {p1}")
-            self.instruction_label.setText(str(p2))
+            
+            # Dynamic auto-fitting guarantees 100% of the sentence fits without clipping
+            auto_fit_label(self.target_sum_label, f"Sum must be {p1}", max_size=32, min_size=20)
+            auto_fit_label(self.instruction_label, str(p2), max_size=30, min_size=18)
 
         pt_name = "Point 1" if target_pt == 1 else "Point 2"
         key_hint = "F13" if target_pt == 1 else "F14"
 
         self.handover_label.setText(
-            f"Place the workpiece at <b>{pt_name}</b>.<br>"
-            f"Press <b>{key_hint}</b> upon completion."
+            f"Place the workpiece at <b>{pt_name}</b>. Press <b>{key_hint}</b> upon completion."
         )
 
         self.timer_label.setStyleSheet("color: black;")
@@ -1041,7 +1055,7 @@ def cleanup_resources():
         haptic_loop.call_soon_threadsafe(haptic_loop.stop)
 
 def run_paradigm():
-    global controller, font_size_multiplier
+    global controller
     init_lsl()
     start_haptic_thread()
     
@@ -1057,10 +1071,15 @@ def run_paradigm():
     
     screens = app.screens()
     if len(screens) > 1:
-        second_screen = screens[1].geometry()
-        controller.move(second_screen.left(), second_screen.top())
+        second_screen = screens[1]
+        controller.move(second_screen.geometry().topLeft())
+        controller.show()
+        if controller.windowHandle():
+            controller.windowHandle().setScreen(second_screen)
+        controller.showFullScreen()
+    else:
+        controller.showFullScreen()
         
-    controller.showFullScreen()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
