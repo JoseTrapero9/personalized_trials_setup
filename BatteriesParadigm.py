@@ -263,8 +263,8 @@ class setupscreen(QWidget):
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(15)
         
-        main_font = QFont("Helvetica", 14)
-        title_font = QFont("Helvetica", 18, QFont.Bold)
+        main_font = QFont("Helvetica", 24)
+        title_font = QFont("Helvetica", 24, QFont.Bold)
         
         self.title_label = QLabel("Experiment Configuration")
         self.title_label.setFont(title_font)
@@ -367,16 +367,16 @@ class startscreen(QWidget):
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(25)
         
-        main_font = QFont("Helvetica", 18)
-        button_font = QFont("Helvetica", 16)
-        timer_font = QFont("Helvetica", 42, QFont.Bold)
+        main_font = QFont("Helvetica", 28)
+        button_font = QFont("Helvetica", 26)
+        timer_font = QFont("Helvetica", 72, QFont.Bold)
         
         intro_text = ("<b>Paradigm Start</b><br><br>"
                       "1. Retrieve parts from Container I or II.<br>"
                       "2. Observe the objective and assemble according to color and slot rules.<br>"
                       "3. You have <b>25 seconds</b> before the alarm triggers.<br><br>"
-                      "Press <b>F13</b> for Point 1<br>"
-                      "Press <b>F14</b> for Point 2")
+                      "Press <b>Left</b> for Point 1<br>"
+                      "Press <b>Right</b> for Point 2")
         
         self.message_label = QLabel(intro_text)
         self.message_label.setFont(main_font)
@@ -436,8 +436,8 @@ class restscreen(QWidget):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(25)
-        main_font = QFont("Helvetica", 22, QFont.Bold)
-        timer_font = QFont("Helvetica", 50, QFont.Bold)
+        main_font = QFont("Helvetica", 38, QFont.Bold)
+        timer_font = QFont("Helvetica", 80, QFont.Bold)
         
         self.message_label = QLabel("Great job! Take a short break.<br><br>The next scenario will start soon.")
         self.message_label.setFont(main_font)
@@ -476,8 +476,8 @@ class longrestscreen(QWidget):
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(25)
         
-        main_font = QFont("Helvetica", 22, QFont.Bold)
-        button_font = QFont("Helvetica", 16)
+        main_font = QFont("Helvetica", 30, QFont.Bold)
+        button_font = QFont("Helvetica", 30)
         
         self.message_label = QLabel("You have completed a block of 3 scenarios.<br><br>Please take a longer break.<br>Press the button when you are ready to continue.")
         self.message_label.setFont(main_font)
@@ -517,8 +517,8 @@ class retrievalscreen(QWidget):
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(25)
 
-        main_font = QFont("Helvetica", 20)
-        timer_font = QFont("Helvetica", 50, QFont.Bold)
+        main_font = QFont("Helvetica", 48)
+        timer_font = QFont("Helvetica", 80, QFont.Bold)
 
         self.instruction_label = QLabel("")
         self.instruction_label.setFont(main_font)
@@ -602,7 +602,7 @@ class workpiecetaskscreen(QWidget):
 
         # Header title
         self.header_label = QLabel("CURRENT WORKPIECE")
-        self.header_label.setFont(QFont("Helvetica", 16, QFont.Bold))
+        self.header_label.setFont(QFont("Helvetica", 30, QFont.Bold))
         self.header_label.setStyleSheet("color: #777; letter-spacing: 2px;")
         self.header_label.setAlignment(Qt.AlignCenter)
         left_layout.addWidget(self.header_label)
@@ -611,14 +611,14 @@ class workpiecetaskscreen(QWidget):
 
         # Centered Huge Countdown Timer (Immediate visibility)
         self.timer_label = QLabel("25 s")
-        self.timer_label.setFont(QFont("Helvetica", 64, QFont.Bold))
+        self.timer_label.setFont(QFont("Helvetica", 100, QFont.Bold))
         self.timer_label.setAlignment(Qt.AlignCenter)
         self.timer_label.setStyleSheet("color: #111;")
         left_layout.addWidget(self.timer_label)
 
         # Centered Warning indicator (28pt bold)
         self.warning_label = QLabel("")
-        self.warning_label.setFont(QFont("Helvetica", 28, QFont.Bold))
+        self.warning_label.setFont(QFont("Helvetica", 45, QFont.Bold))
         self.warning_label.setStyleSheet("color: red; letter-spacing: 1px;")
         self.warning_label.setAlignment(Qt.AlignCenter)
         self.warning_label.setFixedHeight(45)
@@ -650,7 +650,7 @@ class workpiecetaskscreen(QWidget):
 
         # Handover instructions
         self.handover_label = QLabel()
-        self.handover_label.setFont(QFont("Helvetica", 18))
+        self.handover_label.setFont(QFont("Helvetica", 25))
         self.handover_label.setAlignment(Qt.AlignCenter)
         self.handover_label.setStyleSheet("color: #222; padding: 10px; background-color: #F0F4F8; border-radius: 6px;")
         left_layout.addWidget(self.handover_label)
@@ -667,7 +667,7 @@ class workpiecetaskscreen(QWidget):
         right_layout.setSpacing(10)
 
         rules_head = QLabel("Rules")
-        rules_head.setFont(QFont("Helvetica", 18, QFont.Bold))
+        rules_head.setFont(QFont("Helvetica", 44, QFont.Bold))
         right_layout.addWidget(rules_head)
 
         rules_colors = QLabel(
@@ -681,7 +681,7 @@ class workpiecetaskscreen(QWidget):
             "Slot 2 = x 2<br>"
             "Slot 3 = x 3"
         )
-        rules_colors.setFont(QFont("Helvetica", 14))
+        rules_colors.setFont(QFont("Helvetica", 28))
         right_layout.addWidget(rules_colors)
 
         main_layout.addWidget(self.left_panel, 1)
@@ -693,11 +693,11 @@ class workpiecetaskscreen(QWidget):
 
         scenario = self.get_scenario_cb()
         if scenario == "robot_fast":
-            self.ticks_left = 20
+            self.ticks_left = 15
         elif scenario == "robot_slow":
-            self.ticks_left = 30
-        else:
             self.ticks_left = 25
+        else:
+            self.ticks_left = 20
 
         self.current_trial_num = trial_num
         self.evaluated = False
@@ -734,7 +734,7 @@ class workpiecetaskscreen(QWidget):
             auto_fit_label(self.instruction_label, str(p2), max_size=46, min_size=24)
 
         pt_name = "Point 1" if target_pt == 1 else "Point 2"
-        key_hint = "F13" if target_pt == 1 else "F14"
+        key_hint = "Left" if target_pt == 1 else "Right"
 
         self.handover_label.setText(
             f"Place the workpiece at <b>{pt_name}</b>. Press <b>{key_hint}</b> upon completion."
