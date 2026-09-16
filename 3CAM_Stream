@@ -197,7 +197,7 @@ def zed_capture_thread():
     zed.close()
 
 
-class XimeaWorker(threading.Thread):
+class XimeaWobrker(threading.Thread):
     def __init__(self, cam, model_name, preset):
         super().__init__()
         self.cam = cam
