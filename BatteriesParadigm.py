@@ -944,7 +944,7 @@ class paradigmcontroller(QWidget):
         
     def start_experiment_tracking(self):
         send_marker("Screen_Start_Instructions")
-        if difficulty == "hard":
+        if current_condition in ["hard", "manual"]:
             self.scenario_active_seconds = 0
             self.master_timer.start(1000) 
             self.announce_scenario()
