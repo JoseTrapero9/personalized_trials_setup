@@ -1,0 +1,470 @@
+import os
+import time
+import threading
+from datetime import datetime
+import cv2
+import numpy as np
+#import pyzed.sl as sl
+from pylsl import StreamInfo, StreamOutlet, StreamInlet, resolve_streams
+from ximea import xiapi
+
+# ================= user configuration =================
+RECORDINGS_DIR = r"C:\Users\jose_trapero\recordings"
+os.makedirs(RECORDINGS_DIR, exist_ok=True)
+
+# specify active cameras: any subset of ["ZED", "MQ013", "MC050"]
+ENABLED_CAMERAS = ["MQ013", "MC050"]
+
+AUTO_START_RECORDING = False
+MAX_PERSONS = 1
+FPS_XIMEA = 30.0
+
+# hardware settings matched to model identifiers
+XIMEA_PRESETS = {
+    "MQ013": {
+        "name_match": "MQ013",
+        "id": "ximea_mq013",
+        "exposure": 31000,
+        "gain": 8.0,
+        "gammaY": 0.47,
+        "wb_kr": 1.00,
+        "wb_kb": 1.90,
+        "lsl_stream_name": "ximeasync_mq013",
+        "lsl_source_id": "cam_sync_mq013"
+    },
+    "MC050": {
+        "name_match": "MC050",
+        "id": "ximea_mc050",
+        "exposure": 23000,
+        "gain": 10.0,
+        "gammaY": 0.47,
+        "wb_kr": 1.50,
+        "wb_kb": 2.80,
+        "lsl_stream_name": "ximeasync_mc050",
+        "lsl_source_id": "cam_sync_mc050"
+    }
+}
+# ======================================================
+
+ENABLED_CAMERAS_SET = {cam.strip().upper() for cam in ENABLED_CAMERAS}
+
+shared_data = {
+    "zed_image": None,
+    "bodies": [],
+    "capture_fps": 0.0,
+    "is_recording": False,
+    "session_timestamp": None,
+    "ximea_previews": {}
+}
+data_lock = threading.Lock()
+is_running = True
+
+
+def gui_marker_listener_thread():
+    global is_running, shared_data
+    print("[LSL INLET] Searching for 'ParadigmMarkers' stream from GUI...")
+    streams = resolve_streams('name', 'ParadigmMarkers')
+    if not streams:
+        print("[LSL INLET] 'ParadigmMarkers' not found. Marker logging disabled.")
+        return
+
+    inlet = StreamInlet(streams[0])
+    print("[LSL INLET] Connected to GUI markers.")
+
+    current_log_file = None
+    active_ts = None
+
+    while is_running:
+        sample, timestamp = inlet.pull_sample(timeout=0.2)
+
+        with data_lock:
+            recording_active = shared_data["is_recording"]
+            session_ts = shared_data["session_timestamp"]
+
+        if recording_active and session_ts:
+            if active_ts != session_ts:
+                active_ts = session_ts
+                current_log_file = os.path.join(RECORDINGS_DIR, f"session_markers_{active_ts}.csv")
+                with open(current_log_file, "w") as f:
+                    f.write("local_system_time,lsl_timestamp,marker\n")
+
+            if sample and current_log_file:
+                with open(current_log_file, "a") as f:
+                    f.write(f"{time.time()},{timestamp},{sample[0]}\n")
+        else:
+            active_ts = None
+            current_log_file = None
+
+
+def zed_capture_thread():
+    global shared_data, is_running
+
+    zed = sl.Camera()
+    init_params = sl.InitParameters()
+    init_params.camera_resolution = sl.RESOLUTION.HD1080
+    init_params.camera_fps = 30
+    init_params.depth_mode = sl.DEPTH_MODE.NEURAL
+    init_params.coordinate_units = sl.UNIT.METER
+
+    if zed.open(init_params) != sl.ERROR_CODE.SUCCESS:
+        print("[ZED] Could not open camera.")
+        is_running = False
+        return
+
+    channel_count = 1 + (MAX_PERSONS * 38 * 3)
+    lsl_info = StreamInfo('ZED_Kinematics', 'MoCap', channel_count, 60, 'float32', 'zed_4050_tracker')
+    lsl_outlet = StreamOutlet(lsl_info)
+
+    body_params = sl.BodyTrackingParameters()
+    body_params.enable_tracking = True
+    body_params.enable_body_fitting = False
+    body_params.body_format = sl.BODY_FORMAT.BODY_38
+    body_params.detection_model = sl.BODY_TRACKING_MODEL.HUMAN_BODY_FAST
+
+    if zed.enable_body_tracking(body_params) != sl.ERROR_CODE.SUCCESS:
+        print("[ZED] Failed to enable Body Tracking.")
+        zed.close()
+        is_running = False
+        return
+
+    runtime_params = sl.BodyTrackingRuntimeParameters()
+    bodies = sl.Bodies()
+    image_mat = sl.Mat()
+
+    frames_captured = 0
+    start_time = time.time()
+    current_fps = 0.0
+
+    recording_active = False
+    svo_frame_index = -1
+
+    while is_running:
+        with data_lock:
+            do_record = shared_data["is_recording"]
+            session_ts = shared_data["session_timestamp"]
+
+        if do_record and not recording_active:
+            svo_path = os.path.join(RECORDINGS_DIR, f"zed_session_{session_ts}.svo")
+            rec_param = sl.RecordingParameters(svo_path, sl.SVO_COMPRESSION_MODE.H265)
+            if zed.enable_recording(rec_param) == sl.ERROR_CODE.SUCCESS:
+                recording_active = True
+                svo_frame_index = 0
+                print(f"[ZED] Recording STARTED -> {svo_path}")
+        elif not do_record and recording_active:
+            zed.disable_recording()
+            recording_active = False
+            svo_frame_index = -1
+            print("[ZED] Recording STOPPED.")
+
+        if zed.grab() == sl.ERROR_CODE.SUCCESS:
+            if recording_active:
+                svo_frame_index += 1
+
+            zed.retrieve_bodies(bodies, runtime_params)
+            zed.retrieve_image(image_mat, sl.VIEW.LEFT)
+
+            frames_captured += 1
+            elapsed_time = time.time() - start_time
+            if elapsed_time >= 1.0:
+                current_fps = frames_captured / elapsed_time
+                frames_captured = 0
+                start_time = time.time()
+
+            image_cv = image_mat.get_data()
+            extracted_bodies = []
+            lsl_sample = np.zeros(channel_count, dtype=np.float32)
+            lsl_sample[0] = svo_frame_index
+
+            for i, body in enumerate(bodies.body_list[:MAX_PERSONS]):
+                if body.tracking_state == sl.OBJECT_TRACKING_STATE.OK:
+                    flat_kp = body.keypoint.copy().flatten()
+                    start_idx = 1 + (i * 114)
+                    lsl_sample[start_idx:start_idx + 114] = flat_kp
+                    extracted_bodies.append({
+                        'id': body.id,
+                        'keypoints_2d': body.keypoint_2d.copy(),
+                        'keypoints_3d': body.keypoint.copy()
+                    })
+
+            lsl_outlet.push_sample(lsl_sample.tolist())
+
+            with data_lock:
+                shared_data["zed_image"] = image_cv.copy()
+                shared_data["bodies"] = extracted_bodies
+                shared_data["capture_fps"] = current_fps
+
+    if recording_active:
+        zed.disable_recording()
+    zed.disable_body_tracking()
+    zed.close()
+
+
+class XimeaWorker(threading.Thread):
+    def __init__(self, cam, model_name, preset):
+        super().__init__()
+        self.cam = cam
+        self.model_name = model_name
+        self.preset = preset
+
+        lsl_info = StreamInfo(preset["lsl_stream_name"], 'Markers', 1, 0, 'int32', preset["lsl_source_id"])
+        self.outlet = StreamOutlet(lsl_info)
+
+        img = xiapi.Image()
+        self.cam.get_image(img)
+        frame = img.get_image_data_numpy()
+        self.height, self.width = frame.shape[:2]
+
+    def run(self):
+        global is_running, shared_data
+        img = xiapi.Image()
+        out = None
+        recording_active = False
+        loop_counter = 0
+
+        try:
+            while is_running:
+                with data_lock:
+                    do_record = shared_data["is_recording"]
+                    session_ts = shared_data["session_timestamp"]
+
+                if do_record and not recording_active:
+                    filename = os.path.join(RECORDINGS_DIR, f"{self.preset['id']}_{session_ts}.mp4")
+                    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                    out = cv2.VideoWriter(filename, fourcc, FPS_XIMEA, (self.width, self.height))
+                    recording_active = True
+                    print(f"[XIMEA] Recording STARTED -> {filename}")
+
+                elif not do_record and recording_active:
+                    if out:
+                        out.release()
+                        out = None
+                    recording_active = False
+                    print(f"[XIMEA] Recording STOPPED for {self.preset['id']}.")
+
+                self.cam.get_image(img)
+                frame = img.get_image_data_numpy()
+
+                self.outlet.push_sample([img.nframe])
+
+                if recording_active and out:
+                    out.write(frame)
+
+                # generate preview tile without extra color conversions
+                if loop_counter % 2 == 0:
+                    preview = cv2.resize(frame, (480, 270))
+                    status_text = f"{self.model_name} [{'REC' if recording_active else 'IDLE'}]"
+                    cv2.putText(preview, status_text, (10, 25),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6,
+                                (0, 0, 255) if recording_active else (0, 255, 0), 2)
+                    with data_lock:
+                        shared_data["ximea_previews"][self.preset["id"]] = preview
+
+                loop_counter += 1
+
+        finally:
+            if out:
+                out.release()
+            self.cam.stop_acquisition()
+            self.cam.close_device()
+
+
+def init_and_configure_ximea():
+    # check if any ximea camera is requested
+    ximea_requested = any(k.upper() in ENABLED_CAMERAS_SET for k in XIMEA_PRESETS)
+    if not ximea_requested:
+        print("[DISCOVERY] No XIMEA cameras selected in configuration.")
+        return []
+
+    probe = xiapi.Camera()
+    num_devices = probe.get_number_devices()
+    print(f"\n[DISCOVERY] Detected {num_devices} XIMEA camera(s).")
+
+    configured_workers = []
+
+    for i in range(num_devices):
+        cam = xiapi.Camera(dev_id=i)
+        cam.open_device()
+
+        raw_name = cam.get_param('device_name')
+        raw_sn = cam.get_param('device_sn')
+        model_name = raw_name.decode('utf-8') if isinstance(raw_name, bytes) else str(raw_name)
+        sn = raw_sn.decode('utf-8') if isinstance(raw_sn, bytes) else str(raw_sn)
+
+        matched_key = None
+        matched_preset = None
+        for key, preset in XIMEA_PRESETS.items():
+            if preset["name_match"].upper() in model_name.upper():
+                matched_key = key
+                matched_preset = preset
+                break
+
+        if not matched_preset:
+            print(f" -> WARNING: Camera '{model_name}' (SN: {sn}) did not match presets. Skipping.")
+            cam.close_device()
+            continue
+
+        if matched_key.upper() not in ENABLED_CAMERAS_SET:
+            print(f" -> Skipping [{matched_preset['id']}] on {model_name} (disabled in config).")
+            cam.close_device()
+            continue
+
+        print(f" -> Configured [{matched_preset['id']}] on {model_name} (SN: {sn}, dev_id: {i})")
+
+        cam.set_imgdataformat('XI_RGB24')
+        cam.set_exposure(matched_preset["exposure"])
+        cam.set_gain(matched_preset["gain"])
+        cam.set_gammaY(matched_preset["gammaY"])
+        cam.set_param('wb_kr', matched_preset["wb_kr"])
+        cam.set_param('wb_kb', matched_preset["wb_kb"])
+
+        cam.start_acquisition()
+        worker = XimeaWorker(cam, model_name, matched_preset)
+        configured_workers.append(worker)
+
+    return configured_workers
+
+
+if __name__ == "__main__":
+    ximea_workers = init_and_configure_ximea()
+
+    # initialize zed capture thread only if enabled
+    capture_thread = None
+    if "ZED" in ENABLED_CAMERAS_SET:
+        capture_thread = threading.Thread(target=zed_capture_thread)
+        capture_thread.start()
+
+    listener_thread = threading.Thread(target=gui_marker_listener_thread)
+    listener_thread.start()
+
+    for w in ximea_workers:
+        w.start()
+
+    if AUTO_START_RECORDING:
+        with data_lock:
+            shared_data["is_recording"] = True
+            shared_data["session_timestamp"] = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    cv2.namedWindow("Multi-Camera Dashboard", cv2.WINDOW_NORMAL)
+
+    print("\n--------------------------------------------------")
+    print(f"Active Cameras: {', '.join(ENABLED_CAMERAS_SET) if ENABLED_CAMERAS_SET else 'None'}")
+    print(f"Destination: {RECORDINGS_DIR}")
+    print("CONTROLS:")
+    print("  'R'  : Synchronously START / STOP recording on active cameras")
+    print("  'ESC': Safely close video files and exit")
+    print("--------------------------------------------------\n")
+
+    try:
+        while is_running:
+            local_image = None
+            local_bodies = []
+            capture_fps = 0.0
+            is_recording_active = False
+
+            with data_lock:
+                if shared_data["zed_image"] is not None:
+                    local_image = shared_data["zed_image"].copy()
+                    local_bodies = shared_data["bodies"]
+                    capture_fps = shared_data["capture_fps"]
+                    is_recording_active = shared_data["is_recording"]
+                previews = shared_data["ximea_previews"].copy()
+
+            # build display layout dynamically based on active cameras
+            panels = []
+
+            # 1. zed feed panel
+            if "ZED" in ENABLED_CAMERAS_SET:
+                if local_image is not None:
+                    if local_image.shape[2] == 4:
+                        zed_frame = cv2.cvtColor(local_image, cv2.COLOR_BGRA2BGR)
+                    else:
+                        zed_frame = local_image
+
+                    fps_text = f"ZED FPS: {capture_fps:.1f} (1080p)"
+                    cv2.rectangle(zed_frame, (10, 10), (320, 45), (0, 0, 0), -1)
+                    cv2.putText(zed_frame, fps_text, (15, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+                    if is_recording_active:
+                        h, w = zed_frame.shape[:2]
+                        cv2.circle(zed_frame, (w - 110, 30), 10, (0, 0, 255), -1)
+                        cv2.putText(zed_frame, "REC", (w - 90, 38), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+
+                    for person in local_bodies:
+                        for kp in person['keypoints_2d']:
+                            if not np.isnan(kp[0]) and not np.isnan(kp[1]):
+                                cv2.circle(zed_frame, (int(kp[0]), int(kp[1])), 4, (0, 255, 0), -1)
+
+                    zed_display = cv2.resize(zed_frame, (960, 540))
+                else:
+                    zed_display = np.zeros((540, 960, 3), dtype=np.uint8)
+                    cv2.putText(zed_display, "Waiting for ZED...", (300, 270),
+                                cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
+                panels.append(zed_display)
+
+            # 2. ximea feed panels
+            active_ximea_keys = [k for k in XIMEA_PRESETS if k.upper() in ENABLED_CAMERAS_SET]
+            if active_ximea_keys:
+                ximea_tiles = []
+                for key in active_ximea_keys:
+                    preset_info = XIMEA_PRESETS[key]
+                    pid = preset_info["id"]
+                    if pid in previews:
+                        ximea_tiles.append(previews[pid])
+                    else:
+                        blank = np.zeros((270, 480, 3), dtype=np.uint8)
+                        cv2.putText(blank, f"Connecting {preset_info['name_match']}...", (60, 135),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 100, 100), 2)
+                        ximea_tiles.append(blank)
+
+                if "ZED" in ENABLED_CAMERAS_SET:
+                    if len(ximea_tiles) == 1:
+                        # stack with a blank tile to keep the 540px vertical height aligned with zed
+                        blank_pad = np.zeros((270, 480, 3), dtype=np.uint8)
+                        ximea_column = np.vstack([ximea_tiles[0], blank_pad])
+                    else:
+                        ximea_column = np.vstack(ximea_tiles)
+                    panels.append(ximea_column)
+                else:
+                    # if only ximea cameras are active
+                    if len(ximea_tiles) == 1:
+                        panels.append(cv2.resize(ximea_tiles[0], (960, 540)))
+                    else:
+                        panels.append(np.hstack(ximea_tiles))
+
+            # 3. assemble dashboard
+            if panels:
+                dashboard = np.hstack(panels)
+            else:
+                dashboard = np.zeros((300, 600, 3), dtype=np.uint8)
+                cv2.putText(dashboard, "No cameras enabled.", (150, 150),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+
+            cv2.imshow("Multi-Camera Dashboard", dashboard)
+
+            key = cv2.waitKey(20) & 0xFF
+            if key == 27:
+                is_running = False
+                break
+            elif key in (ord('r'), ord('R')):
+                with data_lock:
+                    if not shared_data["is_recording"]:
+                        shared_data["session_timestamp"] = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        shared_data["is_recording"] = True
+                        print(f"\n[MASTER] >>> RECORDING STARTED ({shared_data['session_timestamp']}) <<<")
+                    else:
+                        shared_data["is_recording"] = False
+                        print("\n[MASTER] >>> RECORDING STOPPED <<<")
+
+    except KeyboardInterrupt:
+        is_running = False
+
+    # shutdown active threads
+    print("\nShutting down capture threads...")
+    is_running = False
+    if capture_thread:
+        capture_thread.join()
+    listener_thread.join()
+    for w in ximea_workers:
+        w.join()
+    cv2.destroyAllWindows()
+    print("Files successfully saved to disk.")
