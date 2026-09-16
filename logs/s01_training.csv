@@ -9,3 +9,5 @@ subject,condition,difficulty,task_info,time_taken_s,handover_point,overtime_alar
 1,training,easy,sum_9_Assemble accordingly,22.599,2,False,none
 1,training,easy,sum_21_Use 1 Blue and 2 Green,9.113,1,False,correct
 1,training,easy,sum_15_Use 1 Red and 2 Yellow,23.687,2,False,incorrect
+1,training,easy,sum_21_Use 1 Blue and 2 Green,35.003,1,True,none
+1,training,easy,sum_21_Use 1 Blue and 2 Green,31.593,1,True,none

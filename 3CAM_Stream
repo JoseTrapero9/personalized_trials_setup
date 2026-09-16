@@ -33,7 +33,7 @@ XIMEA_PRESETS = {
     "MC050": {
         "name_match": "MC050",
         "id": "ximea_mc050",
-        "exposure": 33000,
+        "exposure": 32000,
         "gain": 10.0,
         "gammaY": 0.47,
         "wb_kr": 1.50,
