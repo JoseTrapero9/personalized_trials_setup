@@ -118,7 +118,7 @@ class AudioController:
         if self.alarm_active or not os.path.exists(filepath):
             return
         self.alarm_active = True
-        threading.Thread(target=self._loop_worker, args=(filepath, self.participant_device), daemon=True).start()
+        threading.Thread(target=self._loop_worker, args=(filepath, self.researcher_device), daemon=True).start()
 
     def stop_looping_alarm(self):
         self.alarm_active = False
@@ -168,7 +168,7 @@ current_condition = "training"
 active_scenarios_list = []
 robot_process = None
 
-def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_audio.txt")):
+def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_baseline.txt")):
     sequence = []
     if not os.path.exists(path):
         print(f"Warning: File not found at {path}. Using fallback sequence.")
@@ -1076,7 +1076,7 @@ def run_paradigm():
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(cleanup_resources)
     
-    audio_sys.setup_devices(participant_keyword="Beats", researcher_keyword="Realtek")
+    audio_sys.setup_devices(participant_keyword="Trekz", researcher_keyword="Realtek")
     
     controller = paradigmcontroller()
     
