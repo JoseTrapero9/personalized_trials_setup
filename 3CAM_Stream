@@ -1,11 +1,12 @@
 import os
 import time
+import queue
 import threading
 from datetime import datetime
 import cv2
 import numpy as np
 import pyzed.sl as sl
-from pylsl import StreamInfo, StreamOutlet, StreamInlet, resolve_streams
+from pylsl import StreamInfo, StreamOutlet, StreamInlet, resolve_byprop
 from ximea import xiapi
 
 # ================= USER CONFIGURATION =================
@@ -16,16 +17,16 @@ AUTO_START_RECORDING = False
 MAX_PERSONS = 1
 FPS_XIMEA = 30.0
 
-# Hardware settings matched to model identifiers
 XIMEA_PRESETS = {
     "MQ013": {
         "name_match": "MQ013",
         "id": "ximea_mq013",
-        "exposure": 31000,
+        "exposure": 25000,
         "gain": 8.0,
         "gammaY": 0.47,
         "wb_kr": 1.00,
         "wb_kb": 1.90,
+        "binning": False,
         "lsl_stream_name": "ximeasync_mq013",
         "lsl_source_id": "cam_sync_mq013"
     },
@@ -37,6 +38,7 @@ XIMEA_PRESETS = {
         "gammaY": 0.47,
         "wb_kr": 1.50,
         "wb_kb": 2.80,
+        "binning": True,
         "lsl_stream_name": "ximeasync_mc050",
         "lsl_source_id": "cam_sync_mc050"
     }
@@ -58,7 +60,7 @@ is_running = True
 def gui_marker_listener_thread():
     global is_running, shared_data
     print("[LSL INLET] Searching for 'ParadigmMarkers' stream from GUI...")
-    streams = resolve_streams('name', 'ParadigmMarkers')
+    streams = resolve_byprop('name', 'ParadigmMarkers', timeout=2.0)
     if not streams:
         print("[LSL INLET] 'ParadigmMarkers' not found. Marker logging disabled.")
         return
@@ -101,8 +103,9 @@ def zed_capture_thread():
     init_params.depth_mode = sl.DEPTH_MODE.NEURAL
     init_params.coordinate_units = sl.UNIT.METER
 
-    if zed.open(init_params) != sl.ERROR_CODE.SUCCESS:
-        print("[ZED] Could not open camera.")
+    status = zed.open(init_params)
+    if status != sl.ERROR_CODE.SUCCESS:
+        print(f"[ZED] Could not open camera: {status}.")
         is_running = False
         return
 
@@ -209,10 +212,49 @@ class XimeaWorker(threading.Thread):
         frame = img.get_image_data_numpy()
         self.height, self.width = frame.shape[:2]
 
+        self.frame_queue = queue.Queue(maxsize=150)
+        self.writer_thread = None
+
+    def _video_writer_worker(self, filename, start_time):
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        out = cv2.VideoWriter(filename, fourcc, FPS_XIMEA, (self.width, self.height))
+        frames_written = 0
+
+        while True:
+            item = self.frame_queue.get()
+            if item is None:
+                self.frame_queue.task_done()
+                break
+
+            frame, frame_ts = item
+
+            # Exact real-world time pacing
+            elapsed = frame_ts - start_time
+            target_frame_index = int(elapsed * FPS_XIMEA)
+
+            # 1. Camera delivered faster than 30 FPS: drop surplus frame
+            if target_frame_index < frames_written:
+                self.frame_queue.task_done()
+                continue
+
+            # 2. Camera had a brief lag/gap: fill missing slots to preserve 1:1 timeline
+            missing = target_frame_index - frames_written
+            if missing > 5:
+                # Long freeze recovery: resync without blowing up file size
+                frames_written = target_frame_index
+                missing = 0
+
+            for _ in range(missing + 1):
+                out.write(frame)
+                frames_written += 1
+
+            self.frame_queue.task_done()
+
+        out.release()
+
     def run(self):
         global is_running, shared_data
         img = xiapi.Image()
-        out = None
         recording_active = False
         loop_counter = 0
 
@@ -224,28 +266,37 @@ class XimeaWorker(threading.Thread):
 
                 if do_record and not recording_active:
                     filename = os.path.join(RECORDINGS_DIR, f"{self.preset['id']}_{session_ts}.mp4")
-                    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-                    out = cv2.VideoWriter(filename, fourcc, FPS_XIMEA, (self.width, self.height))
+                    start_time = time.time()
+                    self.writer_thread = threading.Thread(
+                        target=self._video_writer_worker, 
+                        args=(filename, start_time), 
+                        daemon=True
+                    )
+                    self.writer_thread.start()
                     recording_active = True
                     print(f"[XIMEA] Recording STARTED -> {filename}")
 
                 elif not do_record and recording_active:
-                    if out:
-                        out.release()
-                        out = None
                     recording_active = False
+                    self.frame_queue.put(None)
+                    if self.writer_thread:
+                        self.writer_thread.join()
+                        self.writer_thread = None
                     print(f"[XIMEA] Recording STOPPED for {self.preset['id']}.")
 
                 self.cam.get_image(img)
                 frame = img.get_image_data_numpy()
+                capture_time = time.time()
 
                 self.outlet.push_sample([img.nframe])
 
-                if recording_active and out:
-                    out.write(frame)
+                if recording_active:
+                    try:
+                        self.frame_queue.put_nowait((frame.copy(), capture_time))
+                    except queue.Full:
+                        pass
 
-                # Generate a 480x270 preview tile without extra color conversions
-                if loop_counter % 2 == 0:
+                if loop_counter % 3 == 0:
                     preview = cv2.resize(frame, (480, 270))
                     status_text = f"{self.model_name} [{'REC' if recording_active else 'IDLE'}]"
                     cv2.putText(preview, status_text, (10, 25),
@@ -257,8 +308,9 @@ class XimeaWorker(threading.Thread):
                 loop_counter += 1
 
         finally:
-            if out:
-                out.release()
+            if recording_active and self.writer_thread:
+                self.frame_queue.put(None)
+                self.writer_thread.join()
             self.cam.stop_acquisition()
             self.cam.close_device()
 
@@ -290,14 +342,36 @@ def init_and_configure_ximea():
             cam.close_device()
             continue
 
-        print(f" -> Configured [{matched_preset['id']}] on {model_name} (SN: {sn}, dev_id: {i})")
+        print(f" -> Configuring [{matched_preset['id']}] on {model_name} (SN: {sn})")
 
         cam.set_imgdataformat('XI_RGB24')
+
+        if matched_preset.get("binning", False):
+            try:
+                cam.set_param('downsampling_type', 'XI_BINNING')
+                cam.set_param('downsampling', 'XI_DWN_2x2')
+                print(f"    [OK] 2x2 Binning enabled.")
+            except Exception:
+                try:
+                    cam.set_param('downsampling', 'XI_DWN_2x2')
+                except Exception:
+                    pass
+
         cam.set_exposure(matched_preset["exposure"])
         cam.set_gain(matched_preset["gain"])
         cam.set_gammaY(matched_preset["gammaY"])
         cam.set_param('wb_kr', matched_preset["wb_kr"])
         cam.set_param('wb_kb', matched_preset["wb_kb"])
+
+        # Hardware framerate limit to 30.0 FPS
+        try:
+            cam.set_param('acq_timing_mode', 'XI_ACQ_TIMING_MODE_FRAME_RATE')
+            cam.set_param('framerate', float(FPS_XIMEA))
+        except Exception:
+            try:
+                cam.set_param('framerate', float(FPS_XIMEA))
+            except Exception:
+                pass
 
         cam.start_acquisition()
         worker = XimeaWorker(cam, model_name, matched_preset)
@@ -307,10 +381,11 @@ def init_and_configure_ximea():
 
 
 if __name__ == "__main__":
-    ximea_workers = init_and_configure_ximea()
-
     capture_thread = threading.Thread(target=zed_capture_thread)
     capture_thread.start()
+    time.sleep(1.0)
+
+    ximea_workers = init_and_configure_ximea()
 
     listener_thread = threading.Thread(target=gui_marker_listener_thread)
     listener_thread.start()
@@ -347,7 +422,6 @@ if __name__ == "__main__":
                     is_recording_active = shared_data["is_recording"]
                 previews = shared_data["ximea_previews"].copy()
 
-            # --- 1. Left Panel: ZED Feed (960x540) ---
             if local_image is not None:
                 if local_image.shape[2] == 4:
                     zed_frame = cv2.cvtColor(local_image, cv2.COLOR_BGRA2BGR)
@@ -374,7 +448,6 @@ if __name__ == "__main__":
                 cv2.putText(zed_display, "Waiting for ZED...", (300, 270),
                             cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
 
-            # --- 2. Right Panel: Vertically Stacked XIMEA Feeds (480x540 total) ---
             ximea_tiles = []
             for preset_info in XIMEA_PRESETS.values():
                 pid = preset_info["id"]
@@ -387,8 +460,6 @@ if __name__ == "__main__":
                     ximea_tiles.append(blank)
 
             right_column = np.vstack(ximea_tiles)
-
-            # --- 3. Combined Canvas (1440x540) ---
             dashboard = np.hstack([zed_display, right_column])
             cv2.imshow("Multi-Camera Dashboard (ZED + XIMEA)", dashboard)
 
