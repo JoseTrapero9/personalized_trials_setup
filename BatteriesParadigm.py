@@ -25,7 +25,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 audio_dir = os.path.join(base_dir, "audios")
 
 correct_audio = os.path.join(audio_dir, "correct_answer.wav") 
-incorrect_audio = os.path.join(audio_dir, "incorrect_answer.wav")
+incorrect_audio = os.path.join(audio_dir, "loud_incorrect_answer.wav")
 alarm_audio = os.path.join(audio_dir, "alarm_llm.wav")
 
 if not os.path.exists(alarm_audio):
@@ -114,24 +114,31 @@ class AudioController:
         except Exception as e:
             print(f"Error playing {filepath}: {e}")
 
-    def start_looping_alarm(self, filepath):
+    def start_looping_alarm(self, filepath, volume=0.3):
         if self.alarm_active or not os.path.exists(filepath):
             return
         self.alarm_active = True
-        threading.Thread(target=self._loop_worker, args=(filepath, self.researcher_device), daemon=True).start()
+        # pass volume parameter to the background worker thread
+        threading.Thread(
+            target=self._loop_worker,
+            args=(filepath, self.researcher_device, volume),
+            daemon=True,
+        ).start()
 
     def stop_looping_alarm(self):
         self.alarm_active = False
         sd.stop()
 
-    def _loop_worker(self, filepath, device_id):
+    def _loop_worker(self, filepath, device_id, volume=0.3):
         try:
             data, fs = sf.read(filepath, dtype='float32')
+            # scale the waveform amplitude to reduce acoustic intensity
+            scaled_data = data * volume
             while self.alarm_active:
-                sd.play(data, samplerate=fs, device=device_id)
+                sd.play(scaled_data, samplerate=fs, device=device_id)
                 sd.wait()
         except Exception as e:
-            print(f"Alarm loop error: {e}")
+            print(f'Alarm loop error: {e}')
 
 audio_sys = AudioController()
 haptic_loop = None
@@ -795,7 +802,7 @@ class workpiecetaskscreen(QWidget):
             if not self.alarm_triggered:
                 self.alarm_triggered = True
                 send_marker("Workpiece_Task_Overtime_Alarm_Started")
-                audio_sys.start_looping_alarm(alarm_audio)
+                audio_sys.start_looping_alarm(alarm_audio, volume=0.9)
         else:
             self.timer_label.setText(f"{self.ticks_left} s")
 
