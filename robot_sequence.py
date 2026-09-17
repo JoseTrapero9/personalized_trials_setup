@@ -98,29 +98,44 @@ class Scripter:
 
     def move_disposal_up(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [10.21,-93.89,119.48,-114.19,-90.94,-170.21] 
+        degrees = [10.32, -95.79, 116.63, -109.07, -91.06, -170.23]  
         self._send_movej_degrees(degrees, delay=wait_time)
 
-    def move_disposal_down(self, wait_time: float = 2.00):
+    def movel_disposal_up(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [10.32, -95.79, 116.63, -109.07, -91.06, -170.23] 
+        self._send_movel_degrees(degrees, delay=wait_time, a=0.5)
+
+    def move_disposal_down(self, wait_time: float = 2.00,):
         # define your down position in degrees
         degrees = [10.17,-85.72,127.29,-130.16,-91.10,-170.06] 
-        self._send_movel_degrees(degrees, delay=wait_time)
+        self._send_movel_degrees(degrees, delay=wait_time, a=0.5)
+
     def move_return_empty_piece_down(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [129.55,-78.49 ,119.6 ,-129.96 ,-87.88 ,-50.84] 
+        degrees = [129.49, -78.89, 119.51, -129.43, -87.66, -51.00] 
         self._send_movel_degrees(degrees, delay=wait_time)
+
     def move_return_empty_piece_up(self, wait_time: float = 2.00):
         # define your down position in degrees
         degrees = [129.6,-88.67 ,108.05 ,-108.22 ,-87.68 ,-51.06] 
         self._send_movej_degrees(degrees, delay=wait_time)
+
     def move_pickup_empty_piece_down(self, wait_time: float = 2.00):
-            # define your down position in degrees
-            degrees = [23.95,-78.61 ,119.66 ,-129.85 ,-90.93,-156.41] 
-            self._send_movel_degrees(degrees, delay=wait_time)
+        # define your down position in degrees
+        degrees = [23.95,-78.61 ,119.66 ,-129.85 ,-90.93,-156.41] 
+        self._send_movel_degrees(degrees, delay=wait_time, a=0.5)
+
     def move_pickup_empty_piece_up(self, wait_time: float = 2.00):
-             # define your down position in degrees
-            degrees = [24.00,-88.49,108.69,-109.02,-90.73,-156.62] 
-            self._send_movej_degrees(degrees, delay=wait_time)
+        # define your down position in degrees
+        degrees = [24.00,-88.49,108.69,-109.02,-90.73,-156.62] 
+        self._send_movej_degrees(degrees, delay=wait_time)
+
+    def move_return_midpoint(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [74.23, -120.19, 131.96, -99.63, -88.65, -106.46] 
+        self._send_movej_degrees(degrees, delay=wait_time)
+
     def close(self):
         # clean up script socket
         self.sock.close()
@@ -158,49 +173,50 @@ def main():
             # Going to first collection point
             s.move_left_up(wait_time=3)
             wait_for_gui_signal()
-            s.move_left_down(wait_time=2.5)
+            s.move_left_down(wait_time=1.9)
             s.close_gripper()
-            s.movel_left_up(wait_time=2.5)
-            s.move_home(wait_time=3)
+            s.movel_left_up(wait_time=1.9)
+            s.move_home(wait_time=2.9)
 
             # Going to bring back piece
-            s.move_disposal_up(wait_time=5)
-            s.move_disposal_down(wait_time=2)
+            s.move_disposal_up(wait_time=4.5)
+            s.move_disposal_down(wait_time=1.1)
             s.open_gripper()
-            s.move_disposal_up(wait_time=2)
-            s.move_pickup_empty_piece_up(wait_time=2)
-            s.move_pickup_empty_piece_down(wait_time=1.8)
+            s.movel_disposal_up(wait_time=1.5)
+            s.move_pickup_empty_piece_up(wait_time=1.5)
+            s.move_pickup_empty_piece_down(wait_time=1.4)
             s.close_gripper()
-            s.move_pickup_empty_piece_up(wait_time=2)
+            s.move_pickup_empty_piece_up(wait_time=1.5)
 
-            s.move_return_empty_piece_up(wait_time=6)
-            s.move_return_empty_piece_down(wait_time=2)
+            s.move_return_midpoint(wait_time=2.9)
+            s.move_return_empty_piece_up(wait_time=2.8)
+            s.move_return_empty_piece_down(wait_time=1)
             s.open_gripper()
-            s.move_return_empty_piece_up(wait_time=2)
-            # s.move_home(wait_time=2)
+            s.move_return_empty_piece_up(wait_time=1.5)
             
             # Going to second collection point
-            s.move_right_up(wait_time=5)
+            s.move_right_up(wait_time=1.9)
             wait_for_gui_signal()
-            s.move_right_down(wait_time=2.5)
+            s.move_right_down(wait_time=1.3)
             s.close_gripper()
-            s.movel_right_up(wait_time=2.5)
-            s.move_home(wait_time=3)
+            s.movel_right_up(wait_time=1.7)
+            s.move_home(wait_time=2.5)
 
             # Going to bring back piece
-            s.move_disposal_up(wait_time=5)
-            s.move_disposal_down(wait_time=2)
+            s.move_disposal_up(wait_time=4.5)
+            s.move_disposal_down(wait_time=1.1)
             s.open_gripper()
-            s.move_disposal_up(wait_time=2)
-            s.move_pickup_empty_piece_up(wait_time=2)
-            s.move_pickup_empty_piece_down(wait_time=1.8)
+            s.movel_disposal_up(wait_time=1.5)
+            s.move_pickup_empty_piece_up(wait_time=1.5)
+            s.move_pickup_empty_piece_down(wait_time=1.4)
             s.close_gripper()
-            s.move_pickup_empty_piece_up(wait_time=2)
+            s.move_pickup_empty_piece_up(wait_time=1.5)
 
-            s.move_return_empty_piece_up(wait_time=6)
-            s.move_return_empty_piece_down(wait_time=2)
+            s.move_return_midpoint(wait_time=2.9)
+            s.move_return_empty_piece_up(wait_time=2.8)
+            s.move_return_empty_piece_down(wait_time=1)
             s.open_gripper()
-            s.move_return_empty_piece_up(wait_time=2)
+            s.move_return_empty_piece_up(wait_time=1.5)
             # s.move_home(wait_time=2)
             
 

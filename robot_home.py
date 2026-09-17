@@ -65,6 +65,11 @@ class Scripter:
         degrees = [128.66, -50.45, 39.38, -77.93, -87.86, -51.88] 
         self._send_movej_degrees(degrees, delay=wait_time)
 
+    def movel_left_up(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [128.66, -50.45, 39.38, -77.93, -87.86, -51.88] 
+        self._send_movel_degrees(degrees, delay=wait_time)
+
     def move_left_down(self, wait_time: float = 2.00):
         # define your down position in degrees
         degrees = [128.61, -46.97, 68.62, -111.26, -89.09, -50.83] 
@@ -75,6 +80,11 @@ class Scripter:
         degrees = [157.98, -79.92, 90.30, -100.16, -87.56, -22.26] 
         self._send_movej_degrees(degrees, delay=wait_time)
 
+    def movel_right_up(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [157.98, -79.92, 90.30, -100.16, -87.56, -22.26] 
+        self._send_movel_degrees(degrees, delay=wait_time)
+
     def move_right_down(self, wait_time: float = 2.00):
         # define your down position in degrees
         degrees = [158.14, -70.42, 106.62, -126.15, -87.63, -21.80] 
@@ -82,13 +92,43 @@ class Scripter:
 
     def move_disposal_up(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [22.80, -89.08, 103.10, -103.70, -89.89, -156.67] 
+        degrees = [10.32, -95.79, 116.63, -109.07, -91.06, -170.23] 
         self._send_movej_degrees(degrees, delay=wait_time)
+
+    def movel_disposal_up(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [10.32, -95.79, 116.63, -109.07, -91.06, -170.23] 
+        self._send_movel_degrees(degrees, delay=wait_time, a=0.5)
 
     def move_disposal_down(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [22.86, -78.30, 117.68, -128.76, -90.17, -156.16] 
+        degrees = [10.17,-85.72,127.29,-130.16,-91.10,-170.06] 
+        self._send_movel_degrees(degrees, delay=wait_time, a=0.5)
+
+    def move_return_empty_piece_down(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [129.49, -78.89, 119.51, -129.43, -87.66, -51.00] 
         self._send_movel_degrees(degrees, delay=wait_time)
+
+    def move_return_empty_piece_up(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [129.6,-88.67 ,108.05 ,-108.22 ,-87.68 ,-51.06] 
+        self._send_movej_degrees(degrees, delay=wait_time)
+
+    def move_pickup_empty_piece_down(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [23.95,-78.61 ,119.66 ,-129.85 ,-90.93,-156.41] 
+        self._send_movel_degrees(degrees, delay=wait_time,a=0.5)
+
+    def move_pickup_empty_piece_up(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [24.00,-88.49,108.69,-109.02,-90.73,-156.62] 
+        self._send_movej_degrees(degrees, delay=wait_time)
+
+    def move_return_midpoint(self, wait_time: float = 2.00):
+        # define your down position in degrees
+        degrees = [74.23, -120.19, 131.96, -99.63, -88.65, -106.46] 
+        self._send_movej_degrees(degrees, delay=wait_time)
 
     def close(self):
         # clean up script socket
@@ -121,17 +161,16 @@ def main():
         s.close_gripper()
         s.open_gripper()
 
-        # s.move_left_up(wait_time=8)
-        s.move_home(wait_time=8)
-
-        # s.move_left_down(wait_time=2)
-        # s.close_gripper()
-        # s.move_left_up(wait_time=4)
-        
-        # # s.move_home(wait_time=5.5)
-        
-        # s.move_disposal_down(wait_time=2)
-        # s.move_disposal_up(wait_time=8)
+        # s.move_home(wait_time=8)
+        s.close_gripper()
+        s.move_disposal_up(wait_time=3.5)
+        s.move_disposal_down(wait_time=1.3)
+        s.open_gripper()
+        s.movel_disposal_up(wait_time=1.5)
+        s.move_pickup_empty_piece_up(wait_time=1.5)
+        s.move_pickup_empty_piece_down(wait_time=1.4)
+        s.close_gripper()
+        s.move_pickup_empty_piece_up(wait_time=1.5)
 
     finally:
         # closing streams
