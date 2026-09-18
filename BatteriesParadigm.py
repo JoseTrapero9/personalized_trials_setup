@@ -512,7 +512,7 @@ class retrievalscreen(QWidget):
         super().__init__()
         self.finish_callback = finish_callback
         self.get_scenario_cb = get_scenario_cb
-        self.ticks_left = 25
+        self.ticks_left = 18
         self.container_toggle = True
         
         self.timer = QTimer(self)
@@ -532,7 +532,7 @@ class retrievalscreen(QWidget):
         self.instruction_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.instruction_label)
 
-        self.timer_label = QLabel("25 s")
+        self.timer_label = QLabel("18 s")
         self.timer_label.setFont(timer_font)
         self.timer_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.timer_label)
@@ -540,7 +540,7 @@ class retrievalscreen(QWidget):
         self.setLayout(layout)
 
     def start_retrieval(self):
-        self.ticks_left = 20
+        self.ticks_left = 18
         target_container = "I" if self.container_toggle else "II"
         self.instruction_label.setText(f"Retrieve the parts from <b>Container {target_container}</b>")
         self.timer_label.setText(f"{self.ticks_left} s")

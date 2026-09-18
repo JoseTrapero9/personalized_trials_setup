@@ -169,7 +169,7 @@ def main():
         s.open_gripper()
         s.move_home(wait_time=5)
 
-        for i in range(5):  # repeat the sequence 3 times
+        for i in range(7):  # repeat the sequence 3 times
             # Going to first collection point
             s.move_left_up(wait_time=3)
             wait_for_gui_signal()
