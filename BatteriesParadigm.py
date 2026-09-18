@@ -175,7 +175,7 @@ current_condition = "training"
 active_scenarios_list = []
 robot_process = None
 
-def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_baseline.txt")):
+def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_fast.txt")):
     sequence = []
     if not os.path.exists(path):
         print(f"Warning: File not found at {path}. Using fallback sequence.")
@@ -542,7 +542,7 @@ class retrievalscreen(QWidget):
     def start_retrieval(self):
         self.ticks_left = 18
         target_container = "I" if self.container_toggle else "II"
-        self.instruction_label.setText(f"Retrieve the parts from <b>Container {target_container}</b>")
+        self.instruction_label.setText(f"BRING BACK EMPTY PIECE!<br>Retrieve the parts from <b>Container {target_container}</b>")
         self.timer_label.setText(f"{self.ticks_left} s")
 
         current_scenario = self.get_scenario_cb()
@@ -853,8 +853,9 @@ class workpiecetaskscreen(QWidget):
             subj_str = f"s{subj_int:02d}"
         except ValueError:
             subj_str = f"s_{subject_number}"
-            
-        filename = f"{subj_str}_{current_condition}.csv"
+
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        filename = f"{subj_str}_{current_condition}_{timestamp}.csv"
         filepath = os.path.join(log_dir, filename)
         file_exists = os.path.isfile(filepath)
         
