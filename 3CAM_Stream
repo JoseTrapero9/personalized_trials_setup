@@ -25,7 +25,7 @@ XIMEA_PRESETS = {
         "gain": 8.0,
         "gammaY": 0.47,
         "wb_kr": 1.00,
-        "wb_kb": 1.90,
+        "wb_kb": 2.05,
         "binning": False,
         "lsl_stream_name": "ximeasync_mq013",
         "lsl_source_id": "cam_sync_mq013"
@@ -197,7 +197,7 @@ def zed_capture_thread():
     zed.close()
 
 
-class XimeaWobrker(threading.Thread):
+class XimeaWorker(threading.Thread):
     def __init__(self, cam, model_name, preset):
         super().__init__()
         self.cam = cam
