@@ -637,11 +637,7 @@ class retrievalscreen(QWidget):
         self.setLayout(layout)
 
     def start_retrieval(self):
-<<<<<<< HEAD
-        self.ticks_left = RETRIEVAL_SECONDS
-=======
         self.ticks_left = 18
->>>>>>> 7028787b3ccedcfca5c13835a7589e2e456dca73
         target_container = "I" if self.container_toggle else "II"
         self.instruction_label.setText(f"BRING BACK EMPTY PIECE!<br>Retrieve the parts from <b>Container {target_container}</b>")
         self.timer_label.setText(f"{self.ticks_left} s")
