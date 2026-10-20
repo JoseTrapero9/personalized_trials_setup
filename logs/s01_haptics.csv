@@ -1,0 +1,9 @@
+subject,condition,difficulty,task_info,time_taken_s,handover_point,overtime_alarm,assembly_status
+1,manual,hard,sum_15_Use 1 Blue and 2 Green,19.313,1,False,correct
+1,manual,hard,sum_15_Use 2 Blue and 1 Green,20.166,2,True,correct
+1,manual,hard,sum_12_Use 2 Blue and 1 Yellow,17.227,1,False,correct
+1,manual,hard,sum_14_Use 2 Red and 1 Green,19.176,2,False,correct
+1,manual,hard,sum_12_Use 1 Blue and 2 Yellow,18.391,1,False,correct
+1,manual,hard,sum_14_Use 2 Red and 1 Green,21.034,2,True,correct
+1,manual,hard,sum_12_Use 2 Blue and 1 Yellow,16.108,1,False,correct
+1,manual,hard,sum_11_Use 1 Blue and 2 Red,15.875,2,False,none

@@ -25,7 +25,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 audio_dir = os.path.join(base_dir, "audios")
 
 correct_audio = os.path.join(audio_dir, "correct_answer.wav") 
-incorrect_audio = os.path.join(audio_dir, "incorrect_answer.wav")
+incorrect_audio = os.path.join(audio_dir, "loud_incorrect_answer.wav")
 alarm_audio = os.path.join(audio_dir, "alarm_llm.wav")
 
 if not os.path.exists(alarm_audio):
@@ -130,24 +130,31 @@ class AudioController:
         except Exception as e:
             print(f"Error playing {filepath}: {e}")
 
-    def start_looping_alarm(self, filepath):
+    def start_looping_alarm(self, filepath, volume=0.3):
         if self.alarm_active or not os.path.exists(filepath):
             return
         self.alarm_active = True
-        threading.Thread(target=self._loop_worker, args=(filepath, self.researcher_device), daemon=True).start()
+        # pass volume parameter to the background worker thread
+        threading.Thread(
+            target=self._loop_worker,
+            args=(filepath, self.researcher_device, volume),
+            daemon=True,
+        ).start()
 
     def stop_looping_alarm(self):
         self.alarm_active = False
         sd.stop()
 
-    def _loop_worker(self, filepath, device_id):
+    def _loop_worker(self, filepath, device_id, volume=0.3):
         try:
             data, fs = sf.read(filepath, dtype='float32')
+            # scale the waveform amplitude to reduce acoustic intensity
+            scaled_data = data * volume
             while self.alarm_active:
-                sd.play(data, samplerate=fs, device=device_id)
+                sd.play(scaled_data, samplerate=fs, device=device_id)
                 sd.wait()
         except Exception as e:
-            print(f"Alarm loop error: {e}")
+            print(f'Alarm loop error: {e}')
 
 audio_sys = AudioController()
 haptic_loop = None
@@ -184,7 +191,7 @@ current_condition = "training"
 active_scenarios_list = []
 robot_process = None
 
-def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_baseline.txt")):
+def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_fast.txt")):
     sequence = []
     if not os.path.exists(path):
         print(f"Warning: File not found at {path}. Using fallback sequence.")
@@ -599,7 +606,7 @@ class retrievalscreen(QWidget):
         super().__init__()
         self.finish_callback = finish_callback
         self.get_scenario_cb = get_scenario_cb
-        self.ticks_left = 25
+        self.ticks_left = 18
         self.container_toggle = True
         
         self.timer = QTimer(self)
@@ -622,7 +629,7 @@ class retrievalscreen(QWidget):
         self.instruction_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.instruction_label)
 
-        self.timer_label = QLabel("25 s")
+        self.timer_label = QLabel("18 s")
         self.timer_label.setFont(timer_font)
         self.timer_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.timer_label)
@@ -630,9 +637,13 @@ class retrievalscreen(QWidget):
         self.setLayout(layout)
 
     def start_retrieval(self):
+<<<<<<< HEAD
         self.ticks_left = RETRIEVAL_SECONDS
+=======
+        self.ticks_left = 18
+>>>>>>> 7028787b3ccedcfca5c13835a7589e2e456dca73
         target_container = "I" if self.container_toggle else "II"
-        self.instruction_label.setText(f"Retrieve the parts from <b>Container {target_container}</b>")
+        self.instruction_label.setText(f"BRING BACK EMPTY PIECE!<br>Retrieve the parts from <b>Container {target_container}</b>")
         self.timer_label.setText(f"{self.ticks_left} s")
 
         current_scenario = self.get_scenario_cb()
@@ -896,7 +907,7 @@ class workpiecetaskscreen(QWidget):
             if not self.alarm_triggered:
                 self.alarm_triggered = True
                 send_marker("Workpiece_Task_Overtime_Alarm_Started")
-                audio_sys.start_looping_alarm(alarm_audio)
+                audio_sys.start_looping_alarm(alarm_audio, volume=0.9)
         else:
             self.timer_label.setText(f"{self.ticks_left} s")
 
@@ -951,8 +962,9 @@ class workpiecetaskscreen(QWidget):
             subj_str = f"s{subj_int:02d}"
         except ValueError:
             subj_str = f"s_{subject_number}"
-            
-        filename = f"{subj_str}_{current_condition}.csv"
+
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        filename = f"{subj_str}_{current_condition}_{timestamp}.csv"
         filepath = os.path.join(log_dir, filename)
         file_exists = os.path.isfile(filepath)
         
@@ -1797,7 +1809,7 @@ def run_paradigm():
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(cleanup_resources)
     
-    audio_sys.setup_devices(participant_keyword="Trekz", researcher_keyword="Realtek")
+    audio_sys.setup_devices(participant_keyword="Trekz", researcher_keyword="Realtek(R) Audio")
     
     controller = paradigmcontroller()
     
