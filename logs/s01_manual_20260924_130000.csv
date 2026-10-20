@@ -1,0 +1,2 @@
+subject,condition,difficulty,task_info,time_taken_s,handover_point,overtime_alarm,assembly_status
+1,manual,hard,sum_10_Use 1 Blue and 2 Red,17.236,1,False,correct

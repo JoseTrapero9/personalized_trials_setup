@@ -9,6 +9,7 @@ import threading
 import asyncio
 import socket
 import re
+import numpy as np
 import bhaptics_python
 import sounddevice as sd
 import soundfile as sf
@@ -40,7 +41,7 @@ mode_baseline = os.path.join(audio_dir, "BASELINE_MODE.wav")
 
 container1_audio = os.path.join(audio_dir, "CONTAINER1_ALERT.wav")
 container2_audio = os.path.join(audio_dir, "CONTAINER2.wav")
-mistake_audio = os.path.join(audio_dir, "MISTAKE_ALERT.wav")
+mistake_audio = os.path.join(audio_dir, "loud_incorrect_answer.wav")
 
 ROBOT_OWN_IP = "192.168.29.61"
 DIFFICULTY_PORT = 50001
@@ -122,11 +123,28 @@ class AudioController:
         if os.path.exists(filepath):
             threading.Thread(target=self._play_audio, args=(filepath, self.researcher_device), daemon=True).start()
 
+    def play_both(self, filepath):
+        # play concurrently across participant and researcher devices
+        if os.path.exists(filepath):
+            if self.participant_device is not None:
+                threading.Thread(target=self._play_audio, args=(filepath, self.participant_device), daemon=True).start()
+            if self.researcher_device is not None:
+                threading.Thread(target=self._play_audio, args=(filepath, self.researcher_device), daemon=True).start()
+
     def _play_audio(self, filepath, device_id):
+        if device_id is None or not os.path.exists(filepath):
+            return
         try:
             data, fs = sf.read(filepath, dtype='float32')
-            sd.play(data, samplerate=fs, device=device_id)
-            sd.wait() 
+            if data.ndim == 1:
+                # duplicate mono signals to stereo for driver compatibility
+                data = np.column_stack((data, data))
+            channels = data.shape[1]
+            
+            # use explicit stream to avoid sd.play internal global cutoff
+            with sd.OutputStream(device=device_id, samplerate=fs, channels=channels, dtype='float32') as stream:
+                stream.write(data)
+                time.sleep(0.1)
         except Exception as e:
             print(f"Error playing {filepath}: {e}")
 
@@ -134,7 +152,6 @@ class AudioController:
         if self.alarm_active or not os.path.exists(filepath):
             return
         self.alarm_active = True
-        # pass volume parameter to the background worker thread
         threading.Thread(
             target=self._loop_worker,
             args=(filepath, self.researcher_device, volume),
@@ -148,11 +165,14 @@ class AudioController:
     def _loop_worker(self, filepath, device_id, volume=0.3):
         try:
             data, fs = sf.read(filepath, dtype='float32')
-            # scale the waveform amplitude to reduce acoustic intensity
+            if data.ndim == 1:
+                data = np.column_stack((data, data))
+            channels = data.shape[1]
             scaled_data = data * volume
+            
             while self.alarm_active:
-                sd.play(scaled_data, samplerate=fs, device=device_id)
-                sd.wait()
+                with sd.OutputStream(device=device_id, samplerate=fs, channels=channels, dtype='float32') as stream:
+                    stream.write(scaled_data)
         except Exception as e:
             print(f'Alarm loop error: {e}')
 
@@ -693,7 +713,7 @@ class workpiecetaskscreen(QWidget):
         main_layout.setContentsMargins(15, 15, 15, 15)
         main_layout.setSpacing(15)
         
-        # Left Panel (Task Workspace)
+        # left panel (task workspace)
         self.left_panel = QFrame()
         self.left_panel.setFrameShape(QFrame.StyledPanel)
         self.left_panel.setStyleSheet("background-color: white; border-radius: 10px;")
@@ -701,9 +721,10 @@ class workpiecetaskscreen(QWidget):
         left_layout = QVBoxLayout(self.left_panel)
         left_layout.setContentsMargins(30, 20, 30, 20)
         
-        # Top flexible spacer
+        # top flexible spacer
         left_layout.addStretch(1)
 
+        # header title
         self.training_tag = make_training_tag()
         left_layout.addWidget(self.training_tag, alignment=Qt.AlignCenter)
 
@@ -716,20 +737,20 @@ class workpiecetaskscreen(QWidget):
 
         left_layout.addSpacing(4)
 
-        # Centered Huge Countdown Timer (Immediate visibility)
+        # centered huge countdown timer
         self.timer_label = QLabel("25 s")
         self.timer_label.setFont(QFont("Helvetica", 100, QFont.Bold))
         self.timer_label.setAlignment(Qt.AlignCenter)
         self.timer_label.setStyleSheet("color: #111;")
         left_layout.addWidget(self.timer_label)
 
-        # Centered Warning indicator
+        # centered warning indicator
         self.warning_label = QLabel("")
-        self.warning_label.setFont(QFont("Helvetica", 60, QFont.Bold))  # Increased font size
+        self.warning_label.setFont(QFont("Helvetica", 60, QFont.Bold))
         self.warning_label.setStyleSheet("color: red; letter-spacing: 1px;")
         self.warning_label.setAlignment(Qt.AlignCenter)
         
-        # Set height to 75–80px to accommodate a 50–55pt font without clipping
+        # set height to 80px to accommodate large font without clipping
         self.warning_label.setFixedHeight(80) 
         left_layout.addWidget(self.warning_label)
 
@@ -739,7 +760,7 @@ class workpiecetaskscreen(QWidget):
         self.image_label.setAlignment(Qt.AlignCenter)
         left_layout.addWidget(self.image_label)
 
-        # Dedicated Target Sum Label
+        # dedicated target sum label
         self.target_sum_label = QLabel()
         self.target_sum_label.setAlignment(Qt.AlignCenter)
         self.target_sum_label.setStyleSheet("font-weight: bold; color: #222;")
@@ -747,24 +768,24 @@ class workpiecetaskscreen(QWidget):
 
         left_layout.addSpacing(10)
 
-        # Dedicated Instruction Label (Dynamic auto-fit up to 46pt, single line)
+        # dedicated instruction label
         self.instruction_label = QLabel()
         self.instruction_label.setAlignment(Qt.AlignCenter)
         self.instruction_label.setStyleSheet("font-weight: bold; color: #0056B3;")
         self.instruction_label.setWordWrap(False)
         left_layout.addWidget(self.instruction_label)
 
-        # Bottom flexible spacer
+        # bottom flexible spacer
         left_layout.addStretch(1)
 
-        # Handover instructions
+        # handover instructions
         self.handover_label = QLabel()
         self.handover_label.setFont(QFont("Helvetica", 25))
         self.handover_label.setAlignment(Qt.AlignCenter)
         self.handover_label.setStyleSheet("color: #222; padding: 10px; background-color: #F0F4F8; border-radius: 6px;")
         left_layout.addWidget(self.handover_label)
 
-        # Right Panel (Rules Card)
+        # right panel (rules card)
         self.right_panel = QFrame()
         self.right_panel.setFrameShape(QFrame.StyledPanel)
         self.right_panel.setStyleSheet("background-color: #FAFAFA; border-radius: 10px;")
@@ -867,7 +888,8 @@ class workpiecetaskscreen(QWidget):
         send_marker(f"Assembly_Evaluated_{self.assembly_status}")
 
         if not is_correct:
-            audio_sys.play_participant(incorrect_audio)
+            # trigger incorrect feedback on both headphones and laptop speakers
+            audio_sys.play_both(incorrect_audio)
 
         if self.pending_log is not None:
             self.pending_log["assembly_status"] = self.assembly_status
@@ -889,12 +911,11 @@ class workpiecetaskscreen(QWidget):
                 self.warning_label.setText("WARNING - FINISH")
                 self.blink_timer.start(250)
         
-        # When time runs out, keep blinking active
+        # when time runs out, keep blinking active
         if self.ticks_left <= 0:
             self.timer_label.setText("0 s")
             self.timer_label.setStyleSheet("color: red;")
             
-            # Ensure the blink timer stays active if time ran out without triggering 10s warning
             if not self.blink_timer.isActive():
                 self.warn_visible = True
                 self.warning_label.setText("WARNING - FINISH")
@@ -1715,7 +1736,7 @@ class paradigmcontroller(QWidget):
         if mode in ["haptic", "audio_haptic"]:
             activate_haptic_vest()
         if mode in ["audio", "audio_haptic"]:
-            audio_sys.play_participant(mistake_audio)
+            audio_sys.play_both(mistake_audio)
             
         self.mistake_on_cooldown = True
         QTimer.singleShot(2000, self.reset_mistake_cooldown)
