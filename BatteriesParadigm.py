@@ -56,7 +56,7 @@ RETRIEVAL_SECONDS = 20          # container retrieval phase
 TASK_SECONDS_DEFAULT = 20       # assembly time in baseline / easy / hard (non-robot) scenarios
 WARNING_SECONDS = 10            # red timer + blinking warning starts at this many seconds left
 
-TRAINING_SECONDS = 180          # length of the practice round (3 min, baseline-like)
+TRAINING_SECONDS = 240          # length of the practice round (3 min, baseline-like)
 LOG_TRAINING_CSV = False        # training is NOT a measurement -> no performance CSV by default
 TRAINING_MARKER_PREFIX = "TRAIN_"
 training_active = False         # set to True when condition == "training"
@@ -211,7 +211,7 @@ current_condition = "training"
 active_scenarios_list = []
 robot_process = None
 
-def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s01_fast.txt")):
+def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s06_haptics.txt")):
     sequence = []
     if not os.path.exists(path):
         print(f"Warning: File not found at {path}. Using fallback sequence.")
@@ -1258,7 +1258,7 @@ class tutorialscreen(QWidget):
 
         self._add_page(
             "Feedback and alerts",
-            "After each hand over, the experimenter checks your assembly. If it is <b>incorrect</b>, you hear an "
+            "After each hand over, an AI will evaluate your assembly. If it is <b>incorrect</b>, you hear an "
             "error tone. In the real experiment you may also get a <b>warning</b> while you work \u2013 a sound "
             "and/or a vibration of the vest. It means: double-check your assembly.",
             self._ill_alerts(),
@@ -1698,7 +1698,7 @@ class paradigmcontroller(QWidget):
                 self.pending_training_end = True
                 self.master_timer.stop()
             return
-        if self.scenario_active_seconds >= 300:
+        if self.scenario_active_seconds >= 360:
             if self.current_scenario_idx + 1 >= len(self.scenarios):
                 send_marker("Experiment_Complete_Time_Limit")
                 QApplication.instance().quit()

@@ -1,2 +1,0 @@
-subject,condition,difficulty,task_info,time_taken_s,handover_point,overtime_alarm,assembly_status
-1,manual,hard,sum_20_Use 2 Yellow and 1 Green,17.433,1,False,incorrect
