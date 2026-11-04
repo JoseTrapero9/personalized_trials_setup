@@ -26,7 +26,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 audio_dir = os.path.join(base_dir, "audios")
 
 correct_audio = os.path.join(audio_dir, "correct_answer.wav") 
-incorrect_audio = os.path.join(audio_dir, "loud_incorrect_answer.wav")
+incorrect_audio = os.path.join(audio_dir, "buzzer.wav")
 alarm_audio = os.path.join(audio_dir, "alarm_llm.wav")
 
 if not os.path.exists(alarm_audio):
@@ -56,7 +56,7 @@ RETRIEVAL_SECONDS = 20          # container retrieval phase
 TASK_SECONDS_DEFAULT = 20       # assembly time in baseline / easy / hard (non-robot) scenarios
 WARNING_SECONDS = 10            # red timer + blinking warning starts at this many seconds left
 
-TRAINING_SECONDS = 240          # length of the practice round (3 min, baseline-like)
+TRAINING_SECONDS = 360          # length of the practice round (3 min, baseline-like)
 LOG_TRAINING_CSV = False        # training is NOT a measurement -> no performance CSV by default
 TRAINING_MARKER_PREFIX = "TRAIN_"
 training_active = False         # set to True when condition == "training"
@@ -211,7 +211,7 @@ current_condition = "training"
 active_scenarios_list = []
 robot_process = None
 
-def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s06_haptics.txt")):
+def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s09_audio.txt")):
     sequence = []
     if not os.path.exists(path):
         print(f"Warning: File not found at {path}. Using fallback sequence.")
@@ -1736,11 +1736,12 @@ class paradigmcontroller(QWidget):
         if mode in ["haptic", "audio_haptic"]:
             activate_haptic_vest()
         if mode in ["audio", "audio_haptic"]:
-            audio_sys.play_both(mistake_audio)
+            # play mistake audio only on participant bone conduction headphones
+            audio_sys.play_participant(mistake_audio)
             
         self.mistake_on_cooldown = True
-        QTimer.singleShot(2000, self.reset_mistake_cooldown)
-
+        QTimer.singleShot(100, self.reset_mistake_cooldown)
+        
     def reset_mistake_cooldown(self):
         self.mistake_on_cooldown = False
 
