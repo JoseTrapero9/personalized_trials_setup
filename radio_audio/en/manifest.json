@@ -1,0 +1,1975 @@
+{
+ "language": "en",
+ "voice": "Microsoft David Desktop - English (United States)",
+ "voice_source": "desktop",
+ "rate": 0,
+ "script_hash": "592f0b529702",
+ "generated": "2026-11-04 13:43:04",
+ "clips": {
+  "filler_00": {
+   "parts": [
+    "Hello everyone, this is plant radio with your regular update from the control room."
+   ],
+   "duration_s": 4.894
+  },
+  "filler_01": {
+   "parts": [
+    "All four turbines are running smoothly, and output is right on target today."
+   ],
+   "duration_s": 4.421
+  },
+  "filler_02": {
+   "parts": [
+    "The maintenance team finished the inspection of the cooling towers this morning."
+   ],
+   "duration_s": 3.708
+  },
+  "filler_03": {
+   "parts": [
+    "The weather outside is calm, with a light breeze coming from the river."
+   ],
+   "duration_s": 3.774
+  },
+  "filler_04": {
+   "parts": [
+    "Energy output this hour is slightly above yesterday's average. Nice work, everyone."
+   ],
+   "duration_s": 5.944
+  },
+  "filler_05": {
+   "parts": [
+    "A reminder that the cafeteria serves soup and fresh bread until two o'clock."
+   ],
+   "duration_s": 4.05
+  },
+  "filler_06": {
+   "parts": [
+    "The new sensors in the boiler room are sending clean data, with no surprises so far."
+   ],
+   "duration_s": 5.11
+  },
+  "filler_07": {
+   "parts": [
+    "Grid demand is stable, so we expect a quiet afternoon on the network."
+   ],
+   "duration_s": 4.278
+  },
+  "filler_08": {
+   "parts": [
+    "Shift change is at six. Please leave your notes for the next team."
+   ],
+   "duration_s": 4.323
+  },
+  "filler_09": {
+   "parts": [
+    "The coal yard received a full shipment this morning, and storage is looking good."
+   ],
+   "duration_s": 4.436
+  },
+  "filler_10": {
+   "parts": [
+    "Water temperature in the condenser is steady and well within limits."
+   ],
+   "duration_s": 3.459
+  },
+  "filler_11": {
+   "parts": [
+    "The safety walk in sector two went well. Thanks to everyone who joined."
+   ],
+   "duration_s": 4.641
+  },
+  "filler_12": {
+   "parts": [
+    "Our solar field is adding a little extra power while the sun is out."
+   ],
+   "duration_s": 3.526
+  },
+  "filler_13": {
+   "parts": [
+    "A group of visitors from the university will tour the plant later today."
+   ],
+   "duration_s": 3.611
+  },
+  "filler_14": {
+   "parts": [
+    "Fuel consumption is lower than planned, which keeps the budget happy."
+   ],
+   "duration_s": 3.858
+  },
+  "filler_15": {
+   "parts": [
+    "Remember to drink some water and take a short stretch when you can."
+   ],
+   "duration_s": 3.429
+  },
+  "filler_16": {
+   "parts": [
+    "Vibration on the main shaft is low and steady, just how we like it."
+   ],
+   "duration_s": 4.033
+  },
+  "filler_17": {
+   "parts": [
+    "The parking lot will be repainted on the weekend, so please park near the gate."
+   ],
+   "duration_s": 4.366
+  },
+  "filler_18": {
+   "parts": [
+    "Steam pressure across the plant is balanced and holding nicely."
+   ],
+   "duration_s": 3.501
+  },
+  "filler_19": {
+   "parts": [
+    "That is all for now from the control room. Enjoy your shift."
+   ],
+   "duration_s": 4.062
+  },
+  "fb_solved_0": {
+   "parts": [
+    "Perfect, that fixed it."
+   ],
+   "duration_s": 1.621
+  },
+  "fb_solved_1": {
+   "parts": [
+    "Great job, everything is stable again."
+   ],
+   "duration_s": 2.494
+  },
+  "fb_solved_2": {
+   "parts": [
+    "Nice, problem solved."
+   ],
+   "duration_s": 1.891
+  },
+  "fb_wrong_0": {
+   "parts": [
+    "Oh no, that was not right. We lost some power."
+   ],
+   "duration_s": 3.84
+  },
+  "fb_wrong_1": {
+   "parts": [
+    "That didn't work, the system took some damage."
+   ],
+   "duration_s": 2.853
+  },
+  "fb_wrong_2": {
+   "parts": [
+    "Too bad, that was the wrong move."
+   ],
+   "duration_s": 2.175
+  },
+  "fb_timeout_0": {
+   "parts": [
+    "Too late, the system shut down for a moment."
+   ],
+   "duration_s": 2.749
+  },
+  "fb_timeout_1": {
+   "parts": [
+    "Time is up, we lost some power."
+   ],
+   "duration_s": 2.282
+  },
+  "ann_container_1": {
+   "parts": [
+    "Checkpoint. Bring back the empty piece, and take new parts from container one."
+   ],
+   "duration_s": 5.448
+  },
+  "ann_container_2": {
+   "parts": [
+    "Checkpoint. Bring back the empty piece, and take new parts from container two."
+   ],
+   "duration_s": 5.417
+  },
+  "prob_e000": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the green button."
+   ],
+   "duration_s": 6.56
+  },
+  "prob_e001": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 6.759
+  },
+  "prob_e002": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the yellow button."
+   ],
+   "duration_s": 6.329
+  },
+  "prob_e003": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the yellow button."
+   ],
+   "duration_s": 6.15
+  },
+  "prob_e004": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the yellow button."
+   ],
+   "duration_s": 5.966
+  },
+  "prob_e005": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled blue."
+   ],
+   "duration_s": 7.177
+  },
+  "prob_e006": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled blue, and then the button labeled red."
+   ],
+   "duration_s": 8.756
+  },
+  "prob_e007": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled yellow, and then the button labeled purple."
+   ],
+   "duration_s": 8.934
+  },
+  "prob_e008": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the blue button, and then the button labeled blue."
+   ],
+   "duration_s": 8.576
+  },
+  "prob_e009": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the yellow button, and then the button labeled purple."
+   ],
+   "duration_s": 8.342
+  },
+  "prob_e010": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled yellow, and then the button labeled purple."
+   ],
+   "duration_s": 9.093
+  },
+  "prob_e011": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the purple button, and then the yellow button."
+   ],
+   "duration_s": 8.367
+  },
+  "prob_e012": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled red, and then the button labeled blue."
+   ],
+   "duration_s": 9.083
+  },
+  "prob_e013": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled purple, then the button labeled red, and finally the green button."
+   ],
+   "duration_s": 10.606
+  },
+  "prob_e014": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the green button, then the yellow button, and finally the purple button."
+   ],
+   "duration_s": 9.522
+  },
+  "prob_e015": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the blue button, then the button labeled red, and finally the yellow button."
+   ],
+   "duration_s": 10.26
+  },
+  "prob_e016": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled purple, then the purple button, and finally the yellow button."
+   ],
+   "duration_s": 10.643
+  },
+  "prob_e017": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled blue, then the purple button, and finally the button labeled yellow."
+   ],
+   "duration_s": 10.808
+  },
+  "prob_e018": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled yellow, then the purple button, and finally the button labeled red."
+   ],
+   "duration_s": 10.929
+  },
+  "prob_e019": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the red button, then the purple button, and finally the button labeled blue."
+   ],
+   "duration_s": 10.506
+  },
+  "prob_e020": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the button labeled green."
+   ],
+   "duration_s": 6.613
+  },
+  "prob_e021": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the red button."
+   ],
+   "duration_s": 5.903
+  },
+  "prob_e022": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled red."
+   ],
+   "duration_s": 6.67
+  },
+  "prob_e023": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 6.32
+  },
+  "prob_e024": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled green."
+   ],
+   "duration_s": 6.254
+  },
+  "prob_e025": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the red button."
+   ],
+   "duration_s": 5.828
+  },
+  "prob_e026": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled blue, and then the button labeled yellow."
+   ],
+   "duration_s": 8.426
+  },
+  "prob_e027": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the green button, and then the blue button."
+   ],
+   "duration_s": 8.059
+  },
+  "prob_e028": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the yellow button, and then the button labeled green."
+   ],
+   "duration_s": 8.666
+  },
+  "prob_e029": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the red button, and then the yellow button."
+   ],
+   "duration_s": 8.088
+  },
+  "prob_e030": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled blue, and then the blue button."
+   ],
+   "duration_s": 8.612
+  },
+  "prob_e031": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the green button, and then the button labeled yellow."
+   ],
+   "duration_s": 7.961
+  },
+  "prob_e032": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the yellow button, and then the blue button."
+   ],
+   "duration_s": 8.063
+  },
+  "prob_e033": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled purple, then the button labeled green, and finally the blue button."
+   ],
+   "duration_s": 10.156
+  },
+  "prob_e034": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the purple button, then the blue button, and finally the yellow button."
+   ],
+   "duration_s": 10.022
+  },
+  "prob_e035": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the blue button, then the button labeled red, and finally the green button."
+   ],
+   "duration_s": 9.799
+  },
+  "prob_e036": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled red, then the button labeled yellow, and finally the button labeled blue."
+   ],
+   "duration_s": 10.676
+  },
+  "prob_e037": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the green button, then the yellow button, and finally the blue button."
+   ],
+   "duration_s": 9.557
+  },
+  "prob_e038": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the blue button, then the purple button, and finally the yellow button."
+   ],
+   "duration_s": 9.638
+  },
+  "prob_e039": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled red, then the button labeled green, and finally the yellow button."
+   ],
+   "duration_s": 10.7
+  },
+  "prob_e040": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled yellow."
+   ],
+   "duration_s": 6.739
+  },
+  "prob_e041": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled green."
+   ],
+   "duration_s": 6.913
+  },
+  "prob_e042": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the purple button."
+   ],
+   "duration_s": 6.608
+  },
+  "prob_e043": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled yellow."
+   ],
+   "duration_s": 6.3
+  },
+  "prob_e044": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the green button."
+   ],
+   "duration_s": 6.719
+  },
+  "prob_e045": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the red button."
+   ],
+   "duration_s": 6.266
+  },
+  "prob_e046": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the red button, and then the green button."
+   ],
+   "duration_s": 8.361
+  },
+  "prob_e047": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled red, and then the button labeled green."
+   ],
+   "duration_s": 8.597
+  },
+  "prob_e048": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled red, and then the button labeled green."
+   ],
+   "duration_s": 8.597
+  },
+  "prob_e049": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the yellow button, and then the button labeled blue."
+   ],
+   "duration_s": 8.198
+  },
+  "prob_e050": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled purple, and then the green button."
+   ],
+   "duration_s": 8.737
+  },
+  "prob_e051": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the red button, and then the blue button."
+   ],
+   "duration_s": 7.349
+  },
+  "prob_e052": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled green, and then the purple button."
+   ],
+   "duration_s": 8.562
+  },
+  "prob_e053": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled purple, then the button labeled blue, and finally the purple button."
+   ],
+   "duration_s": 10.047
+  },
+  "prob_e054": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the purple button, then the button labeled red, and finally the yellow button."
+   ],
+   "duration_s": 10.533
+  },
+  "prob_e055": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled green, then the button labeled red, and finally the button labeled blue."
+   ],
+   "duration_s": 10.669
+  },
+  "prob_e056": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled red, then the yellow button, and finally the button labeled blue."
+   ],
+   "duration_s": 10.817
+  },
+  "prob_e057": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the yellow button, then the button labeled red, and finally the green button."
+   ],
+   "duration_s": 9.516
+  },
+  "prob_e058": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled red, then the yellow button, and finally the blue button."
+   ],
+   "duration_s": 10.266
+  },
+  "prob_e059": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled purple, then the button labeled blue, and finally the button labeled green."
+   ],
+   "duration_s": 11.209
+  },
+  "prob_e060": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the green button."
+   ],
+   "duration_s": 6.719
+  },
+  "prob_e061": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the yellow button."
+   ],
+   "duration_s": 6.709
+  },
+  "prob_e062": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the green button."
+   ],
+   "duration_s": 6.26
+  },
+  "prob_e063": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled green."
+   ],
+   "duration_s": 7.188
+  },
+  "prob_e064": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the purple button."
+   ],
+   "duration_s": 6.308
+  },
+  "prob_e065": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled blue."
+   ],
+   "duration_s": 6.681
+  },
+  "prob_e066": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled green, and then the button labeled yellow."
+   ],
+   "duration_s": 8.902
+  },
+  "prob_e067": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the red button, and then the button labeled red."
+   ],
+   "duration_s": 7.772
+  },
+  "prob_e068": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the purple button, and then the yellow button."
+   ],
+   "duration_s": 8.367
+  },
+  "prob_e069": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the red button, and then the blue button."
+   ],
+   "duration_s": 7.708
+  },
+  "prob_e070": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the red button, and then the button labeled green."
+   ],
+   "duration_s": 7.792
+  },
+  "prob_e071": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the blue button, and then the red button."
+   ],
+   "duration_s": 7.607
+  },
+  "prob_e072": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled purple, and then the purple button."
+   ],
+   "duration_s": 8.792
+  },
+  "prob_e073": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled yellow, then the button labeled blue, and finally the button labeled green."
+   ],
+   "duration_s": 11.032
+  },
+  "prob_e074": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled purple, then the button labeled green, and finally the blue button."
+   ],
+   "duration_s": 10.156
+  },
+  "prob_e075": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the yellow button, then the button labeled purple, and finally the button labeled yellow."
+   ],
+   "duration_s": 10.976
+  },
+  "prob_e076": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the blue button, then the button labeled yellow, and finally the button labeled red."
+   ],
+   "duration_s": 10.639
+  },
+  "prob_e077": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the blue button, then the purple button, and finally the yellow button."
+   ],
+   "duration_s": 9.199
+  },
+  "prob_e078": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the yellow button, then the green button, and finally the button labeled red."
+   ],
+   "duration_s": 9.91
+  },
+  "prob_e079": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the button labeled purple, then the red button, and finally the button labeled red."
+   ],
+   "duration_s": 10.28
+  },
+  "prob_e080": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the green button."
+   ],
+   "duration_s": 6.159
+  },
+  "prob_e081": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled red."
+   ],
+   "duration_s": 7.166
+  },
+  "prob_e082": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled blue."
+   ],
+   "duration_s": 6.681
+  },
+  "prob_e083": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the blue button."
+   ],
+   "duration_s": 6.069
+  },
+  "prob_e084": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the purple button."
+   ],
+   "duration_s": 6.308
+  },
+  "prob_e085": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled green."
+   ],
+   "duration_s": 7.188
+  },
+  "prob_e086": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the button labeled blue, and then the green button."
+   ],
+   "duration_s": 8.135
+  },
+  "prob_e087": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled green, and then the green button."
+   ],
+   "duration_s": 8.651
+  },
+  "prob_e088": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled red, and then the blue button."
+   ],
+   "duration_s": 8.147
+  },
+  "prob_e089": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled purple, and then the button labeled red."
+   ],
+   "duration_s": 8.237
+  },
+  "prob_e090": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled red, and then the purple button."
+   ],
+   "duration_s": 8.803
+  },
+  "prob_e091": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the yellow button, and then the red button."
+   ],
+   "duration_s": 7.429
+  },
+  "prob_e092": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the green button, and then the purple button."
+   ],
+   "duration_s": 7.802
+  },
+  "prob_e093": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the purple button, then the blue button, and finally the red button."
+   ],
+   "duration_s": 9.397
+  },
+  "prob_e094": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the purple button, then the button labeled blue, and finally the red button."
+   ],
+   "duration_s": 9.925
+  },
+  "prob_e095": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled yellow, then the red button, and finally the button labeled purple."
+   ],
+   "duration_s": 10.222
+  },
+  "prob_e096": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled blue, then the button labeled green, and finally the button labeled red."
+   ],
+   "duration_s": 10.181
+  },
+  "prob_e097": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the purple button, then the green button, and finally the button labeled purple."
+   ],
+   "duration_s": 9.718
+  },
+  "prob_e098": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the green button, then the yellow button, and finally the red button."
+   ],
+   "duration_s": 10.079
+  },
+  "prob_e099": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the green button, then the purple button, and finally the yellow button."
+   ],
+   "duration_s": 9.354
+  },
+  "prob_e100": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the purple button."
+   ],
+   "duration_s": 6.387
+  },
+  "prob_e101": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled yellow."
+   ],
+   "duration_s": 6.739
+  },
+  "prob_e102": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled red."
+   ],
+   "duration_s": 6.89
+  },
+  "prob_e103": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled green."
+   ],
+   "duration_s": 6.913
+  },
+  "prob_e104": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled blue."
+   ],
+   "duration_s": 6.318
+  },
+  "prob_e105": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled red."
+   ],
+   "duration_s": 6.49
+  },
+  "prob_e106": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled green, and then the green button."
+   ],
+   "duration_s": 7.833
+  },
+  "prob_e107": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled red, and then the button labeled green."
+   ],
+   "duration_s": 8.417
+  },
+  "prob_e108": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled blue, and then the button labeled yellow."
+   ],
+   "duration_s": 8.986
+  },
+  "prob_e109": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the blue button, and then the yellow button."
+   ],
+   "duration_s": 7.467
+  },
+  "prob_e110": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled yellow, and then the purple button."
+   ],
+   "duration_s": 7.919
+  },
+  "prob_e111": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the button labeled yellow, and then the button labeled blue."
+   ],
+   "duration_s": 8.563
+  },
+  "prob_e112": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the red button, and then the yellow button."
+   ],
+   "duration_s": 8.363
+  },
+  "prob_e113": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the purple button, then the yellow button, and finally the button labeled green."
+   ],
+   "duration_s": 9.71
+  },
+  "prob_e114": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the blue button, then the purple button, and finally the yellow button."
+   ],
+   "duration_s": 9.275
+  },
+  "prob_e115": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled green, then the button labeled purple, and finally the button labeled blue."
+   ],
+   "duration_s": 10.771
+  },
+  "prob_e116": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the button labeled blue, then the button labeled yellow, and finally the button labeled purple."
+   ],
+   "duration_s": 10.647
+  },
+  "prob_e117": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled green, then the blue button, and finally the button labeled purple."
+   ],
+   "duration_s": 10.592
+  },
+  "prob_e118": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the green button, then the purple button, and finally the button labeled green."
+   ],
+   "duration_s": 9.719
+  },
+  "prob_e119": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled red, then the button labeled yellow, and finally the button labeled blue."
+   ],
+   "duration_s": 10.676
+  },
+  "prob_e120": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the blue button."
+   ],
+   "duration_s": 6.249
+  },
+  "prob_e121": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 6.396
+  },
+  "prob_e122": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 7.255
+  },
+  "prob_e123": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 6.579
+  },
+  "prob_e124": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the blue button."
+   ],
+   "duration_s": 6.249
+  },
+  "prob_e125": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the red button."
+   ],
+   "duration_s": 6.646
+  },
+  "prob_e126": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled purple, and then the red button."
+   ],
+   "duration_s": 8.672
+  },
+  "prob_e127": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled red, and then the yellow button."
+   ],
+   "duration_s": 8.238
+  },
+  "prob_e128": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled purple, and then the red button."
+   ],
+   "duration_s": 8.292
+  },
+  "prob_e129": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled yellow, and then the blue button."
+   ],
+   "duration_s": 8.212
+  },
+  "prob_e130": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled yellow, and then the green button."
+   ],
+   "duration_s": 7.934
+  },
+  "prob_e131": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the blue button, and then the button labeled yellow."
+   ],
+   "duration_s": 8.627
+  },
+  "prob_e132": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled red, and then the button labeled green."
+   ],
+   "duration_s": 8.234
+  },
+  "prob_e133": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the green button, then the purple button, and finally the button labeled yellow."
+   ],
+   "duration_s": 10.628
+  },
+  "prob_e134": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the red button, then the green button, and finally the yellow button."
+   ],
+   "duration_s": 9.593
+  },
+  "prob_e135": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the red button, then the button labeled blue, and finally the button labeled green."
+   ],
+   "duration_s": 9.788
+  },
+  "prob_e136": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the red button, then the button labeled yellow, and finally the green button."
+   ],
+   "duration_s": 9.877
+  },
+  "prob_e137": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the yellow button, then the green button, and finally the red button."
+   ],
+   "duration_s": 10.088
+  },
+  "prob_e138": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled red, then the purple button, and finally the button labeled blue."
+   ],
+   "duration_s": 10.206
+  },
+  "prob_e139": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled purple, then the green button, and finally the button labeled green."
+   ],
+   "duration_s": 10.654
+  },
+  "prob_e140": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the red button."
+   ],
+   "duration_s": 6.187
+  },
+  "prob_e141": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled green."
+   ],
+   "duration_s": 6.254
+  },
+  "prob_e142": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the yellow button."
+   ],
+   "duration_s": 5.966
+  },
+  "prob_e143": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 7.138
+  },
+  "prob_e144": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the green button."
+   ],
+   "duration_s": 6.159
+  },
+  "prob_e145": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the blue button."
+   ],
+   "duration_s": 6.249
+  },
+  "prob_e146": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled purple, and then the button labeled blue."
+   ],
+   "duration_s": 8.516
+  },
+  "prob_e147": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled blue, and then the blue button."
+   ],
+   "duration_s": 7.753
+  },
+  "prob_e148": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the purple button, and then the button labeled green."
+   ],
+   "duration_s": 8.282
+  },
+  "prob_e149": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled yellow, and then the button labeled green."
+   ],
+   "duration_s": 9.153
+  },
+  "prob_e150": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled purple, and then the green button."
+   ],
+   "duration_s": 8.737
+  },
+  "prob_e151": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the yellow button, and then the blue button."
+   ],
+   "duration_s": 8.063
+  },
+  "prob_e152": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled purple, and then the red button."
+   ],
+   "duration_s": 7.854
+  },
+  "prob_e153": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the yellow button, then the red button, and finally the button labeled red."
+   ],
+   "duration_s": 10.164
+  },
+  "prob_e154": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled green, then the button labeled purple, and finally the green button."
+   ],
+   "duration_s": 10.806
+  },
+  "prob_e155": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the yellow button, then the button labeled blue, and finally the button labeled purple."
+   ],
+   "duration_s": 9.984
+  },
+  "prob_e156": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the purple button, then the button labeled green, and finally the button labeled red."
+   ],
+   "duration_s": 10.396
+  },
+  "prob_e157": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the purple button, then the red button, and finally the button labeled yellow."
+   ],
+   "duration_s": 9.646
+  },
+  "prob_e158": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled purple, then the red button, and finally the blue button."
+   ],
+   "duration_s": 9.756
+  },
+  "prob_e159": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled green, then the red button, and finally the blue button."
+   ],
+   "duration_s": 9.423
+  },
+  "prob_e160": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled yellow."
+   ],
+   "duration_s": 6.559
+  },
+  "prob_e161": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled blue."
+   ],
+   "duration_s": 6.318
+  },
+  "prob_e162": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled blue."
+   ],
+   "duration_s": 6.902
+  },
+  "prob_e163": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the purple button."
+   ],
+   "duration_s": 6.387
+  },
+  "prob_e164": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the blue button."
+   ],
+   "duration_s": 6.249
+  },
+  "prob_e165": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled yellow."
+   ],
+   "duration_s": 6.376
+  },
+  "prob_e166": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the purple button, and then the yellow button."
+   ],
+   "duration_s": 8.484
+  },
+  "prob_e167": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the yellow button, and then the red button."
+   ],
+   "duration_s": 7.429
+  },
+  "prob_e168": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the red button, and then the green button."
+   ],
+   "duration_s": 7.685
+  },
+  "prob_e169": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the red button, and then the button labeled red."
+   ],
+   "duration_s": 7.772
+  },
+  "prob_e170": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the blue button, and then the red button."
+   ],
+   "duration_s": 8.008
+  },
+  "prob_e171": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the yellow button, and then the button labeled red."
+   ],
+   "duration_s": 8.487
+  },
+  "prob_e172": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the purple button, and then the button labeled yellow."
+   ],
+   "duration_s": 8.397
+  },
+  "prob_e173": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the yellow button, then the green button, and finally the button labeled red."
+   ],
+   "duration_s": 10.485
+  },
+  "prob_e174": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled purple, then the button labeled red, and finally the yellow button."
+   ],
+   "duration_s": 10.391
+  },
+  "prob_e175": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled green, then the button labeled blue, and finally the button labeled red."
+   ],
+   "duration_s": 10.999
+  },
+  "prob_e176": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled red, then the button labeled purple, and finally the button labeled blue."
+   ],
+   "duration_s": 11.232
+  },
+  "prob_e177": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled red, then the red button, and finally the blue button."
+   ],
+   "duration_s": 9.469
+  },
+  "prob_e178": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the yellow button, then the blue button, and finally the purple button."
+   ],
+   "duration_s": 10.012
+  },
+  "prob_e179": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled purple, then the button labeled green, and finally the button labeled blue."
+   ],
+   "duration_s": 10.591
+  },
+  "prob_e180": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled red."
+   ],
+   "duration_s": 6.67
+  },
+  "prob_e181": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the green button."
+   ],
+   "duration_s": 6.26
+  },
+  "prob_e182": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the button labeled blue."
+   ],
+   "duration_s": 6.602
+  },
+  "prob_e183": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled blue."
+   ],
+   "duration_s": 6.902
+  },
+  "prob_e184": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled green."
+   ],
+   "duration_s": 7.188
+  },
+  "prob_e185": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the red button."
+   ],
+   "duration_s": 6.646
+  },
+  "prob_e186": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the red button, and then the button labeled blue."
+   ],
+   "duration_s": 8.03
+  },
+  "prob_e187": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled blue, and then the purple button."
+   ],
+   "duration_s": 8.092
+  },
+  "prob_e188": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the red button, and then the purple button."
+   ],
+   "duration_s": 8.428
+  },
+  "prob_e189": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled purple, and then the yellow button."
+   ],
+   "duration_s": 7.984
+  },
+  "prob_e190": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled purple, and then the button labeled yellow."
+   ],
+   "duration_s": 9.14
+  },
+  "prob_e191": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled green, and then the green button."
+   ],
+   "duration_s": 7.908
+  },
+  "prob_e192": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled red, and then the button labeled purple."
+   ],
+   "duration_s": 8.295
+  },
+  "prob_e193": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the green button, then the blue button, and finally the button labeled purple."
+   ],
+   "duration_s": 9.918
+  },
+  "prob_e194": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled blue, then the purple button, and finally the blue button."
+   ],
+   "duration_s": 9.477
+  },
+  "prob_e195": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the yellow button, then the green button, and finally the button labeled blue."
+   ],
+   "duration_s": 10.492
+  },
+  "prob_e196": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the green button, then the blue button, and finally the purple button."
+   ],
+   "duration_s": 9.443
+  },
+  "prob_e197": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the green button, then the purple button, and finally the button labeled blue."
+   ],
+   "duration_s": 10.286
+  },
+  "prob_e198": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the red button, then the green button, and finally the button labeled green."
+   ],
+   "duration_s": 9.773
+  },
+  "prob_e199": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the purple button, then the button labeled green, and finally the green button."
+   ],
+   "duration_s": 10.562
+  },
+  "prob_e200": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 6.579
+  },
+  "prob_e201": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the purple button."
+   ],
+   "duration_s": 6.608
+  },
+  "prob_e202": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the button labeled blue."
+   ],
+   "duration_s": 6.602
+  },
+  "prob_e203": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled blue."
+   ],
+   "duration_s": 6.501
+  },
+  "prob_e204": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 6.759
+  },
+  "prob_e205": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled yellow."
+   ],
+   "duration_s": 6.376
+  },
+  "prob_e206": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled purple, and then the purple button."
+   ],
+   "duration_s": 8.412
+  },
+  "prob_e207": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the green button, and then the button labeled red."
+   ],
+   "duration_s": 8.079
+  },
+  "prob_e208": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled yellow, and then the button labeled blue."
+   ],
+   "duration_s": 9.021
+  },
+  "prob_e209": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled blue, and then the purple button."
+   ],
+   "duration_s": 8.768
+  },
+  "prob_e210": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled purple, and then the button labeled red."
+   ],
+   "duration_s": 8.237
+  },
+  "prob_e211": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled red, and then the button labeled green."
+   ],
+   "duration_s": 8.597
+  },
+  "prob_e212": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the button labeled yellow, and then the button labeled purple."
+   ],
+   "duration_s": 8.533
+  },
+  "prob_e213": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the green button, then the blue button, and finally the button labeled yellow."
+   ],
+   "duration_s": 9.991
+  },
+  "prob_e214": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the purple button, then the red button, and finally the button labeled green."
+   ],
+   "duration_s": 10.404
+  },
+  "prob_e215": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the purple button, then the button labeled green, and finally the red button."
+   ],
+   "duration_s": 9.637
+  },
+  "prob_e216": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled yellow, then the button labeled green, and finally the green button."
+   ],
+   "duration_s": 10.014
+  },
+  "prob_e217": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the yellow button, then the blue button, and finally the red button."
+   ],
+   "duration_s": 9.068
+  },
+  "prob_e218": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the green button, then the red button, and finally the button labeled yellow."
+   ],
+   "duration_s": 10.507
+  },
+  "prob_e219": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled purple, then the button labeled blue, and finally the yellow button."
+   ],
+   "duration_s": 10.355
+  },
+  "prob_e220": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the blue button."
+   ],
+   "duration_s": 6.069
+  },
+  "prob_e221": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 6.32
+  },
+  "prob_e222": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the blue button."
+   ],
+   "duration_s": 6.249
+  },
+  "prob_e223": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 6.759
+  },
+  "prob_e224": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 6.98
+  },
+  "prob_e225": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled purple."
+   ],
+   "duration_s": 6.98
+  },
+  "prob_e226": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the blue button, and then the yellow button."
+   ],
+   "duration_s": 8.326
+  },
+  "prob_e227": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled yellow, and then the yellow button."
+   ],
+   "duration_s": 8.66
+  },
+  "prob_e228": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled green, and then the yellow button."
+   ],
+   "duration_s": 8.492
+  },
+  "prob_e229": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the yellow button, and then the purple button."
+   ],
+   "duration_s": 8.208
+  },
+  "prob_e230": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled red, and then the purple button."
+   ],
+   "duration_s": 8.687
+  },
+  "prob_e231": {
+   "parts": [
+    "Oh no, the voltage is dropping on line four!",
+    "To fix it, press the red button, and then the button labeled green."
+   ],
+   "duration_s": 8.051
+  },
+  "prob_e232": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled red, and then the button labeled green."
+   ],
+   "duration_s": 8.977
+  },
+  "prob_e233": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled yellow, then the yellow button, and finally the purple button."
+   ],
+   "duration_s": 9.723
+  },
+  "prob_e234": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the yellow button, then the button labeled blue, and finally the green button."
+   ],
+   "duration_s": 9.926
+  },
+  "prob_e235": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the red button, then the button labeled yellow, and finally the button labeled green."
+   ],
+   "duration_s": 10.692
+  },
+  "prob_e236": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled red, then the button labeled yellow, and finally the button labeled purple."
+   ],
+   "duration_s": 10.747
+  },
+  "prob_e237": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the button labeled red, then the button labeled purple, and finally the red button."
+   ],
+   "duration_s": 10.247
+  },
+  "prob_e238": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled yellow, then the button labeled purple, and finally the red button."
+   ],
+   "duration_s": 9.931
+  },
+  "prob_e239": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the button labeled green, then the blue button, and finally the yellow button."
+   ],
+   "duration_s": 10.306
+  },
+  "prob_t00": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the button labeled green."
+   ],
+   "duration_s": 6.692
+  },
+  "prob_t01": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled yellow."
+   ],
+   "duration_s": 6.376
+  },
+  "prob_t02": {
+   "parts": [
+    "Warning, the main cooling pump just stopped!",
+    "To fix it, press the button labeled green."
+   ],
+   "duration_s": 6.329
+  },
+  "prob_t03": {
+   "parts": [
+    "Attention, the generator is overheating!",
+    "To fix it, press the button labeled red."
+   ],
+   "duration_s": 6.231
+  },
+  "prob_t04": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled red, and then the button labeled green."
+   ],
+   "duration_s": 9.093
+  },
+  "prob_t05": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the button labeled green, and then the button labeled purple."
+   ],
+   "duration_s": 8.614
+  },
+  "prob_t06": {
+   "parts": [
+    "Oh no, there's a short circuit in the turbine hall!",
+    "To fix it, press the blue button, and then the button labeled green."
+   ],
+   "duration_s": 8.206
+  },
+  "prob_t07": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the button labeled purple, and then the button labeled yellow."
+   ],
+   "duration_s": 8.981
+  },
+  "prob_t08": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the purple button, and then the button labeled red."
+   ],
+   "duration_s": 8.542
+  },
+  "prob_t09": {
+   "parts": [
+    "Oh no, the transformer in sector three is overloaded!",
+    "To fix it, press the red button, then the yellow button, and finally the button labeled red."
+   ],
+   "duration_s": 10.305
+  },
+  "prob_t10": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the yellow button, then the button labeled red, and finally the button labeled yellow."
+   ],
+   "duration_s": 10.863
+  },
+  "prob_t11": {
+   "parts": [
+    "Attention, the pressure in boiler two is rising fast!",
+    "To fix it, press the button labeled green, then the green button, and finally the blue button."
+   ],
+   "duration_s": 10.408
+  },
+  "prob_t12": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the yellow button, then the button labeled green, and finally the green button."
+   ],
+   "duration_s": 10.223
+  },
+  "prob_t13": {
+   "parts": [
+    "Alert, there's a steam leak in the north pipeline!",
+    "To fix it, press the button labeled yellow, then the button labeled blue, and finally the green button."
+   ],
+   "duration_s": 10.217
+  },
+  "prob_t14": {
+   "parts": [
+    "Careful, the conveyor belt in the coal yard is jammed!",
+    "To fix it, press the purple button, then the blue button, and finally the button labeled yellow."
+   ],
+   "duration_s": 10.279
+  }
+ }
+}

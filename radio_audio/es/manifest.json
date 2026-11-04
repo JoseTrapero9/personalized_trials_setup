@@ -1,0 +1,1975 @@
+{
+ "language": "es",
+ "voice": "Microsoft Sabina Desktop - Spanish (Mexico)",
+ "voice_source": "desktop",
+ "rate": 0,
+ "script_hash": "89a35428082e",
+ "generated": "2026-11-04 11:50:39",
+ "clips": {
+  "filler_00": {
+   "parts": [
+    "Hola a todos, aquí la radio de la planta con su actualización desde la sala de control."
+   ],
+   "duration_s": 4.867
+  },
+  "filler_01": {
+   "parts": [
+    "Las cuatro turbinas funcionan sin problemas, y la producción va justo según lo planeado."
+   ],
+   "duration_s": 5.191
+  },
+  "filler_02": {
+   "parts": [
+    "El equipo de mantenimiento terminó hoy la inspección de las torres de enfriamiento."
+   ],
+   "duration_s": 4.188
+  },
+  "filler_03": {
+   "parts": [
+    "El clima afuera está tranquilo, con una brisa ligera que viene del río."
+   ],
+   "duration_s": 4.055
+  },
+  "filler_04": {
+   "parts": [
+    "La producción de energía de esta hora está un poco arriba del promedio de ayer. Buen trabajo a todos."
+   ],
+   "duration_s": 6.206
+  },
+  "filler_05": {
+   "parts": [
+    "Les recordamos que el comedor sirve sopa y pan recién hecho hasta las dos de la tarde."
+   ],
+   "duration_s": 4.552
+  },
+  "filler_06": {
+   "parts": [
+    "Los sensores nuevos de la sala de calderas envían datos limpios, sin sorpresas hasta ahora."
+   ],
+   "duration_s": 5.208
+  },
+  "filler_07": {
+   "parts": [
+    "La demanda de la red está estable, así que esperamos una tarde tranquila."
+   ],
+   "duration_s": 4.262
+  },
+  "filler_08": {
+   "parts": [
+    "El cambio de turno es a las seis. Por favor dejen sus notas para el siguiente equipo."
+   ],
+   "duration_s": 5.403
+  },
+  "filler_09": {
+   "parts": [
+    "El patio de carbón recibió un cargamento completo esta mañana, y el almacén se ve bien."
+   ],
+   "duration_s": 5.071
+  },
+  "filler_10": {
+   "parts": [
+    "La temperatura del agua en el condensador está estable y dentro de los límites."
+   ],
+   "duration_s": 4.223
+  },
+  "filler_11": {
+   "parts": [
+    "El recorrido de seguridad en el sector dos salió muy bien. Gracias a todos los que participaron."
+   ],
+   "duration_s": 5.964
+  },
+  "filler_12": {
+   "parts": [
+    "El campo solar está aportando un poco de energía extra mientras hay sol."
+   ],
+   "duration_s": 4.091
+  },
+  "filler_13": {
+   "parts": [
+    "Un grupo de visitantes de la universidad va a recorrer la planta más tarde."
+   ],
+   "duration_s": 3.958
+  },
+  "filler_14": {
+   "parts": [
+    "El consumo de combustible está por debajo de lo planeado, y eso ayuda al presupuesto."
+   ],
+   "duration_s": 5.02
+  },
+  "filler_15": {
+   "parts": [
+    "Recuerden tomar agua y estirarse un poco cuando puedan."
+   ],
+   "duration_s": 3.078
+  },
+  "filler_16": {
+   "parts": [
+    "La vibración del eje principal está baja y estable, justo como nos gusta."
+   ],
+   "duration_s": 4.552
+  },
+  "filler_17": {
+   "parts": [
+    "El estacionamiento se va a repintar el fin de semana, así que estaciónense cerca de la entrada."
+   ],
+   "duration_s": 5.372
+  },
+  "filler_18": {
+   "parts": [
+    "La presión de vapor en toda la planta está equilibrada y se mantiene bien."
+   ],
+   "duration_s": 3.944
+  },
+  "filler_19": {
+   "parts": [
+    "Eso es todo por ahora desde la sala de control. Que tengan un buen turno."
+   ],
+   "duration_s": 4.675
+  },
+  "fb_solved_0": {
+   "parts": [
+    "Perfecto, eso lo arregló."
+   ],
+   "duration_s": 1.797
+  },
+  "fb_solved_1": {
+   "parts": [
+    "Excelente, todo está estable otra vez."
+   ],
+   "duration_s": 2.679
+  },
+  "fb_solved_2": {
+   "parts": [
+    "Muy bien, problema resuelto."
+   ],
+   "duration_s": 2.006
+  },
+  "fb_wrong_0": {
+   "parts": [
+    "Ay no, eso no era. Perdimos algo de energía."
+   ],
+   "duration_s": 3.732
+  },
+  "fb_wrong_1": {
+   "parts": [
+    "Eso no funcionó, el sistema sufrió daños."
+   ],
+   "duration_s": 2.85
+  },
+  "fb_wrong_2": {
+   "parts": [
+    "Qué mal, ese no era el movimiento correcto."
+   ],
+   "duration_s": 2.602
+  },
+  "fb_timeout_0": {
+   "parts": [
+    "Muy tarde, el sistema se apagó por un momento."
+   ],
+   "duration_s": 2.902
+  },
+  "fb_timeout_1": {
+   "parts": [
+    "Se acabó el tiempo, perdimos energía."
+   ],
+   "duration_s": 2.576
+  },
+  "ann_container_1": {
+   "parts": [
+    "Punto de control. Regresa la pieza vacía, y toma piezas nuevas del contenedor uno."
+   ],
+   "duration_s": 5.735
+  },
+  "ann_container_2": {
+   "parts": [
+    "Punto de control. Regresa la pieza vacía, y toma piezas nuevas del contenedor dos."
+   ],
+   "duration_s": 5.81
+  },
+  "prob_e000": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón verde."
+   ],
+   "duration_s": 7.278
+  },
+  "prob_e001": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.245
+  },
+  "prob_e002": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón amarillo."
+   ],
+   "duration_s": 6.886
+  },
+  "prob_e003": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón amarillo."
+   ],
+   "duration_s": 6.776
+  },
+  "prob_e004": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón amarillo."
+   ],
+   "duration_s": 7.462
+  },
+  "prob_e005": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice azul."
+   ],
+   "duration_s": 7.811
+  },
+  "prob_e006": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice azul, y después el botón que dice rojo."
+   ],
+   "duration_s": 9.818
+  },
+  "prob_e007": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice amarillo, y después el botón que dice morado."
+   ],
+   "duration_s": 10.005
+  },
+  "prob_e008": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón azul, y después el botón que dice azul."
+   ],
+   "duration_s": 9.2
+  },
+  "prob_e009": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón amarillo, y después el botón que dice morado."
+   ],
+   "duration_s": 9.034
+  },
+  "prob_e010": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice amarillo, y después el botón que dice morado."
+   ],
+   "duration_s": 9.87
+  },
+  "prob_e011": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón morado, y después el botón amarillo."
+   ],
+   "duration_s": 8.955
+  },
+  "prob_e012": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón que dice azul."
+   ],
+   "duration_s": 9.92
+  },
+  "prob_e013": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón que dice rojo, y al final el botón verde."
+   ],
+   "duration_s": 11.315
+  },
+  "prob_e014": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón verde, luego el botón amarillo, y al final el botón morado."
+   ],
+   "duration_s": 9.902
+  },
+  "prob_e015": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón azul, luego el botón que dice rojo, y al final el botón amarillo."
+   ],
+   "duration_s": 10.823
+  },
+  "prob_e016": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón morado, y al final el botón amarillo."
+   ],
+   "duration_s": 11.117
+  },
+  "prob_e017": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice azul, luego el botón morado, y al final el botón que dice amarillo."
+   ],
+   "duration_s": 11.275
+  },
+  "prob_e018": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice amarillo, luego el botón morado, y al final el botón que dice rojo."
+   ],
+   "duration_s": 11.553
+  },
+  "prob_e019": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón rojo, luego el botón morado, y al final el botón que dice azul."
+   ],
+   "duration_s": 10.974
+  },
+  "prob_e020": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón que dice verde."
+   ],
+   "duration_s": 7.151
+  },
+  "prob_e021": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón rojo."
+   ],
+   "duration_s": 7.333
+  },
+  "prob_e022": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice rojo."
+   ],
+   "duration_s": 7.214
+  },
+  "prob_e023": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.205
+  },
+  "prob_e024": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice verde."
+   ],
+   "duration_s": 7.146
+  },
+  "prob_e025": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón rojo."
+   ],
+   "duration_s": 6.718
+  },
+  "prob_e026": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice azul, y después el botón que dice amarillo."
+   ],
+   "duration_s": 9.291
+  },
+  "prob_e027": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón verde, y después el botón azul."
+   ],
+   "duration_s": 8.907
+  },
+  "prob_e028": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón amarillo, y después el botón que dice verde."
+   ],
+   "duration_s": 9.369
+  },
+  "prob_e029": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón amarillo."
+   ],
+   "duration_s": 9.069
+  },
+  "prob_e030": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice azul, y después el botón azul."
+   ],
+   "duration_s": 9.451
+  },
+  "prob_e031": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón verde, y después el botón que dice amarillo."
+   ],
+   "duration_s": 9.508
+  },
+  "prob_e032": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón amarillo, y después el botón azul."
+   ],
+   "duration_s": 9.096
+  },
+  "prob_e033": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón que dice verde, y al final el botón azul."
+   ],
+   "duration_s": 10.657
+  },
+  "prob_e034": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón morado, luego el botón azul, y al final el botón amarillo."
+   ],
+   "duration_s": 10.395
+  },
+  "prob_e035": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón azul, luego el botón que dice rojo, y al final el botón verde."
+   ],
+   "duration_s": 10.26
+  },
+  "prob_e036": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice rojo, luego el botón que dice amarillo, y al final el botón que dice azul."
+   ],
+   "duration_s": 11.365
+  },
+  "prob_e037": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón verde, luego el botón amarillo, y al final el botón azul."
+   ],
+   "duration_s": 10.004
+  },
+  "prob_e038": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón azul, luego el botón morado, y al final el botón amarillo."
+   ],
+   "duration_s": 10.007
+  },
+  "prob_e039": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice rojo, luego el botón que dice verde, y al final el botón amarillo."
+   ],
+   "duration_s": 11.241
+  },
+  "prob_e040": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice amarillo."
+   ],
+   "duration_s": 7.319
+  },
+  "prob_e041": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice verde."
+   ],
+   "duration_s": 7.703
+  },
+  "prob_e042": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón morado."
+   ],
+   "duration_s": 7.314
+  },
+  "prob_e043": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice amarillo."
+   ],
+   "duration_s": 7.279
+  },
+  "prob_e044": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón verde."
+   ],
+   "duration_s": 7.142
+  },
+  "prob_e045": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón rojo."
+   ],
+   "duration_s": 6.758
+  },
+  "prob_e046": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón verde."
+   ],
+   "duration_s": 9.037
+  },
+  "prob_e047": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón que dice verde."
+   ],
+   "duration_s": 9.281
+  },
+  "prob_e048": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón que dice verde."
+   ],
+   "duration_s": 9.281
+  },
+  "prob_e049": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón amarillo, y después el botón que dice azul."
+   ],
+   "duration_s": 8.969
+  },
+  "prob_e050": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón verde."
+   ],
+   "duration_s": 9.268
+  },
+  "prob_e051": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón azul."
+   ],
+   "duration_s": 8.391
+  },
+  "prob_e052": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice verde, y después el botón morado."
+   ],
+   "duration_s": 9.357
+  },
+  "prob_e053": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón que dice azul, y al final el botón morado."
+   ],
+   "duration_s": 11.379
+  },
+  "prob_e054": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón morado, luego el botón que dice rojo, y al final el botón amarillo."
+   ],
+   "duration_s": 11.104
+  },
+  "prob_e055": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice verde, luego el botón que dice rojo, y al final el botón que dice azul."
+   ],
+   "duration_s": 11.171
+  },
+  "prob_e056": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice rojo, luego el botón amarillo, y al final el botón que dice azul."
+   ],
+   "duration_s": 11.531
+  },
+  "prob_e057": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón que dice rojo, y al final el botón verde."
+   ],
+   "duration_s": 10.43
+  },
+  "prob_e058": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice rojo, luego el botón amarillo, y al final el botón azul."
+   ],
+   "duration_s": 10.88
+  },
+  "prob_e059": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón que dice azul, y al final el botón que dice verde."
+   ],
+   "duration_s": 11.804
+  },
+  "prob_e060": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón verde."
+   ],
+   "duration_s": 7.142
+  },
+  "prob_e061": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón amarillo."
+   ],
+   "duration_s": 7.271
+  },
+  "prob_e062": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón verde."
+   ],
+   "duration_s": 6.723
+  },
+  "prob_e063": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice verde."
+   ],
+   "duration_s": 7.796
+  },
+  "prob_e064": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón morado."
+   ],
+   "duration_s": 6.759
+  },
+  "prob_e065": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice azul."
+   ],
+   "duration_s": 7.196
+  },
+  "prob_e066": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice verde, y después el botón que dice amarillo."
+   ],
+   "duration_s": 9.897
+  },
+  "prob_e067": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón que dice rojo."
+   ],
+   "duration_s": 8.845
+  },
+  "prob_e068": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón morado, y después el botón amarillo."
+   ],
+   "duration_s": 8.955
+  },
+  "prob_e069": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón azul."
+   ],
+   "duration_s": 8.396
+  },
+  "prob_e070": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón que dice verde."
+   ],
+   "duration_s": 8.801
+  },
+  "prob_e071": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón azul, y después el botón rojo."
+   ],
+   "duration_s": 8.29
+  },
+  "prob_e072": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón morado."
+   ],
+   "duration_s": 9.313
+  },
+  "prob_e073": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice amarillo, luego el botón que dice azul, y al final el botón que dice verde."
+   ],
+   "duration_s": 11.686
+  },
+  "prob_e074": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón que dice verde, y al final el botón azul."
+   ],
+   "duration_s": 10.657
+  },
+  "prob_e075": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón que dice morado, y al final el botón que dice amarillo."
+   ],
+   "duration_s": 11.691
+  },
+  "prob_e076": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón azul, luego el botón que dice amarillo, y al final el botón que dice rojo."
+   ],
+   "duration_s": 11.299
+  },
+  "prob_e077": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón azul, luego el botón morado, y al final el botón amarillo."
+   ],
+   "duration_s": 9.967
+  },
+  "prob_e078": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón verde, y al final el botón que dice rojo."
+   ],
+   "duration_s": 10.41
+  },
+  "prob_e079": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón rojo, y al final el botón que dice rojo."
+   ],
+   "duration_s": 10.799
+  },
+  "prob_e080": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón verde."
+   ],
+   "duration_s": 6.647
+  },
+  "prob_e081": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice rojo."
+   ],
+   "duration_s": 7.824
+  },
+  "prob_e082": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice azul."
+   ],
+   "duration_s": 7.196
+  },
+  "prob_e083": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón azul."
+   ],
+   "duration_s": 6.66
+  },
+  "prob_e084": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón morado."
+   ],
+   "duration_s": 6.759
+  },
+  "prob_e085": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice verde."
+   ],
+   "duration_s": 7.796
+  },
+  "prob_e086": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón que dice azul, y después el botón verde."
+   ],
+   "duration_s": 8.785
+  },
+  "prob_e087": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice verde, y después el botón verde."
+   ],
+   "duration_s": 9.181
+  },
+  "prob_e088": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón azul."
+   ],
+   "duration_s": 8.866
+  },
+  "prob_e089": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón que dice rojo."
+   ],
+   "duration_s": 9.313
+  },
+  "prob_e090": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón morado."
+   ],
+   "duration_s": 9.501
+  },
+  "prob_e091": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón amarillo, y después el botón rojo."
+   ],
+   "duration_s": 8.529
+  },
+  "prob_e092": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón verde, y después el botón morado."
+   ],
+   "duration_s": 8.294
+  },
+  "prob_e093": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón morado, luego el botón azul, y al final el botón rojo."
+   ],
+   "duration_s": 9.771
+  },
+  "prob_e094": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón morado, luego el botón que dice azul, y al final el botón rojo."
+   ],
+   "duration_s": 10.32
+  },
+  "prob_e095": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice amarillo, luego el botón rojo, y al final el botón que dice morado."
+   ],
+   "duration_s": 10.838
+  },
+  "prob_e096": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice azul, luego el botón que dice verde, y al final el botón que dice rojo."
+   ],
+   "duration_s": 11.098
+  },
+  "prob_e097": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón morado, luego el botón verde, y al final el botón que dice morado."
+   ],
+   "duration_s": 10.303
+  },
+  "prob_e098": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón verde, luego el botón amarillo, y al final el botón rojo."
+   ],
+   "duration_s": 10.611
+  },
+  "prob_e099": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón verde, luego el botón morado, y al final el botón amarillo."
+   ],
+   "duration_s": 10.581
+  },
+  "prob_e100": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón morado."
+   ],
+   "duration_s": 6.772
+  },
+  "prob_e101": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice amarillo."
+   ],
+   "duration_s": 7.319
+  },
+  "prob_e102": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice rojo."
+   ],
+   "duration_s": 7.731
+  },
+  "prob_e103": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice verde."
+   ],
+   "duration_s": 7.703
+  },
+  "prob_e104": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice azul."
+   ],
+   "duration_s": 7.773
+  },
+  "prob_e105": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice rojo."
+   ],
+   "duration_s": 7.104
+  },
+  "prob_e106": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice verde, y después el botón verde."
+   ],
+   "duration_s": 8.764
+  },
+  "prob_e107": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón que dice verde."
+   ],
+   "duration_s": 9.171
+  },
+  "prob_e108": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice azul, y después el botón que dice amarillo."
+   ],
+   "duration_s": 9.786
+  },
+  "prob_e109": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón azul, y después el botón amarillo."
+   ],
+   "duration_s": 9.097
+  },
+  "prob_e110": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice amarillo, y después el botón morado."
+   ],
+   "duration_s": 8.996
+  },
+  "prob_e111": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón que dice amarillo, y después el botón que dice azul."
+   ],
+   "duration_s": 9.408
+  },
+  "prob_e112": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón amarillo."
+   ],
+   "duration_s": 9.159
+  },
+  "prob_e113": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón morado, luego el botón amarillo, y al final el botón que dice verde."
+   ],
+   "duration_s": 11.052
+  },
+  "prob_e114": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón azul, luego el botón morado, y al final el botón amarillo."
+   ],
+   "duration_s": 10.585
+  },
+  "prob_e115": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice verde, luego el botón que dice morado, y al final el botón que dice azul."
+   ],
+   "duration_s": 11.197
+  },
+  "prob_e116": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón que dice azul, luego el botón que dice amarillo, y al final el botón que dice morado."
+   ],
+   "duration_s": 11.342
+  },
+  "prob_e117": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice verde, luego el botón azul, y al final el botón que dice morado."
+   ],
+   "duration_s": 11.257
+  },
+  "prob_e118": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón verde, luego el botón morado, y al final el botón que dice verde."
+   ],
+   "duration_s": 10.867
+  },
+  "prob_e119": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice rojo, luego el botón que dice amarillo, y al final el botón que dice azul."
+   ],
+   "duration_s": 11.365
+  },
+  "prob_e120": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón azul."
+   ],
+   "duration_s": 6.77
+  },
+  "prob_e121": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.816
+  },
+  "prob_e122": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.855
+  },
+  "prob_e123": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.135
+  },
+  "prob_e124": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón azul."
+   ],
+   "duration_s": 6.77
+  },
+  "prob_e125": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón rojo."
+   ],
+   "duration_s": 7.143
+  },
+  "prob_e126": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón rojo."
+   ],
+   "duration_s": 9.278
+  },
+  "prob_e127": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón amarillo."
+   ],
+   "duration_s": 8.986
+  },
+  "prob_e128": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón rojo."
+   ],
+   "duration_s": 8.893
+  },
+  "prob_e129": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice amarillo, y después el botón azul."
+   ],
+   "duration_s": 9.013
+  },
+  "prob_e130": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice amarillo, y después el botón verde."
+   ],
+   "duration_s": 9.579
+  },
+  "prob_e131": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón azul, y después el botón que dice amarillo."
+   ],
+   "duration_s": 9.344
+  },
+  "prob_e132": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón que dice verde."
+   ],
+   "duration_s": 9.853
+  },
+  "prob_e133": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón verde, luego el botón morado, y al final el botón que dice amarillo."
+   ],
+   "duration_s": 11.047
+  },
+  "prob_e134": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón rojo, luego el botón verde, y al final el botón amarillo."
+   ],
+   "duration_s": 9.98
+  },
+  "prob_e135": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón rojo, luego el botón que dice azul, y al final el botón que dice verde."
+   ],
+   "duration_s": 10.692
+  },
+  "prob_e136": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón rojo, luego el botón que dice amarillo, y al final el botón verde."
+   ],
+   "duration_s": 10.435
+  },
+  "prob_e137": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón verde, y al final el botón rojo."
+   ],
+   "duration_s": 10.611
+  },
+  "prob_e138": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice rojo, luego el botón morado, y al final el botón que dice azul."
+   ],
+   "duration_s": 10.681
+  },
+  "prob_e139": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón verde, y al final el botón que dice verde."
+   ],
+   "duration_s": 11.26
+  },
+  "prob_e140": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón rojo."
+   ],
+   "duration_s": 6.723
+  },
+  "prob_e141": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice verde."
+   ],
+   "duration_s": 7.146
+  },
+  "prob_e142": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón amarillo."
+   ],
+   "duration_s": 7.462
+  },
+  "prob_e143": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.63
+  },
+  "prob_e144": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón verde."
+   ],
+   "duration_s": 6.647
+  },
+  "prob_e145": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón azul."
+   ],
+   "duration_s": 6.77
+  },
+  "prob_e146": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón que dice azul."
+   ],
+   "duration_s": 9.218
+  },
+  "prob_e147": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice azul, y después el botón azul."
+   ],
+   "duration_s": 9.412
+  },
+  "prob_e148": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón morado, y después el botón que dice verde."
+   ],
+   "duration_s": 8.833
+  },
+  "prob_e149": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice amarillo, y después el botón que dice verde."
+   ],
+   "duration_s": 10.041
+  },
+  "prob_e150": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón verde."
+   ],
+   "duration_s": 9.268
+  },
+  "prob_e151": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón amarillo, y después el botón azul."
+   ],
+   "duration_s": 9.096
+  },
+  "prob_e152": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón rojo."
+   ],
+   "duration_s": 8.859
+  },
+  "prob_e153": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón rojo, y al final el botón que dice rojo."
+   ],
+   "duration_s": 11.025
+  },
+  "prob_e154": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice verde, luego el botón que dice morado, y al final el botón verde."
+   ],
+   "duration_s": 11.121
+  },
+  "prob_e155": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón que dice azul, y al final el botón que dice morado."
+   ],
+   "duration_s": 11.5
+  },
+  "prob_e156": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón morado, luego el botón que dice verde, y al final el botón que dice rojo."
+   ],
+   "duration_s": 10.767
+  },
+  "prob_e157": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón morado, luego el botón rojo, y al final el botón que dice amarillo."
+   ],
+   "duration_s": 10.443
+  },
+  "prob_e158": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón rojo, y al final el botón azul."
+   ],
+   "duration_s": 10.266
+  },
+  "prob_e159": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice verde, luego el botón rojo, y al final el botón azul."
+   ],
+   "duration_s": 10.25
+  },
+  "prob_e160": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice amarillo."
+   ],
+   "duration_s": 7.209
+  },
+  "prob_e161": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice azul."
+   ],
+   "duration_s": 7.773
+  },
+  "prob_e162": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice azul."
+   ],
+   "duration_s": 7.718
+  },
+  "prob_e163": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón morado."
+   ],
+   "duration_s": 6.772
+  },
+  "prob_e164": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón azul."
+   ],
+   "duration_s": 6.77
+  },
+  "prob_e165": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice amarillo."
+   ],
+   "duration_s": 7.891
+  },
+  "prob_e166": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón morado, y después el botón amarillo."
+   ],
+   "duration_s": 9.18
+  },
+  "prob_e167": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón amarillo, y después el botón rojo."
+   ],
+   "duration_s": 8.529
+  },
+  "prob_e168": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón verde."
+   ],
+   "duration_s": 8.317
+  },
+  "prob_e169": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón que dice rojo."
+   ],
+   "duration_s": 8.845
+  },
+  "prob_e170": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón azul, y después el botón rojo."
+   ],
+   "duration_s": 8.92
+  },
+  "prob_e171": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón amarillo, y después el botón que dice rojo."
+   ],
+   "duration_s": 9.553
+  },
+  "prob_e172": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón morado, y después el botón que dice amarillo."
+   ],
+   "duration_s": 9.005
+  },
+  "prob_e173": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón verde, y al final el botón que dice rojo."
+   ],
+   "duration_s": 11.055
+  },
+  "prob_e174": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón que dice rojo, y al final el botón amarillo."
+   ],
+   "duration_s": 10.931
+  },
+  "prob_e175": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice verde, luego el botón que dice azul, y al final el botón que dice rojo."
+   ],
+   "duration_s": 11.523
+  },
+  "prob_e176": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice rojo, luego el botón que dice morado, y al final el botón que dice azul."
+   ],
+   "duration_s": 11.863
+  },
+  "prob_e177": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice rojo, luego el botón rojo, y al final el botón azul."
+   ],
+   "duration_s": 10.939
+  },
+  "prob_e178": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón azul, y al final el botón morado."
+   ],
+   "duration_s": 10.416
+  },
+  "prob_e179": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón que dice verde, y al final el botón que dice azul."
+   ],
+   "duration_s": 11.084
+  },
+  "prob_e180": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice rojo."
+   ],
+   "duration_s": 7.214
+  },
+  "prob_e181": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón verde."
+   ],
+   "duration_s": 6.723
+  },
+  "prob_e182": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón que dice azul."
+   ],
+   "duration_s": 7.167
+  },
+  "prob_e183": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice azul."
+   ],
+   "duration_s": 7.718
+  },
+  "prob_e184": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice verde."
+   ],
+   "duration_s": 7.796
+  },
+  "prob_e185": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón rojo."
+   ],
+   "duration_s": 7.143
+  },
+  "prob_e186": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón que dice azul."
+   ],
+   "duration_s": 8.74
+  },
+  "prob_e187": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice azul, y después el botón morado."
+   ],
+   "duration_s": 8.733
+  },
+  "prob_e188": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón morado."
+   ],
+   "duration_s": 9.075
+  },
+  "prob_e189": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón amarillo."
+   ],
+   "duration_s": 9.607
+  },
+  "prob_e190": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón que dice amarillo."
+   ],
+   "duration_s": 9.845
+  },
+  "prob_e191": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice verde, y después el botón verde."
+   ],
+   "duration_s": 9.376
+  },
+  "prob_e192": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón que dice morado."
+   ],
+   "duration_s": 9.923
+  },
+  "prob_e193": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón verde, luego el botón azul, y al final el botón que dice morado."
+   ],
+   "duration_s": 10.264
+  },
+  "prob_e194": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice azul, luego el botón morado, y al final el botón azul."
+   ],
+   "duration_s": 10.288
+  },
+  "prob_e195": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón verde, y al final el botón que dice azul."
+   ],
+   "duration_s": 11.037
+  },
+  "prob_e196": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón verde, luego el botón azul, y al final el botón morado."
+   ],
+   "duration_s": 9.729
+  },
+  "prob_e197": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón verde, luego el botón morado, y al final el botón que dice azul."
+   ],
+   "duration_s": 10.823
+  },
+  "prob_e198": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón rojo, luego el botón verde, y al final el botón que dice verde."
+   ],
+   "duration_s": 10.165
+  },
+  "prob_e199": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón morado, luego el botón que dice verde, y al final el botón verde."
+   ],
+   "duration_s": 10.902
+  },
+  "prob_e200": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.135
+  },
+  "prob_e201": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón morado."
+   ],
+   "duration_s": 7.314
+  },
+  "prob_e202": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón que dice azul."
+   ],
+   "duration_s": 7.167
+  },
+  "prob_e203": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice azul."
+   ],
+   "duration_s": 7.086
+  },
+  "prob_e204": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.245
+  },
+  "prob_e205": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice amarillo."
+   ],
+   "duration_s": 7.891
+  },
+  "prob_e206": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón morado."
+   ],
+   "duration_s": 8.928
+  },
+  "prob_e207": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón verde, y después el botón que dice rojo."
+   ],
+   "duration_s": 8.728
+  },
+  "prob_e208": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice amarillo, y después el botón que dice azul."
+   ],
+   "duration_s": 9.827
+  },
+  "prob_e209": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice azul, y después el botón morado."
+   ],
+   "duration_s": 9.477
+  },
+  "prob_e210": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón que dice rojo."
+   ],
+   "duration_s": 9.313
+  },
+  "prob_e211": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón que dice verde."
+   ],
+   "duration_s": 9.281
+  },
+  "prob_e212": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón que dice amarillo, y después el botón que dice morado."
+   ],
+   "duration_s": 9.375
+  },
+  "prob_e213": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón verde, luego el botón azul, y al final el botón que dice amarillo."
+   ],
+   "duration_s": 10.384
+  },
+  "prob_e214": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón morado, luego el botón rojo, y al final el botón que dice verde."
+   ],
+   "duration_s": 10.718
+  },
+  "prob_e215": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón morado, luego el botón que dice verde, y al final el botón rojo."
+   ],
+   "duration_s": 10.878
+  },
+  "prob_e216": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice amarillo, luego el botón que dice verde, y al final el botón verde."
+   ],
+   "duration_s": 11.432
+  },
+  "prob_e217": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón azul, y al final el botón rojo."
+   ],
+   "duration_s": 9.964
+  },
+  "prob_e218": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón verde, luego el botón rojo, y al final el botón que dice amarillo."
+   ],
+   "duration_s": 11.029
+  },
+  "prob_e219": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice morado, luego el botón que dice azul, y al final el botón amarillo."
+   ],
+   "duration_s": 10.898
+  },
+  "prob_e220": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón azul."
+   ],
+   "duration_s": 6.66
+  },
+  "prob_e221": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.205
+  },
+  "prob_e222": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón azul."
+   ],
+   "duration_s": 6.77
+  },
+  "prob_e223": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.245
+  },
+  "prob_e224": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.761
+  },
+  "prob_e225": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice morado."
+   ],
+   "duration_s": 7.761
+  },
+  "prob_e226": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón azul, y después el botón amarillo."
+   ],
+   "duration_s": 9.132
+  },
+  "prob_e227": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice amarillo, y después el botón amarillo."
+   ],
+   "duration_s": 9.521
+  },
+  "prob_e228": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice verde, y después el botón amarillo."
+   ],
+   "duration_s": 9.458
+  },
+  "prob_e229": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón amarillo, y después el botón morado."
+   ],
+   "duration_s": 9.117
+  },
+  "prob_e230": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón morado."
+   ],
+   "duration_s": 9.264
+  },
+  "prob_e231": {
+   "parts": [
+    "¡Ay no, el voltaje está bajando en la línea cuatro!",
+    "Para arreglarlo, presiona el botón rojo, y después el botón que dice verde."
+   ],
+   "duration_s": 8.731
+  },
+  "prob_e232": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón que dice verde."
+   ],
+   "duration_s": 9.666
+  },
+  "prob_e233": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice amarillo, luego el botón amarillo, y al final el botón morado."
+   ],
+   "duration_s": 11.233
+  },
+  "prob_e234": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón que dice azul, y al final el botón verde."
+   ],
+   "duration_s": 10.426
+  },
+  "prob_e235": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón rojo, luego el botón que dice amarillo, y al final el botón que dice verde."
+   ],
+   "duration_s": 11.287
+  },
+  "prob_e236": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice rojo, luego el botón que dice amarillo, y al final el botón que dice morado."
+   ],
+   "duration_s": 11.389
+  },
+  "prob_e237": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón que dice rojo, luego el botón que dice morado, y al final el botón rojo."
+   ],
+   "duration_s": 10.786
+  },
+  "prob_e238": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice amarillo, luego el botón que dice morado, y al final el botón rojo."
+   ],
+   "duration_s": 10.903
+  },
+  "prob_e239": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón que dice verde, luego el botón azul, y al final el botón amarillo."
+   ],
+   "duration_s": 10.767
+  },
+  "prob_t00": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón que dice verde."
+   ],
+   "duration_s": 7.177
+  },
+  "prob_t01": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice amarillo."
+   ],
+   "duration_s": 7.891
+  },
+  "prob_t02": {
+   "parts": [
+    "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
+    "Para arreglarlo, presiona el botón que dice verde."
+   ],
+   "duration_s": 7.758
+  },
+  "prob_t03": {
+   "parts": [
+    "¡Atención, el generador se está sobrecalentando!",
+    "Para arreglarlo, presiona el botón que dice rojo."
+   ],
+   "duration_s": 7.174
+  },
+  "prob_t04": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice rojo, y después el botón que dice verde."
+   ],
+   "duration_s": 9.891
+  },
+  "prob_t05": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón que dice verde, y después el botón que dice morado."
+   ],
+   "duration_s": 9.266
+  },
+  "prob_t06": {
+   "parts": [
+    "¡Ay no, hay un cortocircuito en la sala de turbinas!",
+    "Para arreglarlo, presiona el botón azul, y después el botón que dice verde."
+   ],
+   "duration_s": 8.804
+  },
+  "prob_t07": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón que dice morado, y después el botón que dice amarillo."
+   ],
+   "duration_s": 9.98
+  },
+  "prob_t08": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón morado, y después el botón que dice rojo."
+   ],
+   "duration_s": 9.419
+  },
+  "prob_t09": {
+   "parts": [
+    "¡Ay no, el transformador del sector tres está sobrecargado!",
+    "Para arreglarlo, presiona el botón rojo, luego el botón amarillo, y al final el botón que dice rojo."
+   ],
+   "duration_s": 10.89
+  },
+  "prob_t10": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón que dice rojo, y al final el botón que dice amarillo."
+   ],
+   "duration_s": 11.661
+  },
+  "prob_t11": {
+   "parts": [
+    "¡Atención, la presión de la caldera dos está subiendo rápido!",
+    "Para arreglarlo, presiona el botón que dice verde, luego el botón verde, y al final el botón azul."
+   ],
+   "duration_s": 10.858
+  },
+  "prob_t12": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón amarillo, luego el botón que dice verde, y al final el botón verde."
+   ],
+   "duration_s": 10.936
+  },
+  "prob_t13": {
+   "parts": [
+    "¡Alerta, hay una fuga de vapor en la tubería norte!",
+    "Para arreglarlo, presiona el botón que dice amarillo, luego el botón que dice azul, y al final el botón verde."
+   ],
+   "duration_s": 10.83
+  },
+  "prob_t14": {
+   "parts": [
+    "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
+    "Para arreglarlo, presiona el botón morado, luego el botón azul, y al final el botón que dice amarillo."
+   ],
+   "duration_s": 10.973
+  }
+ }
+}
