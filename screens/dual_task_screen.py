@@ -18,6 +18,7 @@ from config import (
     USE_RADIO_CONTAINER_CUES,
     WARNING_SECONDS,
     alarm_audio,
+    assembly_seconds,
     base_dir,
     container1_audio,
     container2_audio,
@@ -25,7 +26,7 @@ from config import (
 )
 from game import RadioPanelGame
 from lsl_markers import send_marker
-from sequences import WORKPIECE_SEQUENCE
+from sequences import load_condition_sequence
 from state import state
 from texts import t
 from ui_helpers import auto_fit_label, make_training_tag
@@ -57,6 +58,8 @@ class DualTaskScreen(QWidget):
         self.assembly_status = "none"
         self.pending_log = None
         self.session_csv_path = None
+        self.sequence = []
+        self.sequence_file = ""
 
         self.phase_timer = QTimer(self)
         self.phase_timer.timeout.connect(self._on_phase_timer_tick)
@@ -186,6 +189,11 @@ class DualTaskScreen(QWidget):
         self.current_round = 0
         self.container_toggle = True
         self.session_csv_path = None
+        if state.training_active and state.training_sequence:
+            self.sequence, self.sequence_file = state.training_sequence, "training"
+        else:
+            self.sequence, self.sequence_file = load_condition_sequence(state.subject_number, state.current_condition)
+        send_marker(f"Sequence_File_{self.sequence_file}")
         self.system_failed_label.hide()
         self.system_failed_label.setText(t("system_failed"))
         self.right_container.hide()
@@ -245,13 +253,7 @@ class DualTaskScreen(QWidget):
         self.game_widget.set_pause(False)
         self.right_container.show()
 
-        scenario = self.get_scenario_cb()
-        if scenario == "robot_fast":
-            self.assembly_ticks_left = 15
-        elif scenario == "robot_slow":
-            self.assembly_ticks_left = 25
-        else:
-            self.assembly_ticks_left = TASK_SECONDS_DEFAULT
+        self.assembly_ticks_left = assembly_seconds(self.get_scenario_cb())
 
         self.evaluated = False
         self.assembly_status = "none"
@@ -261,7 +263,7 @@ class DualTaskScreen(QWidget):
         self.task_start_time = time.perf_counter()
         self.warn_visible = False
 
-        seq = state.training_sequence if (state.training_active and state.training_sequence) else WORKPIECE_SEQUENCE
+        seq = self.sequence
         idx = (self.current_round - 1) % len(seq)
         mode, p1, p2 = seq[idx]
 
@@ -447,13 +449,14 @@ class DualTaskScreen(QWidget):
             self.handover_label.setText(t("advance"))
             self._enter_play_to_checkpoint()
 
-    def record_evaluation(self, is_correct: bool):
+    def record_evaluation(self, is_correct: bool, source: str = "researcher"):
         if self.current_round == 0 or self.evaluated:
             return
 
         self.evaluated = True
         self.assembly_status = "correct" if is_correct else "incorrect"
         send_marker(f"Assembly_Evaluated_{self.assembly_status}")
+        send_marker(f"Assembly_Evaluation_Source_{source}_Round_{self.current_round}")
 
         if is_correct:
             self.game_widget.score += 100
@@ -465,6 +468,13 @@ class DualTaskScreen(QWidget):
             self.pending_log["game_score"] = self.game_widget.score
             self._write_csv_row(self.pending_log)
             self.pending_log = None
+
+    def remote_verdict(self, round_number: int, is_correct: bool):
+        """Verdict from live_evaluator.py (camera PC). Only used for the round it belongs to."""
+        if round_number != self.current_round:
+            send_marker(f"Remote_Verdict_Ignored_Round_{round_number}_Current_{self.current_round}")
+            return
+        self.record_evaluation(is_correct, source="camera")
 
     def flush_pending_log(self):
         if self.pending_log is not None:
