@@ -20,9 +20,13 @@ LIVE (with the GUI on the other PC, same network):
 How a row / round is evaluated (both modes)
   * Evaluation is ACTIVE (marks drawn in green) from the start of the round until it is evaluated;
     afterwards the marks are frozen and drawn in black.
-  * A tray reading counts once it is the same for STABLE_FRAMES frames with no hand in view.
+  * A tray reading counts once it is the same for STABLE_FRAMES frames with no hand at the station.
+  * Only the STATION counts (the model's "Station" class): batteries are read only inside a tray
+    whose centre is on the station. Batteries lying around (dropped on the table / floor), trays
+    elsewhere and hands away from the station are ignored. The station box is remembered, so it
+    still works while the tray covers the station.
   * The round is evaluated at the FIRST of:
-      - the tray leaves the station (no tray and no hand for TRAY_GONE_SECONDS),
+      - the tray is off the station (no tray on it and no hand at it for TRAY_GONE_SECONDS),
         so a participant who says "deliver" after picking the tray up is still judged on the
         tray as it was on the station;
       - "deliver" is said;
@@ -63,8 +67,10 @@ from sequences import sequence_path, subject_tag
 # ================= CONFIGURATION =================
 MARKER_STREAM_NAME = "ParadigmMarkers"     # the GUI's marker stream (lsl_markers.py)
 STABLE_FRAMES = 8                          # same tray reading this many frames in a row (~0.27 s at 30 fps)
-TRAY_GONE_SECONDS = 1.0                    # no tray + no hand this long = tray left the station -> evaluate
-STATION_CLEAR_SECONDS = 0.3                # no tray this long = station cleared (arms "tray left")
+TRAY_GONE_SECONDS = 0.5                    # tray off the station (no hand at it) this long -> evaluate
+STATION_CLEAR_SECONDS = 0.3                # no tray on the station this long = cleared (arms "tray left")
+STATION_LABEL = "station"                  # YOLO class of the assembly station (case-insensitive)
+STATION_MARGIN = 0.10                      # tray centre may be this fraction of the station size outside it
 SEND_VERDICTS = True                       # False = only predict / log (--predict-only)
 # =================================================
 
@@ -172,6 +178,7 @@ class ParadigmTracker:
         self.live_slots = None
         self.hand = False
         self.tray = False
+        self.camera_detail = ""         # e.g. "tray off the station", "STATION NOT FOUND"
         if subject and condition:
             self._load_answer_key_for(subject, condition)
 
@@ -354,9 +361,10 @@ class ParadigmTracker:
                    f"read {fmt_slots(slots)}, expected {fmt_slots(rec.expected)}")
 
     # ---------------- tray readings ----------------
-    def update_reading(self, slots, hand, tray_seen, ts=None):
+    def update_reading(self, slots, hand, tray_seen, ts=None, detail=""):
+        """slots: tray on the station; hand: hand at the station; tray_seen: a tray is ON the station."""
         ts = self.clock() if ts is None else ts
-        self.hand, self.tray = hand, tray_seen
+        self.hand, self.tray, self.camera_detail = hand, tray_seen, detail
         if hand:
             self._candidate, self._candidate_count, self._absent_since = None, 0, None
             return
@@ -503,12 +511,14 @@ class ParadigmTracker:
             lines.append(("Evaluation inactive", (0, 0, 0)))
 
         if self.hand:
-            cam = "camera: hand in view (holding last reading)"
+            cam = "station: hand at the station (holding last reading)"
         elif not self.tray:
-            cam = "camera: no tray on the station"
+            cam = "station: no tray on the station"
         else:
-            cam = f"camera: {fmt_slots(self.live_slots)}  (sum {slot_sum(self.live_slots or EMPTY)})"
-        lines.append((cam, (90, 90, 90)))
+            cam = f"station: {fmt_slots(self.live_slots)}  (sum {slot_sum(self.live_slots or EMPTY)})"
+        if self.camera_detail:
+            cam += f"  - {self.camera_detail}"
+        lines.append((cam, (0, 0, 200) if "NOT FOUND" in self.camera_detail else (90, 90, 90)))
         return lines
 
 
@@ -648,31 +658,119 @@ class WebcamCaptureThread(threading.Thread):
         self.running = False
 
 
+class StationReader:
+    """Turns YOLO detections into the reading of the tray ON the station.
+
+    detections: [(label, confidence, (x1, y1, x2, y2))] in image pixels.
+    Returns dict(slots, hand, tray_on_station, tray_elsewhere, station, station_live, tray).
+    """
+
+    def __init__(self, station_label=STATION_LABEL, margin=STATION_MARGIN):
+        self.station_label = station_label.lower()
+        self.margin = margin
+        self.station = None          # last station box (the station does not move)
+
+    def _area(self):
+        x1, y1, x2, y2 = self.station
+        mx, my = (x2 - x1) * self.margin, (y2 - y1) * self.margin
+        return x1 - mx, y1 - my, x2 + mx, y2 + my
+
+    def _on_station(self, box):
+        if self.station is None:
+            return True                      # no station known: whole image (old behaviour)
+        ax1, ay1, ax2, ay2 = self._area()
+        cx, cy = (box[0] + box[2]) / 2, (box[1] + box[3]) / 2
+        return ax1 <= cx <= ax2 and ay1 <= cy <= ay2
+
+    def _touches_station(self, box):
+        if self.station is None:
+            return True
+        ax1, ay1, ax2, ay2 = self._area()
+        return box[0] < ax2 and box[2] > ax1 and box[1] < ay2 and box[3] > ay1
+
+    def read(self, detections):
+        dets = [(str(label).strip().lower(), float(conf), tuple(map(float, box))) for label, conf, box in detections]
+        stations = [d for d in dets if d[0] == self.station_label]
+        if stations:
+            self.station = max(stations, key=lambda d: d[1])[2]
+        out = {"slots": EMPTY, "hand": False, "tray_on_station": False, "tray_elsewhere": False,
+               "station": self.station, "station_live": bool(stations), "tray": None}
+
+        out["hand"] = any(d[0] == "hand" and self._touches_station(d[2]) for d in dets)
+        trays = [d for d in dets if d[0] == "tray"]
+        on = [d for d in trays if self._on_station(d[2])]
+        out["tray_elsewhere"] = len(on) < len(trays)
+        if not on:
+            return out
+        tray = max(on, key=lambda d: d[1])[2]
+        out["tray_on_station"], out["tray"] = True, tray
+
+        tx1, ty1, tx2, ty2 = tray
+        width = (tx2 - tx1) / 3.0 or 1.0
+        best = [None, None, None]            # (confidence, color) per slot, same zones as live_test.py
+        for label, conf, (x1, y1, x2, y2) in dets:
+            color = label.capitalize()
+            if color not in COLOR_VALUES:
+                continue
+            bx, by = (x1 + x2) / 2, (y1 + y2) / 2
+            if not (tx1 <= bx <= tx2 and ty1 <= by <= ty2):
+                continue                     # battery not in the tray on the station: ignored
+            k = max(0, min(2, int((bx - tx1) // width)))
+            if best[k] is None or conf > best[k][0]:
+                best[k] = (conf, color)
+        out["slots"] = tuple(b[1] if b else None for b in best)
+        return out
+
+
+def camera_detail(reading):
+    if reading["station"] is None:
+        return "STATION NOT FOUND (whole image used)"
+    if not reading["tray_on_station"] and reading["tray_elsewhere"]:
+        return "tray off the station"
+    return "" if reading["station_live"] else "station hidden (last position)"
+
+
+def draw_station(img, reading):
+    """Evaluation area on the camera image: green with a tray on it, grey without."""
+    import cv2
+    if reading["station"] is None:
+        return img
+    x1, y1, x2, y2 = (int(v) for v in reading["station"])
+    color = (0, 200, 0) if reading["tray_on_station"] else (170, 170, 170)
+    cv2.rectangle(img, (x1, y1), (x2, y2), color, 4)
+    cv2.putText(img, "EVALUATION AREA", (x1, min(img.shape[0] - 8, y2 + 30)), cv2.FONT_HERSHEY_SIMPLEX,
+                0.9, color, 2, cv2.LINE_AA)
+    return img
+
+
 class CameraModel:
     def __init__(self, webcam=None):
         import torch
         from ultralytics import YOLO
-        from live_test import CONFIDENCE, FPS_XIMEA, MC050_PRESET, MODEL_PATH, XimeaCaptureThread, evaluate_tray_slots
+        from live_test import CONFIDENCE, FPS_XIMEA, MC050_PRESET, MODEL_PATH, XimeaCaptureThread
         if not os.path.exists(MODEL_PATH):
             raise FileNotFoundError(f"Model not found at: {MODEL_PATH}")
         self.device = 0 if torch.cuda.is_available() else "cpu"
         self.model = YOLO(MODEL_PATH)
         self.conf = CONFIDENCE
-        self.evaluate_tray_slots = evaluate_tray_slots
+        self.station = StationReader()
         print(f"[INFO] YOLO on {self.device}, classes {self.model.names}")
+        if not any(str(n).lower() == STATION_LABEL for n in self.model.names.values()):
+            print(f"[WARN] The model has no '{STATION_LABEL}' class - the whole image is used.")
         self.cam = XimeaCaptureThread(MC050_PRESET, fps=FPS_XIMEA) if webcam is None else WebcamCaptureThread(webcam)
         self.cam.start()
 
     def read(self):
-        """(annotated image, slots, hand_in_view, tray_in_view) or None if no new frame."""
+        """(annotated image, station reading dict) or None if no new frame."""
         try:
             frame = self.cam.frame_queue.get(timeout=0.2)
         except queue.Empty:
             return None
         results = self.model.predict(source=frame, conf=self.conf, device=self.device, verbose=False)[0]
-        status, slots, _ = self.evaluate_tray_slots(results, self.model.names)
-        # evaluate_tray_slots reports a hand / a missing tray through its status text
-        return results.plot(), slots, status.startswith("HAND"), not status.startswith("WAITING")
+        detections = [(self.model.names[int(b.cls[0].item())], b.conf[0].item(), b.xyxy[0].tolist())
+                      for b in results.boxes]
+        reading = self.station.read(detections)
+        return draw_station(results.plot(), reading), reading
 
     def stop(self):
         self.cam.stop()
@@ -813,8 +911,9 @@ def run_test(args):
         while True:
             got = camera.read()
             if got is not None:
-                image, slots, hand, tray = got
-                tracker.update_reading(slots, hand, tray)
+                image, reading = got
+                tracker.update_reading(reading["slots"], reading["hand"], reading["tray_on_station"],
+                                       detail=camera_detail(reading))
             if deliver_event.is_set():
                 deliver_event.clear()
                 tracker.deliver()
@@ -870,8 +969,9 @@ def run_live(args):
                     drain(q, tracker)
                     got = camera.read()
                     if got is not None:
-                        image, slots, hand, tray = got
-                        tracker.update_reading(slots, hand, tray)
+                        image, reading = got
+                        tracker.update_reading(reading["slots"], reading["hand"], reading["tray_on_station"],
+                                               detail=camera_detail(reading))
                     link = "GUI linked" if listener.connected else "GUI NOT FOUND"
                     cv2.imshow("Battery evaluator", compose(image, tracker, link, listener.connected))
                     if (cv2.waitKey(1) & 0xFF) in (ord("q"), ord("Q"), 27):
@@ -898,7 +998,7 @@ def main():
     ap.add_argument("--no-camera", action="store_true", help="live mode: only follow the GUI markers")
     ap.add_argument("--stable-frames", type=int, default=STABLE_FRAMES)
     ap.add_argument("--tray-gone", type=float, default=TRAY_GONE_SECONDS,
-                    help="seconds without tray that count as 'tray left the station'")
+                    help="seconds the tray must be off the station before it is evaluated")
     ap.add_argument("--predict-only", action="store_true", help="live mode: never send verdicts to the GUI")
     args = ap.parse_args()
     SEND_VERDICTS = SEND_VERDICTS and not args.predict_only
