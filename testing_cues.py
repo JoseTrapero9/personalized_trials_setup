@@ -18,6 +18,7 @@ STEP_HIT_POINTS = 10
 UNIT_BONUS_POINTS = 20
 STEP_WRONG_PENALTY = 5
 TIME_TEST = 120  # game duration in seconds (120 = 2 minutes)
+AUDIO_GONE_IN = 30  # duration in seconds after which audio cues disappear
 
 STEPS_INFO = [
     ("STEP 1: BASE ALIGNMENT", ["PORT A", "PORT B", "PORT C"]),
@@ -433,6 +434,8 @@ class ProceduralAssemblyGame(QWidget):
         super().__init__()
         self.feedback = feedback_ctrl
         self.player_name = player_name
+        self.initial_audio_enabled = self.feedback.audio_enabled
+
         audio_str = "Audio ON" if self.feedback.audio_enabled else "Haptics Only"
         self.setWindowTitle(
             f"Procedural Assembly - bHaptics X16 [{self.feedback.pos_mode} | {self.feedback.neg_mode} | Map: {self.feedback.mapping_mode} | {audio_str}]"
@@ -472,6 +475,7 @@ class ProceduralAssemblyGame(QWidget):
         self.game_start_time = now
         self.is_game_over = False
         self.score_saved = False
+        self.feedback.audio_enabled = self.initial_audio_enabled
         self._new_unit()
         self.timer.start(30)
 
@@ -578,7 +582,13 @@ class ProceduralAssemblyGame(QWidget):
 
     def _tick(self):
         now = time.perf_counter()
-        if now - self.game_start_time >= TIME_TEST:
+        elapsed = now - self.game_start_time
+
+        # mute audio after AUDIO_GONE_IN seconds if initially enabled
+        if self.initial_audio_enabled:
+            self.feedback.audio_enabled = (elapsed < AUDIO_GONE_IN)
+
+        if elapsed >= TIME_TEST:
             if not self.is_game_over:
                 self.is_game_over = True
                 self.timer.stop()
