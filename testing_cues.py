@@ -83,12 +83,13 @@ def clear_leaderboard_file():
 
 
 class FeedbackController:
-    """manages persistent bhaptics player websocket connection, stimulus variants, spatial mapping, and wav playback."""
+    """manages persistent bhaptics player websocket connection, stimulus variants, spatial mapping, audio toggling, and wav playback."""
 
-    def __init__(self, base_dir=".", pos_mode="positive_1", neg_mode="negative_1", mapping_mode="correct_back"):
+    def __init__(self, base_dir=".", pos_mode="positive_1", neg_mode="negative_1", mapping_mode="correct_back", audio_enabled=True):
         self.pos_mode = pos_mode
         self.neg_mode = neg_mode
         self.mapping_mode = mapping_mode
+        self.audio_enabled = audio_enabled
         self._update_positions()
 
         self.ws_app = None
@@ -114,10 +115,11 @@ class FeedbackController:
         else:
             print(f"warning: audio file not found at {incorrect_path}")
 
-    def set_modes(self, pos_mode, neg_mode, mapping_mode="correct_back"):
+    def set_modes(self, pos_mode, neg_mode, mapping_mode="correct_back", audio_enabled=True):
         self.pos_mode = pos_mode
         self.neg_mode = neg_mode
         self.mapping_mode = mapping_mode
+        self.audio_enabled = audio_enabled
         self._update_positions()
 
     def _update_positions(self):
@@ -187,7 +189,7 @@ class FeedbackController:
             print(f"bhaptics send error: {e}")
 
     def trigger_correct(self, mode_override=None):
-        if self.snd_correct.isLoaded():
+        if self.audio_enabled and self.snd_correct.isLoaded():
             self.snd_correct.stop()
             self.snd_correct.play()
         mode = mode_override or self.pos_mode
@@ -200,7 +202,7 @@ class FeedbackController:
         threading.Thread(target=fn, daemon=True).start()
 
     def trigger_incorrect(self, mode_override=None):
-        if self.snd_incorrect.isLoaded():
+        if self.audio_enabled and self.snd_incorrect.isLoaded():
             self.snd_incorrect.stop()
             self.snd_incorrect.play()
         mode = mode_override or self.neg_mode
@@ -274,7 +276,7 @@ class FeedbackController:
 
 
 class StimulusConfigDialog(QDialog):
-    """startup selector allowing player name entry, haptic spatial mapping, and haptic conditions preview."""
+    """startup selector allowing player name entry, haptic spatial mapping, audio modality, and haptic conditions preview."""
 
     def __init__(self, feedback_ctrl):
         super().__init__()
@@ -319,6 +321,12 @@ class StimulusConfigDialog(QDialog):
         self.name_input.setPlaceholderText("Enter your name")
         self.name_input.setText("Player 1")
         form.addRow(QLabel("Player Name:"), self.name_input)
+
+        # feedback modality selector (Haptic + Audio vs. Haptics Only)
+        self.modality_combo = QComboBox()
+        self.modality_combo.addItem("Haptics + Audio", True)
+        self.modality_combo.addItem("Haptics Only", False)
+        form.addRow(QLabel("Feedback Modality:"), self.modality_combo)
 
         # spatial mapping selector
         self.map_combo = QComboBox()
@@ -383,7 +391,8 @@ class StimulusConfigDialog(QDialog):
         self.feedback.set_modes(
             self.pos_combo.currentData(),
             self.neg_combo.currentData(),
-            self.map_combo.currentData()
+            self.map_combo.currentData(),
+            self.modality_combo.currentData()
         )
         self.feedback.trigger_correct()
 
@@ -391,7 +400,8 @@ class StimulusConfigDialog(QDialog):
         self.feedback.set_modes(
             self.pos_combo.currentData(),
             self.neg_combo.currentData(),
-            self.map_combo.currentData()
+            self.map_combo.currentData(),
+            self.modality_combo.currentData()
         )
         self.feedback.trigger_incorrect()
 
@@ -407,7 +417,13 @@ class StimulusConfigDialog(QDialog):
 
     def get_selections(self):
         name = self.name_input.text().strip() or "Player 1"
-        return self.pos_combo.currentData(), self.neg_combo.currentData(), self.map_combo.currentData(), name
+        return (
+            self.pos_combo.currentData(),
+            self.neg_combo.currentData(),
+            self.map_combo.currentData(),
+            self.modality_combo.currentData(),
+            name
+        )
 
 
 class ProceduralAssemblyGame(QWidget):
@@ -417,8 +433,9 @@ class ProceduralAssemblyGame(QWidget):
         super().__init__()
         self.feedback = feedback_ctrl
         self.player_name = player_name
+        audio_str = "Audio ON" if self.feedback.audio_enabled else "Haptics Only"
         self.setWindowTitle(
-            f"Procedural Assembly - bHaptics X16 [{self.feedback.pos_mode} | {self.feedback.neg_mode} | Map: {self.feedback.mapping_mode}]"
+            f"Procedural Assembly - bHaptics X16 [{self.feedback.pos_mode} | {self.feedback.neg_mode} | Map: {self.feedback.mapping_mode} | {audio_str}]"
         )
         self.setMinimumSize(840, 620)
         self.setFocusPolicy(Qt.StrongFocus)
@@ -611,7 +628,8 @@ class ProceduralAssemblyGame(QWidget):
         vest_status = "VEST: OK" if self.feedback.connected else "VEST: DISCONNECTED"
         pos_loc = "FRONT" if self.feedback.pos_position == "VestFront" else "BACK"
         neg_loc = "FRONT" if self.feedback.neg_position == "VestFront" else "BACK"
-        mode_label = f"{vest_status}  (+{pos_loc} | -{neg_loc})"
+        snd_label = "+AUDIO" if self.feedback.audio_enabled else "NO AUDIO"
+        mode_label = f"{vest_status}  (+{pos_loc} | -{neg_loc} | {snd_label})"
         painter.setFont(QFont("Helvetica", 10, QFont.Bold))
         painter.setPen(QColor("#4ADE80") if self.feedback.connected else QColor("#F87171"))
         painter.drawText(hud, Qt.AlignCenter, mode_label)
@@ -834,8 +852,8 @@ if __name__ == "__main__":
 
     dialog = StimulusConfigDialog(feedback)
     if dialog.exec_() == QDialog.Accepted:
-        pos_choice, neg_choice, map_choice, player_name = dialog.get_selections()
-        feedback.set_modes(pos_choice, neg_choice, map_choice)
+        pos_choice, neg_choice, map_choice, audio_choice, player_name = dialog.get_selections()
+        feedback.set_modes(pos_choice, neg_choice, map_choice, audio_choice)
         window = ProceduralAssemblyGame(feedback, player_name=player_name)
         window.show()
         sys.exit(app.exec_())
