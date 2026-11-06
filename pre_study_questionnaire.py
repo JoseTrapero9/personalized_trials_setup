@@ -28,7 +28,7 @@ FRONT_RIGHT = [2, 3, 6, 7, 10, 11, 14, 15, 18, 19]
 
 
 class FeedbackController:
-    """manages persistent bhaptics player websocket connection and stimulus variants."""
+    """Manages persistent bhaptics player websocket connection and stimulus variants."""
 
     def __init__(self, pos_mode="positive_1", neg_mode="negative_1", mapping_mode="correct_back"):
         self.pos_mode = pos_mode
@@ -59,7 +59,7 @@ class FeedbackController:
 
         def on_open(ws):
             self.connected = True
-            print("connected to bhaptics player.")
+            print("Connected to bhaptics player.")
 
         def on_close(ws, close_status_code, close_msg):
             self.connected = False
@@ -110,9 +110,9 @@ class FeedbackController:
         try:
             self.ws_app.send(json.dumps(payload))
         except Exception as e:
-            print(f"bhaptics send error: {e}")
+            print(f"bHaptics send error: {e}")
 
-    def trigger_positive(self, mode_override=None):
+    def trigger_correct(self, mode_override=None):
         mode = mode_override or self.pos_mode
         target_map = {
             "positive_1": self._pos_1_1p4hz,
@@ -132,7 +132,15 @@ class FeedbackController:
         fn = target_map.get(mode, self._neg_1_0p5hz)
         threading.Thread(target=fn, daemon=True).start()
 
-    # ------------------------------------------------------------------ positive patterns
+    def feel_spatial_mapping(self):
+        """Triggers a correct cue followed by an incorrect cue to feel the spatial mapping layout."""
+        def sequence():
+            self.trigger_correct()
+            time.sleep(0.7)
+            self.trigger_incorrect()
+        threading.Thread(target=sequence, daemon=True).start()
+
+    # ------------------------------------------------------------------ Correct patterns
     def _pos_1_1p4hz(self):
         pos = self.pos_position
         self._send_dot_frame("p1_a", pos, [(i, 35) for i in BACK_ALL], 60)
@@ -159,7 +167,7 @@ class FeedbackController:
         time.sleep(0.14)
         self._send_dot_frame("p3_3", pos, [(i, 25) for i in BACK_OUTER], 200)
 
-    # ------------------------------------------------------------------ negative patterns
+    # ------------------------------------------------------------------ Incorrect patterns
     def _neg_1_0p5hz(self):
         pos = self.neg_position
         self._send_dot_frame("n1_a", pos, [(i, 95) for i in FRONT_ALL], 240)
@@ -194,13 +202,25 @@ class FeedbackController:
 
 
 class PreStudyQuestionnaire(QWidget):
-    """pre-study evaluation form with interactive haptic trigger buttons."""
+    """Pre-study evaluation form with interactive haptic trigger buttons."""
+
+    CORRECT_CUES = [
+        ("positive_1", "Correct Cue 1: 1.4 Hz Rhythmic Pulse"),
+        ("positive_2", "Correct Cue 2: Upward Spatial Wave"),
+        ("positive_3", "Correct Cue 3: Warm Gaussian Swell")
+    ]
+
+    INCORRECT_CUES = [
+        ("negative_1", "Incorrect Cue 1: 0.5 Hz Heavy Thud"),
+        ("negative_2", "Incorrect Cue 2: 4 Hz Sharp Staccato"),
+        ("negative_3", "Incorrect Cue 3: 5 Hz Left/Right Jitter")
+    ]
 
     def __init__(self, feedback_ctrl):
         super().__init__()
         self.feedback = feedback_ctrl
         self.setWindowTitle("Pre-Study Haptic Evaluation Questionnaire")
-        self.setMinimumSize(700, 800)
+        self.setMinimumSize(780, 900)
 
         self.setStyleSheet("""
             QWidget { background-color: #0F172A; color: #F8FAFC; font-family: Helvetica, Arial; }
@@ -223,6 +243,10 @@ class PreStudyQuestionnaire(QWidget):
                 background-color: #0284C7; border-color: #38BDF8; color: #FFFFFF;
             }
             QPushButton#triggerBtn:hover { background-color: #0369A1; }
+            QPushButton#mapFeelBtn {
+                background-color: #D97706; border-color: #F59E0B; color: #FFFFFF;
+            }
+            QPushButton#mapFeelBtn:hover { background-color: #B45309; }
             QPushButton#saveBtn {
                 background-color: #16A34A; border-color: #22C55E; font-size: 16px; padding: 12px;
             }
@@ -238,7 +262,6 @@ class PreStudyQuestionnaire(QWidget):
 
         main_layout = QVBoxLayout(self)
 
-        # Scroll container for small displays
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll_content = QWidget()
@@ -252,133 +275,169 @@ class PreStudyQuestionnaire(QWidget):
         title_lbl.setAlignment(Qt.AlignCenter)
         scroll_layout.addWidget(title_lbl)
 
-        # Participant & Mapping Setup Group
-        setup_group = QGroupBox("Participant Setup")
+        # Section 1: Participant Spatial Mapping Setup
+        setup_group = QGroupBox("Participant Spatial Mapping Setup")
         setup_form = QFormLayout()
 
         self.name_input = QLineEdit()
         self.name_input.setPlaceholderText("Enter subject ID or name")
         setup_form.addRow(QLabel("Participant Name / ID:"), self.name_input)
 
+        # Current Test Mapping + Feel Button Row
+        map_row = QHBoxLayout()
         self.map_combo = QComboBox()
         self.map_combo.addItem("Correct -> Back  |  Incorrect -> Front", "correct_back")
         self.map_combo.addItem("Correct -> Front |  Incorrect -> Back", "correct_front")
         self.map_combo.currentIndexChanged.connect(self._on_mapping_change)
-        setup_form.addRow(QLabel("Location Mapping Used:"), self.map_combo)
+
+        btn_feel_map = QPushButton("Feel Mapping")
+        btn_feel_map.setObjectName("mapFeelBtn")
+        btn_feel_map.setToolTip("Feel how Correct and Incorrect cues feel in their assigned locations")
+        btn_feel_map.clicked.connect(self._feel_mapping_action)
+
+        map_row.addWidget(self.map_combo, stretch=1)
+        map_row.addWidget(btn_feel_map)
+        setup_form.addRow(QLabel("Current Test Mapping:"), map_row)
+
+        # Preferred Spatial Mapping Question
+        self.pref_map_combo = QComboBox()
+        self.pref_map_combo.addItem("Correct in Back / Incorrect in Front", "correct_back")
+        self.pref_map_combo.addItem("Correct in Front / Incorrect in Back", "correct_front")
+        setup_form.addRow(QLabel("Preferred Spatial Mapping:"), self.pref_map_combo)
+
+        # Guidance Length Drop-down
+        self.guidance_length_combo = QComboBox()
+        self.guidance_length_combo.addItems(["Keep length", "Increase length", "Decrease length"])
+        setup_form.addRow(QLabel("Guidance Length Preference:"), self.guidance_length_combo)
 
         setup_group.setLayout(setup_form)
         scroll_layout.addWidget(setup_group)
 
-        # Selection of Stimuli
-        stim_group = QGroupBox("Select Evaluated Stimuli")
-        stim_form = QFormLayout()
+        # Section 2: Assessment: Correct Cues
+        correct_group = QGroupBox("Assessment: Correct Cues")
+        correct_layout = QVBoxLayout()
 
-        # Positive dropdown + test button
-        pos_row = QHBoxLayout()
-        self.pos_combo = QComboBox()
-        self.pos_combo.addItem("positive_1  (1.4 Hz Rhythmic Pulse)", "positive_1")
-        self.pos_combo.addItem("positive_2  (Upward Spatial Wave)", "positive_2")
-        self.pos_combo.addItem("positive_3  (Warm Gaussian Swell)", "positive_3")
-        btn_feel_pos_select = QPushButton("Feel Stimulus")
-        btn_feel_pos_select.setObjectName("triggerBtn")
-        btn_feel_pos_select.clicked.connect(self._trigger_current_positive)
-        pos_row.addWidget(self.pos_combo, stretch=1)
-        pos_row.addWidget(btn_feel_pos_select)
-        stim_form.addRow(QLabel("Selected Positive Cue:"), pos_row)
+        self.correct_eval_widgets = {}
+        for key, label_text in self.CORRECT_CUES:
+            sub_box = QGroupBox(label_text)
+            sub_form = QFormLayout()
 
-        # Negative dropdown + test button
-        neg_row = QHBoxLayout()
-        self.neg_combo = QComboBox()
-        self.neg_combo.addItem("negative_1  (0.5 Hz Heavy Thud)", "negative_1")
-        self.neg_combo.addItem("negative_2  (4 Hz Sharp Staccato)", "negative_2")
-        self.neg_combo.addItem("negative_3  (5 Hz Left/Right Jitter)", "negative_3")
-        btn_feel_neg_select = QPushButton("Feel Stimulus")
-        btn_feel_neg_select.setObjectName("triggerBtn")
-        btn_feel_neg_select.clicked.connect(self._trigger_current_negative)
-        neg_row.addWidget(self.neg_combo, stretch=1)
-        neg_row.addWidget(btn_feel_neg_select)
-        stim_form.addRow(QLabel("Selected Negative Cue:"), neg_row)
+            # Feel Cue button
+            btn_feel = QPushButton("Feel Cue")
+            btn_feel.setObjectName("triggerBtn")
+            btn_feel.clicked.connect(lambda _, k=key: self._trigger_correct(k))
+            sub_form.addRow(QLabel("Trigger Vibration:"), btn_feel)
 
-        stim_group.setLayout(stim_form)
-        scroll_layout.addWidget(stim_group)
+            # Intensity drop-down
+            intensity_cb = QComboBox()
+            intensity_cb.addItems(["Keep intensity", "Increase intensity", "Decrease intensity"])
+            sub_form.addRow(QLabel("Guidance Intensity:"), intensity_cb)
 
-        # Task Efficiency Question Group
-        eff_group = QGroupBox("Overall Task Efficiency")
-        eff_layout = QVBoxLayout()
-        eff_lbl = QLabel("Which stimulus let you do the task more efficiently?")
-        self.eff_combo = QComboBox()
-        self.eff_combo.addItem("Positive Cue")
-        self.eff_combo.addItem("Negative Cue")
-        self.eff_combo.addItem("Both Equally")
-        self.eff_combo.addItem("Neither / No Preference")
-        eff_layout.addWidget(eff_lbl)
-        eff_layout.addWidget(self.eff_combo)
-        eff_group.setLayout(eff_layout)
-        scroll_layout.addWidget(eff_group)
+            # Usefulness Slider (0 to 10)
+            slider_row = QHBoxLayout()
+            slider = QSlider(Qt.Horizontal)
+            slider.setRange(0, 10)
+            slider.setValue(0)
+            val_lbl = QLabel("0")
+            val_lbl.setStyleSheet("color: #38BDF8; font-weight: bold; width: 35px;")
+            slider.valueChanged.connect(lambda v, l=val_lbl: l.setText(str(v)))
+            slider_row.addWidget(slider)
+            slider_row.addWidget(val_lbl)
+            sub_form.addRow(
+                QLabel("Usefulness in detecting Correct answer ((0) not useful at all to (10) very useful):"),
+                slider_row
+            )
 
-        # Positive Cue Assessment Group
-        pos_group = QGroupBox("Assessment: Positive Stimulus")
-        pos_form = QFormLayout()
+            sub_box.setLayout(sub_form)
+            correct_layout.addWidget(sub_box)
 
-        btn_feel_pos_again = QPushButton("Feel Positive Cue Again")
-        btn_feel_pos_again.setObjectName("triggerBtn")
-        btn_feel_pos_again.clicked.connect(self._trigger_current_positive)
-        pos_form.addRow(QLabel("Re-trigger Cue:"), btn_feel_pos_again)
+            self.correct_eval_widgets[key] = {
+                "intensity": intensity_cb,
+                "usefulness_slider": slider
+            }
 
-        self.pos_intensity = QComboBox()
-        self.pos_intensity.addItems(["Keep intensity", "Increase intensity", "Decrease intensity"])
-        pos_form.addRow(QLabel("Guidance Intensity:"), self.pos_intensity)
+        # Overall Correct Questions
+        correct_meta_box = QGroupBox("Correct Cues Comparison")
+        meta_correct_form = QFormLayout()
 
-        self.pos_length = QComboBox()
-        self.pos_length.addItems(["Keep length", "Increase length", "Decrease length"])
-        pos_form.addRow(QLabel("Guidance Length:"), self.pos_length)
+        self.best_correct_combo = QComboBox()
+        for key, text in self.CORRECT_CUES:
+            self.best_correct_combo.addItem(text, key)
+        meta_correct_form.addRow(QLabel("Which correct cue did you like the most?"), self.best_correct_combo)
 
-        # Scale slider -10 to +10
-        pos_slider_row = QHBoxLayout()
-        self.pos_slider = QSlider(Qt.Horizontal)
-        self.pos_slider.setRange(-10, 10)
-        self.pos_slider.setValue(0)
-        self.pos_slider_val = QLabel("0")
-        self.pos_slider_val.setStyleSheet("color: #38BDF8; font-weight: bold; width: 30px;")
-        self.pos_slider.valueChanged.connect(lambda v: self.pos_slider_val.setText(f"{v:+d}" if v != 0 else "0"))
-        pos_slider_row.addWidget(self.pos_slider)
-        pos_slider_row.addWidget(self.pos_slider_val)
-        pos_form.addRow(QLabel("Position (-10 Very Neg to +10 Very Pos):"), pos_slider_row)
+        self.diff_correct_combo = QComboBox()
+        self.diff_correct_combo.addItem("One cue was significantly better for perceiving the correct answer", "significantly_better")
+        self.diff_correct_combo.addItem("All correct cues felt almost the same", "almost_same")
+        meta_correct_form.addRow(QLabel("Difference in perception between correct cues:"), self.diff_correct_combo)
 
-        pos_group.setLayout(pos_form)
-        scroll_layout.addWidget(pos_group)
+        correct_meta_box.setLayout(meta_correct_form)
+        correct_layout.addWidget(correct_meta_box)
 
-        # Negative Cue Assessment Group
-        neg_group = QGroupBox("Assessment: Negative Stimulus")
-        neg_form = QFormLayout()
+        correct_group.setLayout(correct_layout)
+        scroll_layout.addWidget(correct_group)
 
-        btn_feel_neg_again = QPushButton("Feel Negative Cue Again")
-        btn_feel_neg_again.setObjectName("triggerBtn")
-        btn_feel_neg_again.clicked.connect(self._trigger_current_negative)
-        neg_form.addRow(QLabel("Re-trigger Cue:"), btn_feel_neg_again)
+        # Section 3: Assessment: Incorrect Cues
+        incorrect_group = QGroupBox("Assessment: Incorrect Cues")
+        incorrect_layout = QVBoxLayout()
 
-        self.neg_intensity = QComboBox()
-        self.neg_intensity.addItems(["Keep intensity", "Increase intensity", "Decrease intensity"])
-        neg_form.addRow(QLabel("Guidance Intensity:"), self.neg_intensity)
+        self.incorrect_eval_widgets = {}
+        for key, label_text in self.INCORRECT_CUES:
+            sub_box = QGroupBox(label_text)
+            sub_form = QFormLayout()
 
-        self.neg_length = QComboBox()
-        self.neg_length.addItems(["Keep length", "Increase length", "Decrease length"])
-        neg_form.addRow(QLabel("Guidance Length:"), self.neg_length)
+            # Feel Cue button
+            btn_feel = QPushButton("Feel Cue")
+            btn_feel.setObjectName("triggerBtn")
+            btn_feel.clicked.connect(lambda _, k=key: self._trigger_incorrect(k))
+            sub_form.addRow(QLabel("Trigger Vibration:"), btn_feel)
 
-        # Scale slider -10 to +10
-        neg_slider_row = QHBoxLayout()
-        self.neg_slider = QSlider(Qt.Horizontal)
-        self.neg_slider.setRange(-10, 10)
-        self.neg_slider.setValue(0)
-        self.neg_slider_val = QLabel("0")
-        self.neg_slider_val.setStyleSheet("color: #F87171; font-weight: bold; width: 30px;")
-        self.neg_slider.valueChanged.connect(lambda v: self.neg_slider_val.setText(f"{v:+d}" if v != 0 else "0"))
-        neg_slider_row.addWidget(self.neg_slider)
-        neg_slider_row.addWidget(self.neg_slider_val)
-        neg_form.addRow(QLabel("Position (-10 Very Neg to +10 Very Pos):"), neg_slider_row)
+            # Intensity drop-down
+            intensity_cb = QComboBox()
+            intensity_cb.addItems(["Keep intensity", "Increase intensity", "Decrease intensity"])
+            sub_form.addRow(QLabel("Guidance Intensity:"), intensity_cb)
 
-        neg_group.setLayout(neg_form)
-        scroll_layout.addWidget(neg_group)
+            # Usefulness Slider (0 to 10)
+            slider_row = QHBoxLayout()
+            slider = QSlider(Qt.Horizontal)
+            slider.setRange(0, 10)
+            slider.setValue(0)
+            val_lbl = QLabel("0")
+            val_lbl.setStyleSheet("color: #F87171; font-weight: bold; width: 35px;")
+            slider.valueChanged.connect(lambda v, l=val_lbl: l.setText(str(v)))
+            slider_row.addWidget(slider)
+            slider_row.addWidget(val_lbl)
+            sub_form.addRow(
+                QLabel("Usefulness in detecting Incorrect answer ((0) not useful at all to (10) very useful):"),
+                slider_row
+            )
+
+            sub_box.setLayout(sub_form)
+            incorrect_layout.addWidget(sub_box)
+
+            self.incorrect_eval_widgets[key] = {
+                "intensity": intensity_cb,
+                "usefulness_slider": slider
+            }
+
+        # Overall Incorrect Questions
+        incorrect_meta_box = QGroupBox("Incorrect Cues Comparison")
+        meta_incorrect_form = QFormLayout()
+
+        self.best_incorrect_combo = QComboBox()
+        for key, text in self.INCORRECT_CUES:
+            self.best_incorrect_combo.addItem(text, key)
+        meta_incorrect_form.addRow(QLabel("Which incorrect cue did you like the most?"), self.best_incorrect_combo)
+
+        self.diff_incorrect_combo = QComboBox()
+        self.diff_incorrect_combo.addItem("One cue was significantly better for perceiving the incorrect answer", "significantly_better")
+        self.diff_incorrect_combo.addItem("All incorrect cues felt almost the same", "almost_same")
+        meta_incorrect_form.addRow(QLabel("Difference in perception between incorrect cues:"), self.diff_incorrect_combo)
+
+        incorrect_meta_box.setLayout(meta_incorrect_form)
+        incorrect_layout.addWidget(incorrect_meta_box)
+
+        incorrect_group.setLayout(incorrect_layout)
+        scroll_layout.addWidget(incorrect_group)
 
         # Save Button
         btn_save = QPushButton("Save Evaluation Answers")
@@ -391,26 +450,22 @@ class PreStudyQuestionnaire(QWidget):
 
     def _on_mapping_change(self):
         self.feedback.set_modes(
-            self.pos_combo.currentData(),
-            self.neg_combo.currentData(),
+            "positive_1",
+            "negative_1",
             self.map_combo.currentData()
         )
 
-    def _trigger_current_positive(self):
-        self.feedback.set_modes(
-            self.pos_combo.currentData(),
-            self.neg_combo.currentData(),
-            self.map_combo.currentData()
-        )
-        self.feedback.trigger_positive()
+    def _feel_mapping_action(self):
+        self._on_mapping_change()
+        self.feedback.feel_spatial_mapping()
 
-    def _trigger_current_negative(self):
-        self.feedback.set_modes(
-            self.pos_combo.currentData(),
-            self.neg_combo.currentData(),
-            self.map_combo.currentData()
-        )
-        self.feedback.trigger_incorrect()
+    def _trigger_correct(self, key):
+        self.feedback.set_modes(key, "negative_1", self.map_combo.currentData())
+        self.feedback.trigger_correct(key)
+
+    def _trigger_incorrect(self, key):
+        self.feedback.set_modes("positive_1", key, self.map_combo.currentData())
+        self.feedback.trigger_incorrect(key)
 
     def _save_answers(self):
         participant_name = self.name_input.text().strip()
@@ -418,31 +473,47 @@ class PreStudyQuestionnaire(QWidget):
             QMessageBox.warning(self, "Missing Name", "Please enter a Participant Name or ID before saving.")
             return
 
-        # Prepare survey payload
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        # Gather evaluations for all 3 correct cues
+        correct_cues_eval = {}
+        for key, _ in self.CORRECT_CUES:
+            correct_cues_eval[key] = {
+                "guidance_intensity": self.correct_eval_widgets[key]["intensity"].currentText(),
+                "usefulness_score": self.correct_eval_widgets[key]["usefulness_slider"].value()
+            }
+
+        # Gather evaluations for all 3 incorrect cues
+        incorrect_cues_eval = {}
+        for key, _ in self.INCORRECT_CUES:
+            incorrect_cues_eval[key] = {
+                "guidance_intensity": self.incorrect_eval_widgets[key]["intensity"].currentText(),
+                "usefulness_score": self.incorrect_eval_widgets[key]["usefulness_slider"].value()
+            }
+
         data = {
             "participant": participant_name,
             "timestamp": timestamp,
-            "location_mapping": self.map_combo.currentData(),
-            "more_efficient_stimulus": self.eff_combo.currentText(),
-            "positive_stimulus_eval": {
-                "selected_pattern": self.pos_combo.currentData(),
-                "intensity_preference": self.pos_intensity.currentText(),
-                "length_preference": self.pos_length.currentText(),
-                "valence_score": self.pos_slider.value()
+            "spatial_mapping_setup": {
+                "current_test_mapping": self.map_combo.currentData(),
+                "preferred_spatial_mapping": self.pref_map_combo.currentData(),
+                "guidance_length_preference": self.guidance_length_combo.currentText()
             },
-            "negative_stimulus_eval": {
-                "selected_pattern": self.neg_combo.currentData(),
-                "intensity_preference": self.neg_intensity.currentText(),
-                "length_preference": self.neg_length.currentText(),
-                "valence_score": self.neg_slider.value()
+            "assessment_correct_cues": {
+                "cues": correct_cues_eval,
+                "most_liked_cue": self.best_correct_combo.currentData(),
+                "perception_difference": self.diff_correct_combo.currentData()
+            },
+            "assessment_incorrect_cues": {
+                "cues": incorrect_cues_eval,
+                "most_liked_cue": self.best_incorrect_combo.currentData(),
+                "perception_difference": self.diff_incorrect_combo.currentData()
             }
         }
 
         # Ensure "answers pre study" directory exists
         os.makedirs(ANSWERS_DIR, exist_ok=True)
 
-        # Sanitize name for filename
         clean_name = "".join(c for c in participant_name if c.isalnum() or c in ("_", "-")).rstrip()
         filename = f"pre_study_{clean_name}_{timestamp}.json"
         filepath = os.path.join(ANSWERS_DIR, filename)

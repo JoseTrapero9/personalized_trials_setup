@@ -1,0 +1,45 @@
+{
+    "participant": "s00",
+    "timestamp": "20261106_162820",
+    "spatial_mapping_setup": {
+        "current_test_mapping": "correct_back",
+        "preferred_spatial_mapping": "correct_back",
+        "guidance_length_preference": "Keep length"
+    },
+    "assessment_correct_cues": {
+        "cues": {
+            "positive_1": {
+                "guidance_intensity": "Keep intensity",
+                "usefulness_score": 0
+            },
+            "positive_2": {
+                "guidance_intensity": "Keep intensity",
+                "usefulness_score": 0
+            },
+            "positive_3": {
+                "guidance_intensity": "Keep intensity",
+                "usefulness_score": 0
+            }
+        },
+        "most_liked_cue": "positive_1",
+        "perception_difference": "significantly_better"
+    },
+    "assessment_incorrect_cues": {
+        "cues": {
+            "negative_1": {
+                "guidance_intensity": "Keep intensity",
+                "usefulness_score": 0
+            },
+            "negative_2": {
+                "guidance_intensity": "Keep intensity",
+                "usefulness_score": 0
+            },
+            "negative_3": {
+                "guidance_intensity": "Keep intensity",
+                "usefulness_score": 0
+            }
+        },
+        "most_liked_cue": "negative_1",
+        "perception_difference": "significantly_better"
+    }
+}
