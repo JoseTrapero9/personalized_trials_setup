@@ -9,6 +9,8 @@ TEST (no GUI needed, run it right now):
   Row 1 of the file is active right away. Build the tray: every battery gets a check or a cross
   in the table as soon as the camera sees it. Say "deliver" (or press D) to evaluate the row and
   move on to the next one. R = redo the current row, Q / Esc = quit.
+  Feedback: a random audios/positive_audio*.wav for a correct row, buzzer.wav or mistake_audio.wav for
+  a mistake, played on the subject's output (Trekz, --audio-out NAME), each cut to 1 s (--no-sounds = off).
 
 LIVE (with the GUI on the other PC, same network):
     python live_evaluator.py
@@ -60,7 +62,9 @@ from config import (
     VOICE_COOLDOWN_SECONDS,
     WARNING_SECONDS,
     assembly_seconds,
+    audio_dir,
     base_dir,
+    mistake_audio,
 )
 from sequences import sequence_path, subject_tag
 
@@ -72,6 +76,13 @@ STATION_CLEAR_SECONDS = 0.3                # no tray on the station this long = 
 STATION_LABEL = "station"                  # YOLO class of the assembly station (case-insensitive)
 STATION_MARGIN = 0.10                      # tray centre may be this fraction of the station size outside it
 SEND_VERDICTS = True                       # False = only predict / log (--predict-only)
+
+# Feedback sounds (TEST MODE ONLY for now), played on the subject's audio output
+FEEDBACK_SOUNDS = True                     # --no-sounds turns them off
+CORRECT_SOUNDS = ["positive_audio*.wav"]   # one picked at random for a correct row
+MISTAKE_SOUNDS = ["buzzer.wav", "mistake_audio.wav"]   # one picked at random for a mistake
+FEEDBACK_MAX_SECONDS = 1.0                 # every clip is cut to this length (short fade-out, files untouched)
+PARTICIPANT_AUDIO_KEYWORD = "Trekz"        # subject audio output (same device as the GUI); --audio-out to change
 # =================================================
 
 COLOR_VALUES = {"Blue": 1, "Red": 2, "Yellow": 3, "Green": 4}
@@ -179,6 +190,7 @@ class ParadigmTracker:
         self.hand = False
         self.tray = False
         self.camera_detail = ""         # e.g. "tray off the station", "STATION NOT FOUND"
+        self.on_verdict = None          # optional callback(round_record) after correct / incorrect
         if subject and condition:
             self._load_answer_key_for(subject, condition)
 
@@ -359,6 +371,8 @@ class ParadigmTracker:
         self.send(("Eval_Verdict_" if (self.mode == "live" and SEND_VERDICTS) else "Eval_Result_") + msg)
         self._note(f"Round {rec.number}: {rec.verdict.upper()} ({trigger.replace('_', ' ')}) "
                    f"read {fmt_slots(slots)}, expected {fmt_slots(rec.expected)}")
+        if self.on_verdict is not None:
+            self.on_verdict(rec)
 
     # ---------------- tray readings ----------------
     def update_reading(self, slots, hand, tray_seen, ts=None, detail=""):
@@ -842,6 +856,85 @@ def drain(q, tracker):
 # ---------------------------------------------------------------------------
 # Test-mode helpers
 # ---------------------------------------------------------------------------
+class FeedbackSounds:
+    """Random correct / mistake clip on the subject's audio output, each cut to FEEDBACK_MAX_SECONDS."""
+
+    def __init__(self, out_keyword=PARTICIPANT_AUDIO_KEYWORD, max_seconds=FEEDBACK_MAX_SECONDS):
+        import glob
+        import numpy as np
+        import sounddevice as sd
+        import soundfile as sf
+        self.np, self.sd, self.sf = np, sd, sf
+        self.max_seconds = max_seconds
+        self.correct = self._load_all([p for pat in CORRECT_SOUNDS for p in sorted(glob.glob(os.path.join(audio_dir, pat)))])
+        mistake_paths = [os.path.join(audio_dir, n) for n in MISTAKE_SOUNDS]
+        if not os.path.exists(mistake_paths[-1]) and os.path.exists(mistake_audio):
+            print(f"[SOUND] {MISTAKE_SOUNDS[-1]} not found - using config.mistake_audio "
+                  f"({os.path.basename(mistake_audio)}) instead")
+            mistake_paths[-1] = mistake_audio
+        self.mistake = self._load_all(mistake_paths)
+
+        self.device, self.device_name = None, "default output"
+        for i, d in enumerate(sd.query_devices()):
+            if d["max_output_channels"] > 0 and out_keyword and out_keyword.lower() in d["name"].lower():
+                self.device, self.device_name = i, d["name"]
+                break
+        else:
+            if out_keyword:
+                print(f"[SOUND] No output device matching '{out_keyword}' - using the default output.")
+        self.status = (f"sounds: {len(self.correct)} correct / {len(self.mistake)} mistake "
+                       f"-> {self.device_name}")
+        print(f"[SOUND] {self.status}: correct {[c[0] for c in self.correct]}, "
+              f"mistake {[m[0] for m in self.mistake]}")
+
+    def _load_all(self, paths):
+        clips = []
+        for path in paths:
+            if not os.path.exists(path):
+                print(f"[SOUND] missing: {path}")
+                continue
+            try:
+                data, fs = self.sf.read(path, dtype="float32", always_2d=True)
+            except Exception as e:
+                print(f"[SOUND] cannot read {path}: {e}")
+                continue
+            data = data[: int(fs * self.max_seconds)].copy()          # never longer than max_seconds
+            fade = min(len(data), int(0.03 * fs))                       # 30 ms fade-out: no click at the cut
+            if fade > 0:
+                data[-fade:] *= self.np.linspace(1.0, 0.0, fade, dtype="float32")[:, None]
+            if data.shape[1] == 1:
+                data = self.np.column_stack((data, data))               # stereo, like audio.py
+            clips.append((os.path.basename(path), data, fs))
+        return clips
+
+    def play(self, correct):
+        import random
+        clips = self.correct if correct else self.mistake
+        if not clips:
+            return None
+        name, data, fs = random.choice(clips)
+        threading.Thread(target=self._play, args=(data, fs), daemon=True).start()
+        return name
+
+    def _play(self, data, fs):
+        try:
+            with self.sd.OutputStream(device=self.device, samplerate=fs, channels=data.shape[1],
+                                      dtype="float32") as stream:
+                stream.write(data)
+        except Exception as e:
+            print(f"[SOUND] playback error: {e}")
+
+
+def start_sounds(args):
+    if args.no_sounds:
+        return None
+    try:
+        return FeedbackSounds(args.audio_out)
+    except Exception as e:
+        print(f"[SOUND] Feedback sounds off ({e}).")
+        return None
+
+
 def choose_log_file(arg):
     log_dir = os.path.join(base_dir, "log_files")
     if arg and arg != "pick":
@@ -902,6 +995,13 @@ def run_test(args):
     tracker = ParadigmTracker(time.monotonic, lambda msg: print(f"[TEST] {msg}"),
                               stable_frames=args.stable_frames, mode="test")
     tracker.start_test(path)
+    sounds = start_sounds(args)
+    if sounds is not None:
+        def feedback(rec):
+            name = sounds.play(rec.verdict == "correct")
+            if name:
+                tracker._note(f"Row {rec.number}: played {name}")
+        tracker.on_verdict = feedback
     camera = CameraModel(args.webcam)
     deliver_event = threading.Event()
     voice = start_voice(deliver_event.set)
@@ -1000,6 +1100,9 @@ def main():
     ap.add_argument("--tray-gone", type=float, default=TRAY_GONE_SECONDS,
                     help="seconds the tray must be off the station before it is evaluated")
     ap.add_argument("--predict-only", action="store_true", help="live mode: never send verdicts to the GUI")
+    ap.add_argument("--audio-out", default=PARTICIPANT_AUDIO_KEYWORD, metavar="NAME",
+                    help="test mode: output device for the feedback sounds (part of its name, default Trekz)")
+    ap.add_argument("--no-sounds", action="store_true", help="test mode: no correct / mistake sounds")
     args = ap.parse_args()
     SEND_VERDICTS = SEND_VERDICTS and not args.predict_only
     TRAY_GONE_SECONDS = args.tray_gone
