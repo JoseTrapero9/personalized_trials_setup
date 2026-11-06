@@ -70,11 +70,13 @@ class paradigmcontroller(QWidget):
         self.f14_shortcut = QShortcut(QKeySequence("F14"), self)
         self.f14_shortcut.activated.connect(lambda: self.on_point_button(2))
 
-        self.y_shortcut = QShortcut(QKeySequence("y"), self)
-        self.y_shortcut.activated.connect(lambda: self.dual_task_screen.record_evaluation(True))
+        # Manual evaluation keys only without the camera evaluator (which judges every assembly itself)
+        if not USE_REMOTE_EVALUATOR:
+            self.y_shortcut = QShortcut(QKeySequence("y"), self)
+            self.y_shortcut.activated.connect(lambda: self.dual_task_screen.record_evaluation(True))
 
-        self.c_shortcut = QShortcut(QKeySequence("c"), self)
-        self.c_shortcut.activated.connect(lambda: self.dual_task_screen.record_evaluation(False))
+            self.c_shortcut = QShortcut(QKeySequence("c"), self)
+            self.c_shortcut.activated.connect(lambda: self.dual_task_screen.record_evaluation(False))
 
         # Camera evaluator on the other PC (live_evaluator.py) - verdicts arrive over LSL
         self.evaluator_link = None
