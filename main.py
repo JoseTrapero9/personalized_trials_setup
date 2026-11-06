@@ -20,6 +20,8 @@ def cleanup_resources():
         state.controller.dual_task_screen.flush_pending_log()
         state.controller.dual_task_screen.voice_listener.stop()
         state.controller.dual_task_screen.game_widget.shutdown()
+        if state.controller.evaluator_link is not None:
+            state.controller.evaluator_link.stop()
 
     stop_robot_process()
     shutdown_haptics()
