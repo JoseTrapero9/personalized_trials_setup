@@ -495,7 +495,7 @@ class DualTaskScreen(QWidget):
                 writer.writerow([
                     "subject", "condition", "difficulty", "round",
                     "task_info", "time_taken_s", "handover_point",
-                    "overtime_alarm", "assembly_status", "game_score"
+                    "overtime_alarm", "assembly_status", "game_score", "game_mode"
                 ])
             writer.writerow([
                 state.subject_number,
@@ -507,7 +507,8 @@ class DualTaskScreen(QWidget):
                 log_dict["point_pressed"],
                 log_dict["alarm_triggered"],
                 log_dict["assembly_status"],
-                log_dict["game_score"]
+                log_dict["game_score"],
+                state.game_mode
             ])
 
     def _point_names(self):

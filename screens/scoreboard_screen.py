@@ -125,7 +125,8 @@ class ArcadeScoreboardScreen(QWidget):
     def _scores_filepath(self):
         log_dir = os.path.join(base_dir, "logs")
         os.makedirs(log_dir, exist_ok=True)
-        return os.path.join(log_dir, f"arcade_scores_{self.condition_name}.json")
+        suffix = "_hard" if state.game_mode == "hard" else ""    # separate leaderboard per game mode
+        return os.path.join(log_dir, f"arcade_scores_{self.condition_name}{suffix}.json")
 
     def _load_scores(self):
         path = self._scores_filepath()

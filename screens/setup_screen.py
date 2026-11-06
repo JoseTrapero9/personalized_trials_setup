@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QVBoxLayout, QWidget
 import json
 import os
 
-from config import ALL_CONDITIONS, MAX_ROUNDS_PER_CONDITION, PROBLEMS_PER_CHECKPOINT, RADIO_AUDIO_DIR
+from config import ALL_CONDITIONS, GAME_MODES, MAX_ROUNDS_PER_CONDITION, PROBLEMS_PER_CHECKPOINT, RADIO_AUDIO_DIR
 from lsl_markers import send_marker
 from radio_script import LANGUAGES
 from state import state
@@ -51,6 +51,17 @@ class setupscreen(QWidget):
         self.cond_combo.setFixedWidth(320)
         self.cond_combo.addItems(ALL_CONDITIONS)
         layout.addWidget(self.cond_combo, alignment=Qt.AlignCenter)
+
+        self.mode_label = QLabel("Game Mode:")
+        self.mode_label.setFont(main_font)
+        layout.addWidget(self.mode_label, alignment=Qt.AlignCenter)
+
+        self.mode_combo = QComboBox()
+        self.mode_combo.setFont(main_font)
+        self.mode_combo.setFixedWidth(320)
+        for mode in GAME_MODES:
+            self.mode_combo.addItem(mode.capitalize(), mode)
+        layout.addWidget(self.mode_combo, alignment=Qt.AlignCenter)
 
         self.lang_label = QLabel("Participant Language (radio + screens):")
         self.lang_label.setFont(main_font)
@@ -107,11 +118,12 @@ class setupscreen(QWidget):
         state.current_condition = self.cond_combo.currentText()
         state.training_active = (state.current_condition == "training")
         state.language = self.lang_combo.currentData()
+        state.game_mode = self.mode_combo.currentData()
 
         if state.current_condition in ["training", "baseline"]:
             state.difficulty = "easy"
         else:
             state.difficulty = "hard"
 
-        send_marker(f"Setup_Complete_Subj_{state.subject_number}_Cond_{state.current_condition}_Lang_{state.language}")
+        send_marker(f"Setup_Complete_Subj_{state.subject_number}_Cond_{state.current_condition}_Lang_{state.language}_Mode_{state.game_mode}")
         self.switch_callback()

@@ -4,10 +4,10 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
-from config import DELIVERY_WINDOW_SECONDS, PROBLEMS_PER_CHECKPOINT, RETRIEVAL_SECONDS
+from config import DELIVERY_WINDOW_SECONDS, IDLE_HIT_POINTS, PROBLEMS_PER_CHECKPOINT, RETRIEVAL_SECONDS
 from lsl_markers import send_marker
 from state import state
-from texts import TUTORIAL, t
+from texts import HARD_TUTORIAL_STEP, TUTORIAL, t
 
 
 class tutorialscreen(QWidget):
@@ -58,7 +58,10 @@ class tutorialscreen(QWidget):
     def reset(self):
         """Load the steps in the participant's language and go to the first page."""
         fmt = dict(n=PROBLEMS_PER_CHECKPOINT, r=RETRIEVAL_SECONDS, d=DELIVERY_WINDOW_SECONDS)
-        steps = TUTORIAL.get(state.language, TUTORIAL["en"])
+        fmt["p"] = IDLE_HIT_POINTS
+        steps = list(TUTORIAL.get(state.language, TUTORIAL["en"]))
+        if state.game_mode == "hard":
+            steps.insert(4, HARD_TUTORIAL_STEP.get(state.language, HARD_TUTORIAL_STEP["en"]))
         self.steps = [(title, body.format(**fmt) if "{" in body else body) for title, body in steps]
         self.back_btn.setText(t("tut_back"))
         self.current_step = 0

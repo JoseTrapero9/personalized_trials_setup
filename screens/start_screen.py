@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
 
 from config import (
     DELIVERY_WINDOW_SECONDS,
+    IDLE_HIT_POINTS,
     MAX_ROUNDS_PER_CONDITION,
     PROBLEMS_PER_CHECKPOINT,
     RETRIEVAL_SECONDS,
@@ -13,6 +14,7 @@ from config import (
 )
 from lsl_markers import send_marker
 from robot import start_robot_process
+from state import state
 from texts import t
 
 
@@ -62,6 +64,7 @@ class startscreen(QWidget):
             f"<b>{title}</b><br><br>"
             + t("start_body", n=PROBLEMS_PER_CHECKPOINT, r=RETRIEVAL_SECONDS,
                 d=DELIVERY_WINDOW_SECONDS, rounds=rounds)
+            + (t("start_hard_line", p=IDLE_HIT_POINTS) if state.game_mode == "hard" else "")
         )
         self.start_button.setText(t("start_button"))
         self.start_button.show()
