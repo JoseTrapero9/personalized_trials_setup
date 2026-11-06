@@ -9,8 +9,8 @@ TEST (no GUI needed, run it right now):
   Row 1 of the file is active right away. Build the tray: every battery gets a check or a cross
   in the table as soon as the camera sees it. Say "deliver" (or press D) to evaluate the row and
   move on to the next one. R = redo the current row, Q / Esc = quit.
-  Feedback: a random audios/positive_audio*.wav for a correct row, buzzer.wav or mistake_audio.wav for
-  a mistake, played on the subject's output (Trekz, --audio-out NAME), each cut to 1 s (--no-sounds = off).
+  Feedback: a random audios/positive_sound*.wav for a correct row, buzzer.wav or incorrect_answer.wav
+  for a mistake, played on the subject's output (Trekz, --audio-out NAME), each cut to 1 s (--no-sounds = off).
 
 LIVE (with the GUI on the other PC, same network):
     python live_evaluator.py
@@ -64,7 +64,6 @@ from config import (
     assembly_seconds,
     audio_dir,
     base_dir,
-    mistake_audio,
 )
 from sequences import sequence_path, subject_tag
 
@@ -79,8 +78,8 @@ SEND_VERDICTS = True                       # False = only predict / log (--predi
 
 # Feedback sounds (TEST MODE ONLY for now), played on the subject's audio output
 FEEDBACK_SOUNDS = True                     # --no-sounds turns them off
-CORRECT_SOUNDS = ["positive_audio*.wav"]   # one picked at random for a correct row
-MISTAKE_SOUNDS = ["buzzer.wav", "mistake_audio.wav"]   # one picked at random for a mistake
+CORRECT_SOUNDS = ["positive_sound*.wav"]   # audios/positive_sound1-3.wav, one picked at random for a correct row
+MISTAKE_SOUNDS = ["buzzer.wav", "incorrect_answer.wav"]   # one picked at random for a mistake
 FEEDBACK_MAX_SECONDS = 1.0                 # every clip is cut to this length (short fade-out, files untouched)
 PARTICIPANT_AUDIO_KEYWORD = "Trekz"        # subject audio output (same device as the GUI); --audio-out to change
 # =================================================
@@ -867,12 +866,7 @@ class FeedbackSounds:
         self.np, self.sd, self.sf = np, sd, sf
         self.max_seconds = max_seconds
         self.correct = self._load_all([p for pat in CORRECT_SOUNDS for p in sorted(glob.glob(os.path.join(audio_dir, pat)))])
-        mistake_paths = [os.path.join(audio_dir, n) for n in MISTAKE_SOUNDS]
-        if not os.path.exists(mistake_paths[-1]) and os.path.exists(mistake_audio):
-            print(f"[SOUND] {MISTAKE_SOUNDS[-1]} not found - using config.mistake_audio "
-                  f"({os.path.basename(mistake_audio)}) instead")
-            mistake_paths[-1] = mistake_audio
-        self.mistake = self._load_all(mistake_paths)
+        self.mistake = self._load_all([p for pat in MISTAKE_SOUNDS for p in sorted(glob.glob(os.path.join(audio_dir, pat)))])
 
         self.device, self.device_name = None, "default output"
         for i, d in enumerate(sd.query_devices()):
