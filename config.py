@@ -50,7 +50,7 @@ if os.path.isdir(VOSK_MODEL_DIR) and not os.path.isdir(os.path.join(VOSK_MODEL_D
             break
 VOSK_SAMPLE_RATE = 16000                           # 16 kHz mono int16 is what Vosk expects
 DELIVER_WORDS = ("deliver", "delivery", "ready")   # grammar-locked trigger words
-VOICE_INPUT_KEYWORD = None                         # e.g. "Realtek" to force a specific mic; None = system default
+VOICE_INPUT_KEYWORD = "Bose"                         # e.g. "Realtek" to force a specific mic; None = system default
 VOICE_COOLDOWN_SECONDS = 1.0                       # ignore repeat triggers from the same utterance
 
 # Radio game (radio_script.py / panel_logic.py / game.py)
