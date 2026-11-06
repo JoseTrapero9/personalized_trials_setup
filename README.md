@@ -94,13 +94,6 @@ python live_evaluator.py --test s03_audio --webcam 0   # normal webcam instead o
 
 Row 1 starts right away. Say "deliver" (Vosk, same as the GUI) or press D: the row is evaluated and
 the next one starts. R = redo the row, Q = quit. Log: `logs/evaluator_test_<file>_<time>.csv`.
-The bottom-left of the window shows `voice ON` / `voice OFF: <reason>` and the last words heard.
-`--mic Bose` picks a microphone by name (default: Windows default input).
-
-**Voice not working?** Run `python voice_check.py` (or `python voice_check.py --mic Bose`): it checks the
-packages and the model, lists the microphones, opens the mic like the GUI does, and shows a volume bar,
-the words heard and each DELIVER for 30 s. Microphones that refuse 16 kHz (Bluetooth headsets) are opened
-at their own rate automatically.
 
 **Evaluation rules (test and live):**
 

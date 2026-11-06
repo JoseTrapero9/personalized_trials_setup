@@ -6,7 +6,6 @@ TEST (no GUI needed, run it right now):
     python live_evaluator.py --test                    # pick a log file in a window
     python live_evaluator.py --test s03_audio          # or name it (log_files/s03_audio.txt)
     python live_evaluator.py --test s03_audio --webcam 0   # test with a normal webcam instead of the XIMEA
-    python live_evaluator.py --test s03_audio --mic Bose   # use the microphone whose name contains "Bose"
   Row 1 of the file is active right away. Build the tray: every battery gets a check or a cross
   in the table as soon as the camera sees it. Say "deliver" (or press D) to evaluate the row and
   move on to the next one. R = redo the current row, Q / Esc = quit.
@@ -616,13 +615,13 @@ def compose(camera_img, tracker, link_text=None, link_ok=True, now=None):
     canvas = np.full((h, cam_w + panel_w, 3), 30, np.uint8)
     if camera_img is not None:
         canvas[:576, :cam_w] = cv2.resize(camera_img, (cam_w, 576))
-    y = 596
+    y = 598
     for note in tracker.notes[-2:]:
         cv2.putText(canvas, note[:120], (12, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (200, 200, 200), 1, cv2.LINE_AA)
-        y += 20
+        y += 22
     if link_text:
-        cv2.putText(canvas, link_text[:110], (12, 632), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                    (0, 200, 0) if link_ok else (0, 0, 255), 1 if len(link_text) > 40 else 2, cv2.LINE_AA)
+        cv2.putText(canvas, link_text, (cam_w - 190, 630), cv2.FONT_HERSHEY_SIMPLEX, 0.55,
+                    (0, 200, 0) if link_ok else (0, 0, 255), 2, cv2.LINE_AA)
     canvas[:, cam_w:] = render_panel(tracker, panel_w, h, now)
     return canvas
 
@@ -870,36 +869,17 @@ def choose_log_file(arg):
     return choose_log_file(name)
 
 
-class VoiceState:
-    def __init__(self):
-        self.listener = None
-        self.status = "voice OFF"
-        self.heard = ""
-
-    @property
-    def on(self):
-        return self.listener is not None and self.listener.stream is not None
-
-
-def start_voice(on_deliver, mic=None):
-    """Vosk 'deliver' listener from voice.py (same words as the GUI). Always returns a VoiceState;
-    its .status says why voice is off (missing package, model, microphone...)."""
-    state = VoiceState()
+def start_voice(on_deliver):
+    """Vosk 'deliver' listener from voice.py (same words / microphone as the GUI). None if unavailable."""
     try:
         from voice import VoiceDeliverListener
-        listener = VoiceDeliverListener(input_keyword=mic) if mic else VoiceDeliverListener()
-    except ImportError as e:
-        state.status = f"voice OFF: {e} (pip install vosk sounddevice PyQt5)"
-        print(f"[VOICE] {state.status} - press D for deliver.")
-        return state
+        listener = VoiceDeliverListener()
     except Exception as e:
-        state.status = f"voice OFF: {e}"
-        print(f"[VOICE] {state.status} - press D for deliver.")
-        return state
+        print(f"[INFO] Voice not available ({e}) - press D for deliver.")
+        return None
     if not listener.vosk_ready:
-        state.status = f"voice OFF: {listener.status}"
-        print(f"[VOICE] {state.status} - press D for deliver.")
-        return state
+        print("[INFO] Voice not available - press D for deliver.")
+        return None
     last = [0.0]
 
     def emit():   # replaces the Qt signal: no Qt event loop in this script
@@ -907,18 +887,10 @@ def start_voice(on_deliver, mic=None):
         if now - last[0] >= VOICE_COOLDOWN_SECONDS:
             last[0] = now
             on_deliver()
-    def heard(text, final):
-        state.heard = text
-
     listener._emit_deliver = emit
-    listener.on_text = heard
     listener.set_enabled(True)
-    state.listener = listener
-    state.status = ("voice ON: " if listener.stream is not None else "voice OFF: ") + listener.status
-    print(f"[VOICE] {state.status}")
-    if listener.stream is not None:
-        print("[VOICE] Say 'deliver' (or press D).")
-    return state
+    print("[INFO] Say 'deliver' (or press D).")
+    return listener
 
 
 # ---------------------------------------------------------------------------
@@ -932,7 +904,7 @@ def run_test(args):
     tracker.start_test(path)
     camera = CameraModel(args.webcam)
     deliver_event = threading.Event()
-    voice = start_voice(deliver_event.set, args.mic)
+    voice = start_voice(deliver_event.set)
     cv2.namedWindow("Battery evaluator - TEST", cv2.WINDOW_NORMAL)
     image = None
     try:
@@ -945,8 +917,8 @@ def run_test(args):
             if deliver_event.is_set():
                 deliver_event.clear()
                 tracker.deliver()
-            text = voice.status + (f'   heard: "{voice.heard}"' if voice.heard else "") + "   (D = deliver)"
-            cv2.imshow("Battery evaluator - TEST", compose(image, tracker, text, voice.on))
+            cv2.imshow("Battery evaluator - TEST",
+                       compose(image, tracker, "voice ON" if voice else "D = deliver", voice is not None))
             key = cv2.waitKey(1) & 0xFF
             if key in (ord("q"), ord("Q"), 27):
                 break
@@ -955,8 +927,8 @@ def run_test(args):
             elif key in (ord("r"), ord("R")):
                 tracker.redo_row()
     finally:
-        if voice.listener is not None:
-            voice.listener.stop()
+        if voice is not None:
+            voice.stop()
         camera.stop()
         tracker.close()
         cv2.destroyAllWindows()
@@ -1021,8 +993,6 @@ def main():
     ap.add_argument("--test", nargs="?", const="pick", metavar="FILE",
                     help="test mode without the GUI; FILE like s03_audio (no FILE = choose in a window)")
     ap.add_argument("--webcam", type=int, default=None, metavar="N", help="use webcam N instead of the XIMEA")
-    ap.add_argument("--mic", metavar="NAME", help="test mode: part of the microphone name (e.g. Bose); "
-                                                  "default = config.VOICE_INPUT_KEYWORD / Windows default")
     ap.add_argument("--subject", help="live mode: subject number, if started after the GUI setup screen")
     ap.add_argument("--condition", help="live mode: GUI condition name (baseline, audio, haptic, ...)")
     ap.add_argument("--no-camera", action="store_true", help="live mode: only follow the GUI markers")
