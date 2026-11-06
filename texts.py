@@ -4,6 +4,22 @@ from state import state
 
 T = {
     # ---------------- game HUD ----------------
+    "status_match": {"en": "FIND THE MATCH!", "es": "¡ENCUENTRA LA COINCIDENCIA!", "de": "FINDE DEN TREFFER!"},
+    "status_wait": {"en": "WAIT FOR YOUR INSTRUCTION!", "es": "¡ESPERA TU INSTRUCCIÓN!",
+                    "de": "WARTE AUF DEINE ANWEISUNG!"},
+    "status_answer": {"en": "ANSWER NOW!", "es": "¡RESPONDE AHORA!", "de": "JETZT ANTWORTEN!"},
+    "mode_hard": {"en": "HARD", "es": "DIFÍCIL", "de": "SCHWER"},
+    "start_hard_line": {
+        "en": "<br><b>HARD MODE:</b> between instructions, press the one button whose color matches its word "
+              "(<b>+{p}</b>, one try per change, missing costs nothing). Instructions count <b>double</b>, "
+              "mistakes cost <b>double</b>.",
+        "es": "<br><b>MODO DIFÍCIL:</b> entre instrucciones, presiona el único botón cuyo color coincide con su palabra "
+              "(<b>+{p}</b>, un intento por cambio, fallar no quita puntos). Las instrucciones valen <b>el doble</b> "
+              "y los errores cuestan <b>el doble</b>.",
+        "de": "<br><b>SCHWERER MODUS:</b> zwischen den Anweisungen drücke den einen Knopf, dessen Farbe zu seinem Wort "
+              "passt (<b>+{p}</b>, ein Versuch pro Wechsel, Verpassen kostet nichts). Anweisungen zählen "
+              "<b>doppelt</b>, Fehler kosten <b>doppelt</b>.",
+    },
     "radio_title": {"en": "PLANT RADIO", "es": "RADIO DE LA PLANTA", "de": "WERKSRADIO"},
     "score": {"en": "SCORE", "es": "PUNTOS", "de": "PUNKTE"},
     "next_cp": {"en": "CHECKPOINT IN {n}", "es": "PUNTO DE CONTROL EN {n}", "de": "KONTROLLPUNKT IN {n}"},
@@ -75,6 +91,33 @@ T = {
     "tut_back": {"en": "← Back", "es": "← Atrás", "de": "← Zurück"},
     "tut_next": {"en": "Next →", "es": "Siguiente →", "de": "Weiter →"},
     "tut_start": {"en": "Start Practice →", "es": "Empezar práctica →", "de": "Training starten →"},
+}
+
+HARD_TUTORIAL_STEP = {
+    "en": ("Hard mode · Find the match",
+           "While you wait for the next instruction, the buttons keep changing, and each time <b>one</b> "
+           "button's color <b>matches</b> its word (for example a <b>red</b> button that says RED).<br><br>"
+           "Press it before the buttons change: <b>+{p} points</b>. You get <b>one try</b> per change, "
+           "and missing it costs nothing.<br><br>"
+           "While the radio gives an instruction (<b>WAIT FOR YOUR INSTRUCTION!</b>) the buttons spin and the "
+           "arrows are <b>locked</b>. At <b>ANSWER NOW!</b> the real buttons appear: press the ones it said.<br><br>"
+           "Radio instructions now give <b>double points</b>, and mistakes cost <b>double</b>."),
+    "es": ("Modo difícil · Encuentra la coincidencia",
+           "Mientras esperas la siguiente instrucción, los botones siguen cambiando, y cada vez <b>un</b> "
+           "botón tiene el color que <b>coincide</b> con su palabra (por ejemplo un botón <b>rojo</b> que dice ROJO).<br><br>"
+           "Presiónalo antes de que cambien los botones: <b>+{p} puntos</b>. Tienes <b>un intento</b> por cambio, "
+           "y si no lo presionas no pierdes puntos.<br><br>"
+           "Mientras la radio da una instrucción (<b>¡ESPERA TU INSTRUCCIÓN!</b>) los botones giran y las "
+           "flechas están <b>bloqueadas</b>. En <b>¡RESPONDE AHORA!</b> aparecen los botones reales: presiona los que dijo.<br><br>"
+           "Las instrucciones de la radio ahora valen <b>el doble</b>, y los errores cuestan <b>el doble</b>."),
+    "de": ("Schwerer Modus · Finde den Treffer",
+           "Während du auf die nächste Anweisung wartest, wechseln die Knöpfe weiter, und jedes Mal "
+           "<b>passt</b> bei <b>einem</b> Knopf die Farbe zum Wort (zum Beispiel ein <b>roter</b> Knopf mit ROT).<br><br>"
+           "Drücke ihn, bevor die Knöpfe wechseln: <b>+{p} Punkte</b>. Du hast <b>einen Versuch</b> pro Wechsel, "
+           "und Verpassen kostet nichts.<br><br>"
+           "Während das Radio eine Anweisung gibt (<b>WARTE AUF DEINE ANWEISUNG!</b>), drehen sich die Knöpfe und die "
+           "Pfeiltasten sind <b>gesperrt</b>. Bei <b>JETZT ANTWORTEN!</b> erscheinen die echten Knöpfe: drücke die genannten.<br><br>"
+           "Radio-Anweisungen geben jetzt <b>doppelte Punkte</b>, und Fehler kosten <b>doppelt</b>."),
 }
 
 TUTORIAL = {

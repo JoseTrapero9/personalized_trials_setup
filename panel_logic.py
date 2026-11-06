@@ -37,6 +37,16 @@ def random_layout(rng):
             return list(zip(fills, labels))
 
 
+def match_layout(rng):
+    """Hard-mode match round: exactly one button whose word matches its color. -> (layout, pos)"""
+    fills = rng.sample(COLOR_KEYS, 3)
+    target = rng.randrange(3)
+    while True:
+        labels = rng.sample(COLOR_KEYS, 3)
+        if all((l == f) == (i == target) for i, (f, l) in enumerate(zip(fills, labels))):
+            return list(zip(fills, labels)), target
+
+
 def resolve_targets(layout, steps):
     """Screen position for each step, or None if a step is ambiguous / missing."""
     targets = []

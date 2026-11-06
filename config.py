@@ -62,6 +62,21 @@ RADIO_FX = True                    # light band-pass "radio" sound
 RADIO_STATIC_DB = -48              # constant soft hiss in dBFS (None = off)
 USE_RADIO_CONTAINER_CUES = True    # checkpoint announcement in the chosen language (else the old WAVs)
 
+# Game mode (chosen on the setup screen)
+GAME_MODES = ["normal", "hard"]
+# Hard mode: between instructions every button change shows exactly ONE button whose color matches
+# its word. Pressing it scores; a miss costs nothing; one press per change (no button mashing).
+HARD_INSTRUCTION_MULTIPLIER = 2    # radio instructions: double points when solved...
+HARD_PENALTY_MULTIPLIER = 2        # ...and double penalty when wrong / too late
+IDLE_HIT_POINTS = POINTS_PER_STEP * HARD_INSTRUCTION_MULTIPLIER // 2   # = half a hard one-button instruction (30)
+IDLE_WRONG_PENALTY = 0             # wrong button on a match round (0 = no penalty, the try is just used up)
+PRESS_GRACE_SECONDS = 0.5          # presses this soon after an instruction starts are ignored
+                                   # (they were aimed at the match round, not the instruction)
+LATE_PRESS_SECONDS = 0.25
+ROULETTE_DURING_INSTRUCTION = ("hard",)   # modes where the buttons spin + arrows lock while the radio
+                                          # speaks; the real buttons appear at ANSWER NOW. Add "normal" to use it there too.
+ROULETTE_FRAME_SECONDS = 0.09             # spin speed          # a press this soon after a button change still counts for the previous one
+
 LOG_TRAINING_CSV = False
 TRAINING_MARKER_PREFIX = "TRAIN_"
 

@@ -1,0 +1,78 @@
+import os
+import shutil
+import random
+
+# ================= CONFIGURATION =================
+BASE_DIR = r"C:\Users\karla\Documents\FabThesisVLM"
+AUTO_DIR = os.path.join(BASE_DIR, "auto_labeled", "ready_to_upload")
+DATASET_DIR = os.path.join(BASE_DIR, "dataset")
+
+TRAIN_RATIO = 0.85  # 85% to train, 15% to valid
+VALID_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp")
+# =================================================
+
+
+def main():
+    if not os.path.exists(AUTO_DIR):
+        raise FileNotFoundError(f"Auto-labeled folder not found: {AUTO_DIR}")
+
+    # Collect all valid image files in ready_to_upload
+    images = [
+        f for f in sorted(os.listdir(AUTO_DIR))
+        if f.lower().endswith(VALID_EXTENSIONS)
+    ]
+
+    paired_files = []
+    for img_name in images:
+        base_name = os.path.splitext(img_name)[0]
+        txt_name = f"{base_name}.txt"
+        txt_path = os.path.join(AUTO_DIR, txt_name)
+
+        # Ensure matching .txt annotation exists (and ignore classes.txt)
+        if os.path.exists(txt_path) and txt_name != "classes.txt":
+            paired_files.append((img_name, txt_name))
+
+    if not paired_files:
+        print("[WARN] No matching image + .txt pairs found to merge.")
+        return
+
+    # Shuffle with a fixed seed for reproducible splits
+    random.seed(42)
+    random.shuffle(paired_files)
+
+    split_idx = int(len(paired_files) * TRAIN_RATIO)
+    train_pairs = paired_files[:split_idx]
+    valid_pairs = paired_files[split_idx:]
+
+    def copy_pairs(pairs, split_name):
+        img_dst_dir = os.path.join(DATASET_DIR, split_name, "images")
+        lbl_dst_dir = os.path.join(DATASET_DIR, split_name, "labels")
+        os.makedirs(img_dst_dir, exist_ok=True)
+        os.makedirs(lbl_dst_dir, exist_ok=True)
+
+        for img_file, txt_file in pairs:
+            # Prefix with 'auto_' to prevent any filename collisions
+            new_img_name = f"auto_{img_file}"
+            new_txt_name = f"auto_{txt_file}"
+
+            shutil.copy2(
+                os.path.join(AUTO_DIR, img_file),
+                os.path.join(img_dst_dir, new_img_name)
+            )
+            shutil.copy2(
+                os.path.join(AUTO_DIR, txt_file),
+                os.path.join(lbl_dst_dir, new_txt_name)
+            )
+
+    copy_pairs(train_pairs, "train")
+    copy_pairs(valid_pairs, "valid")
+
+    print("==================================================")
+    print("[DONE] Auto-labeled data merged into dataset!")
+    print(f"  -> Added to train : {len(train_pairs)} images + labels")
+    print(f"  -> Added to valid : {len(valid_pairs)} images + labels")
+    print("==================================================")
+
+
+if __name__ == "__main__":
+    main()

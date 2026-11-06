@@ -33,6 +33,21 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/`, `workpieces/`,
   and language. Button positions are generated live, so a sentence never implies the keys.
   If someone needs more than 40, the condition reuses its own set (marker `Radio_Problem_Set_Exhausted_...`).
 
+## Game modes (setup screen)
+
+* **Normal**: as above.
+* **Hard**: while no instruction is active, every button change is a *match round*: exactly one
+  button's color matches its word. Press it before the next change for `IDLE_HIT_POINTS` (+30, half of
+  a hard one-button instruction). Missing costs nothing; one try per change (wrong press uses it up).
+  Radio instructions pay double and cost double. Checkpoints still count only radio instructions.
+  A press within `LATE_PRESS_SECONDS` of a change counts for the previous round; presses in the first
+  `PRESS_GRACE_SECONDS` of an instruction are ignored. Markers `Radio_Match_*`, CSV rows of type `match`.
+  Separate leaderboards (`arcade_scores_<condition>_hard.json`).
+* Hard mode banner: FIND THE MATCH! / WAIT FOR YOUR INSTRUCTION! / ANSWER NOW!. While the radio speaks
+  an instruction the buttons spin (random faces) and the arrows are locked (`Radio_Press_Blocked_*`);
+  the real buttons appear at ANSWER NOW (= `Radio_Instruction_End_*`). `ROULETTE_DURING_INSTRUCTION`
+  in config.py also enables this for normal mode.
+
 ## Files
 
 | file | what |

@@ -5,6 +5,10 @@ Bimodal by design:
   * WHERE it is exists only on the screen: 3 buttons (Left / Up / Right keys) whose colors and
     words keep changing and never match each other (Stroop). They freeze while a problem is active.
 
+Hard mode (state.game_mode == "hard"): while no instruction is active, every button change is a
+"match round": exactly one button's word matches its color; pressing it scores IDLE_HIT_POINTS,
+a miss costs nothing, one press per round. Instructions pay double and cost double.
+
 Public API used by DualTaskScreen:
     start(), stop(), shutdown(), press(pos), set_pause(...), set_pause_seconds(n),
     set_system_failed(active, blink), set_counting(on), reset_checkpoint_counter(),
@@ -23,13 +27,15 @@ from PyQt5.QtWidgets import QWidget
 
 from audio import audio_sys
 from config import (
-    FAIL_PENALTY, FILLER_GAP_SECONDS, LOG_TRAINING_CSV, POINTS_PER_STEP, PROBLEM_GAP_SECONDS,
-    PROBLEMS_PER_CHECKPOINT, RESPONSE_SECONDS, RESUME_GAP_SECONDS, SHOW_RESPONSE_BAR,
-    SHUFFLE_SECONDS, base_dir
+    FAIL_PENALTY, FILLER_GAP_SECONDS, HARD_INSTRUCTION_MULTIPLIER, HARD_PENALTY_MULTIPLIER,
+    IDLE_HIT_POINTS, IDLE_WRONG_PENALTY, LATE_PRESS_SECONDS, ROULETTE_DURING_INSTRUCTION, ROULETTE_FRAME_SECONDS, LOG_TRAINING_CSV, POINTS_PER_STEP,
+    PRESS_GRACE_SECONDS, PROBLEM_GAP_SECONDS, PROBLEMS_PER_CHECKPOINT, RESPONSE_SECONDS,
+    RESUME_GAP_SECONDS, SHOW_RESPONSE_BAR, SHUFFLE_SECONDS, base_dir
 )
 from lsl_markers import send_marker
 from panel_logic import (
-    build_pool, layout_for, layout_to_str, problem_order, random_layout, resolve_targets, steps_to_str
+    build_pool, layout_for, layout_to_str, match_layout, problem_order, random_layout, resolve_targets,
+    steps_to_str
 )
 from radio import ClipBank, RadioPlayer
 from radio_script import FEEDBACK, FILLER, LABELS, all_clips
@@ -83,6 +89,12 @@ class RadioPanelGame(QWidget):
         self.recent_fillers = deque(maxlen=6)
         self.next_problem_at = self.next_filler_at = self.next_shuffle_at = 0.0
         self.flash = None                 # (outcome, time)
+        self.hard = False
+        self.roulette = False
+        self.idle = None                  # current match round (hard mode)
+        self.prev_idle = None             # last closed round, can still take a late press
+        self.idle_n = 0
+        self.popups = []                  # (pos, text, color, time)
         self._paused_at = 0.0
         self.key_flash = [0.0, 0.0, 0.0]
         self.eq = [0.0] * 18
@@ -118,15 +130,20 @@ class RadioPanelGame(QWidget):
         self.pending_checkpoint = False
         self.flash = None
         self.csv_path = None
-        self.layout = random_layout(self.rng)
+        self.hard = state.game_mode == "hard"
+        self.roulette = state.game_mode in ROULETTE_DURING_INSTRUCTION
+        self.idle = self.prev_idle = None
+        self.idle_n = 0
+        self.popups = []
 
         now = time.perf_counter()
+        self._new_layout(now)
         self.next_filler_at = now + 0.5
         self.next_problem_at = now + 6.0
         self.next_shuffle_at = now + SHUFFLE_SECONDS
         self.running = True
         self.player.stop()
-        send_marker(f"Radio_Game_Start_Lang_{lang}_Voice_{(self.bank.voice or 'none').replace(' ', '')}"
+        send_marker(f"Radio_Game_Start_Mode_{state.game_mode}_Lang_{lang}_Voice_{(self.bank.voice or 'none').replace(' ', '')}"
                     f"_Silent_{int(self.player.silent or not self.bank.ok)}")
         self.timer.start(30)
         self.update()
@@ -134,6 +151,8 @@ class RadioPanelGame(QWidget):
     def stop(self):
         if self.problem is not None:
             self._interrupt("stopped")
+        self._close_idle(time.perf_counter(), "stopped")
+        self._finalize_prev_idle(force=True)
         self.running = False
         self.timer.stop()
         if self.player is not None:
@@ -150,6 +169,8 @@ class RadioPanelGame(QWidget):
         now = time.perf_counter()
         if paused and not self.paused:
             self._paused_at = now
+            self._close_idle(now, "paused")
+            self._finalize_prev_idle(force=True)
             if self.problem is not None:
                 self._hold_problem(now)
             if self.player is not None:
@@ -159,6 +180,8 @@ class RadioPanelGame(QWidget):
                 self._resume_problem(now)
             self.next_problem_at = max(self.next_problem_at, now + RESUME_GAP_SECONDS)
             self.next_filler_at = now + 0.4
+            if self.problem is None:
+                self.next_shuffle_at = now          # fresh match round right away
         self.paused = paused
         self.update()
 
@@ -194,7 +217,26 @@ class RadioPanelGame(QWidget):
         self.key_flash[pos] = now
         p = self.problem
         if p is None:
-            send_marker(f"Radio_Press_NoProblem_Pos_{pos}")
+            if self.hard:
+                if not self._late_idle_press(pos, now):
+                    if self.idle is not None:
+                        self._idle_answer(self.idle, pos, now)
+                    else:
+                        send_marker(f"Radio_Press_NoTarget_Pos_{pos}")
+            else:
+                send_marker(f"Radio_Press_NoProblem_Pos_{pos}")
+            self.update()
+            return
+        if self._spinning():
+            # Buttons are spinning while the radio speaks: arrows are locked
+            # (a press right at the start may still belong to the match round that was just replaced)
+            if not (self.hard and self._late_idle_press(pos, now)):
+                send_marker(f"Radio_Press_Blocked_{p['id']}_Pos_{pos}")
+            self.update()
+            return
+        if now - p["onset"] < PRESS_GRACE_SECONDS:
+            if not (self.hard and self._late_idle_press(pos, now)):
+                send_marker(f"Radio_Press_Ignored_Grace_{p['id']}_Pos_{pos}")
             self.update()
             return
         p["presses"].append(pos)
@@ -247,8 +289,8 @@ class RadioPanelGame(QWidget):
                 self._play_filler()
 
         if self.problem is None and now >= self.next_shuffle_at:
-            self.layout = random_layout(self.rng)
-            self.next_shuffle_at = now + SHUFFLE_SECONDS
+            self._new_layout(now)
+        self._finalize_prev_idle()
         self.update()
 
     def _on_clip_finished(self, cid, now):
@@ -271,6 +313,7 @@ class RadioPanelGame(QWidget):
             send_marker(f"Radio_Problem_Set_Exhausted_Reusing_Cycle_{self.order_idx // len(self.order) + 1}")
         base = self.order[self.order_idx % len(self.order)]
         self.order_idx += 1
+        self._close_idle(now, "instruction")
         layout = layout_for(base["steps"], self.rng)
         targets = resolve_targets(layout, base["steps"])
         self.layout = layout
@@ -296,9 +339,11 @@ class RadioPanelGame(QWidget):
             end = p.get("replay_start", p["onset"]) + p["instr_dur"]
         rt_after = now - end - p["paused_after_instr"]   # negative = answered before the instruction ended
         if outcome == "solved":
-            self.score += POINTS_PER_STEP * len(p["targets"])
+            mult = HARD_INSTRUCTION_MULTIPLIER if self.hard else 1
+            self.score += POINTS_PER_STEP * len(p["targets"]) * mult
         else:
-            self.score = max(0, self.score - FAIL_PENALTY)
+            mult = HARD_PENALTY_MULTIPLIER if self.hard else 1
+            self.score = max(0, self.score - FAIL_PENALTY * mult)
         send_marker(f"Radio_Problem_{outcome.capitalize()}_{p['id']}_RT_{rt:.3f}"
                     f"_RTafterInstr_{rt_after:.3f}_Score_{self.score}")
 
@@ -314,8 +359,73 @@ class RadioPanelGame(QWidget):
                 self.counted = 0
                 self.pending_checkpoint = True
         self.next_problem_at = now + fb_dur + self.rng.uniform(*PROBLEM_GAP_SECONDS)
-        self.next_shuffle_at = now + 1.0
+        self.next_shuffle_at = now              # hard mode: next match round right away
         self._log(p, outcome, rt, rt_after)
+
+    def _spinning(self):
+        """True while the radio is still giving the instruction and the buttons are hidden."""
+        p = self.problem
+        return self.roulette and p is not None and p["instr_end"] is None and not self.paused
+
+    # ------------------------------------------------------------------ hard mode: match rounds
+    def _new_layout(self, now):
+        """Idle button change. Normal mode: all mismatched. Hard mode: a new match round."""
+        self._close_idle(now, "changed")
+        if self.hard:
+            self.layout, target = match_layout(self.rng)
+            self.idle_n += 1
+            self.idle = {"n": self.idle_n, "layout": self.layout, "target": target, "shown_at": now,
+                         "answered": False, "presses": []}
+            send_marker(f"Radio_Match_Round_{self.idle_n}_Target_{target}_Layout_{layout_to_str(self.layout)}")
+        else:
+            self.layout = random_layout(self.rng)
+        self.next_shuffle_at = now + SHUFFLE_SECONDS
+
+    def _close_idle(self, now, why):
+        """End the current match round; it can still take a press for LATE_PRESS_SECONDS."""
+        if self.idle is None:
+            return
+        self._finalize_prev_idle(force=True)
+        self.idle["closed_at"] = now
+        self.idle["closed_by"] = why
+        self.prev_idle, self.idle = self.idle, None
+
+    def _late_idle_press(self, pos, now):
+        pi = self.prev_idle
+        if pi is not None and not pi["answered"] and now - pi["closed_at"] <= LATE_PRESS_SECONDS:
+            self._idle_answer(pi, pos, now, late=True)
+            return True
+        return False
+
+    def _finalize_prev_idle(self, force=False):
+        pi = self.prev_idle
+        if pi is None:
+            return
+        if not force and time.perf_counter() - pi["closed_at"] <= LATE_PRESS_SECONDS:
+            return
+        self.prev_idle = None
+        if not pi["answered"] and pi["closed_by"] not in ("paused", "stopped"):
+            send_marker(f"Radio_Match_Miss_{pi['n']}")
+            self._log_idle(pi, "miss", None)
+
+    def _idle_answer(self, idle, pos, now, late=False):
+        idle["presses"].append(pos)
+        if idle["answered"]:
+            send_marker(f"Radio_Match_Extra_Press_{idle['n']}_Pos_{pos}")
+            return
+        idle["answered"] = True
+        rt = now - idle["shown_at"]
+        if pos == idle["target"]:
+            self.score += IDLE_HIT_POINTS
+            outcome = "hit"
+            self.popups.append((pos, f"+{IDLE_HIT_POINTS}", "#4ADE80", now))
+        else:
+            self.score = max(0, self.score - IDLE_WRONG_PENALTY)
+            outcome = "wrong"
+            self.popups.append((pos, "✗" if not IDLE_WRONG_PENALTY else f"-{IDLE_WRONG_PENALTY}", "#F87171", now))
+        send_marker(f"Radio_Match_{outcome.capitalize()}_{idle['n']}_Pos_{pos}_Target_{idle['target']}"
+                    f"_RT_{rt:.3f}_Late_{int(late)}_Score_{self.score}")
+        self._log_idle(idle, outcome, rt)
 
     def _hold_problem(self, now):
         """A pause (e.g. saying DELIVER) freezes the active problem instead of cancelling it,
@@ -348,6 +458,18 @@ class RadioPanelGame(QWidget):
 
     # ------------------------------------------------------------------ logging
     def _log(self, p, outcome, rt, rt_after):
+        self._write_row([
+            p["id"], p["type"], len(p["steps"]), steps_to_str(p["steps"]), layout_to_str(p["layout"]),
+            "-".join(map(str, p["targets"])), "-".join(map(str, p["presses"])), int(p["counted"]),
+            outcome, round(rt, 3), "" if rt_after is None else round(rt_after, 3),
+            round(p["paused_s"], 3), p["replays"]])
+
+    def _log_idle(self, idle, outcome, rt):
+        self._write_row([
+            f"match{idle['n']:04d}", "match", 1, "", layout_to_str(idle["layout"]), idle["target"],
+            "-".join(map(str, idle["presses"])), 0, outcome, "" if rt is None else round(rt, 3), "", 0, 0])
+
+    def _write_row(self, values):
         if state.training_active and not LOG_TRAINING_CSV:
             return
         try:
@@ -362,18 +484,14 @@ class RadioPanelGame(QWidget):
                 self.csv_path = os.path.join(log_dir, f"{subj}_{state.current_condition}_radio_{stamp}.csv")
                 with open(self.csv_path, "w", newline="", encoding="utf-8") as f:
                     csv.writer(f).writerow([
-                        "subject", "condition", "language", "problem_id", "type", "n_steps", "steps",
+                        "subject", "condition", "game_mode", "language", "problem_id", "type", "n_steps", "steps",
                         "layout", "targets", "presses", "counted_for_checkpoint", "outcome",
                         "rt_from_onset_s", "rt_after_instruction_s", "paused_s", "instruction_replays",
                         "score"])
             with open(self.csv_path, "a", newline="", encoding="utf-8") as f:
-                csv.writer(f).writerow([
-                    state.subject_number, state.current_condition, state.language, p["id"], p["type"],
-                    len(p["steps"]), steps_to_str(p["steps"]), layout_to_str(p["layout"]),
-                    "-".join(map(str, p["targets"])), "-".join(map(str, p["presses"])),
-                    int(p["counted"]), outcome, round(rt, 3),
-                    "" if rt_after is None else round(rt_after, 3), round(p["paused_s"], 3), p["replays"],
-                    self.score])
+                csv.writer(f).writerow(
+                    [state.subject_number, state.current_condition, state.game_mode, state.language]
+                    + values + [self.score])
         except Exception as e:
             print(f"Radio log error: {e}")
 
@@ -424,7 +542,8 @@ class RadioPanelGame(QWidget):
         painter.setFont(QFont("Helvetica", 15, QFont.Bold))
         painter.setPen(QColor("#94A3B8"))
         painter.drawText(QRectF(radio.left() + 18, radio.top() + 8, radio.width() - 36, 28),
-                         Qt.AlignLeft | Qt.AlignVCenter, t("radio_title"))
+                         Qt.AlignLeft | Qt.AlignVCenter,
+                         t("radio_title") + (f"  ·  {t('mode_hard')}" if self.hard else ""))
         talking = self.player is not None and self.player.busy() and not self.paused
         painter.setPen(Qt.NoPen)
         painter.setBrush(QColor("#EF4444") if talking else QColor("#4B5563"))
@@ -439,7 +558,32 @@ class RadioPanelGame(QWidget):
 
         # Response time bar (only after the instruction has ended)
         p = self.problem
+        # Hard mode: tell the participant which task is on
         bar_y = radio.bottom() + 18
+        if self.hard and not self.paused:
+            status = None
+            if p is not None:
+                status = (t("status_answer"), "#FB923C") if p["instr_end"] is not None \
+                    else (t("status_wait"), "#FACC15")
+            elif self.idle is not None:
+                status = (t("status_match"), "#4ADE80")
+            srect = QRectF(w * 0.12, radio.bottom() + 12, w * 0.76, 46)
+            if status is not None:
+                col = QColor(status[1])
+                painter.setPen(QPen(col, 3))
+                bgc = QColor(col)
+                bgc.setAlpha(40)
+                painter.setBrush(bgc)
+                painter.drawRoundedRect(srect, 12, 12)
+                size = 22
+                font = QFont("Helvetica", size, QFont.Black)
+                while size > 11 and QFontMetrics(font).horizontalAdvance(status[0]) > srect.width() - 24:
+                    size -= 1
+                    font.setPointSize(size)
+                painter.setFont(font)
+                painter.setPen(col)
+                painter.drawText(srect, Qt.AlignCenter, status[0])
+            bar_y = srect.bottom() + 12
         if SHOW_RESPONSE_BAR and p is not None and p["deadline"] is not None:
             frac = max(0.0, min(1.0, (p["deadline"] - now) / RESPONSE_SECONDS))
             full = QRectF(w * 0.12, bar_y, w * 0.76, 12)
@@ -453,7 +597,12 @@ class RadioPanelGame(QWidget):
         gap = w * 0.04
         bw = (w - 2 * w * 0.06 - 2 * gap) / 3
         bh = min(bw * 0.9, h - top - 110)
-        for pos, (fill, label) in enumerate(self.layout):
+        spinning = self._spinning()
+        faces = self.layout
+        if spinning:   # random faces, real buttons hidden until the instruction ends
+            frame = int(now / ROULETTE_FRAME_SECONDS)
+            faces = random_layout(random.Random(frame))
+        for pos, (fill, label) in enumerate(faces):
             x = w * 0.06 + pos * (bw + gap)
             rect = QRectF(x, top, bw, bh)
             painter.setPen(QPen(QColor("#E2E8F0"), 3))
@@ -476,12 +625,32 @@ class RadioPanelGame(QWidget):
                 painter.drawText(badge, Qt.AlignCenter, "✓")
             # key cap
             cap = QRectF(rect.center().x() - 34, rect.bottom() + 16, 68, 52)
-            painter.setPen(QPen(QColor("#64748B"), 2))
-            painter.setBrush(QColor("#1E293B"))
+            painter.setPen(QPen(QColor("#334155" if spinning else "#64748B"), 2))
+            painter.setBrush(QColor("#0F172A" if spinning else "#1E293B"))
             painter.drawRoundedRect(cap, 10, 10)
-            painter.setPen(QColor("#E2E8F0"))
+            painter.setPen(QColor("#475569" if spinning else "#E2E8F0"))
             painter.setFont(QFont("Helvetica", 24, QFont.Bold))
             painter.drawText(cap, Qt.AlignCenter, KEY_GLYPHS[pos])
+            if spinning:   # locked: dim veil + strike over the key cap
+                painter.setPen(Qt.NoPen)
+                painter.setBrush(QColor(11, 18, 32, 70))
+                painter.drawRoundedRect(rect, 18, 18)
+                painter.setPen(QPen(QColor("#94A3B8"), 3))
+                painter.drawLine(cap.topLeft() + QPointF(10, 10), cap.bottomRight() - QPointF(10, 10))
+
+        # Match-round feedback (hard mode)
+        self.popups = [pp for pp in self.popups if now - pp[3] < 0.9]
+        for pos, text, color, t0 in self.popups:
+            age = (now - t0) / 0.9
+            x = w * 0.06 + pos * (bw + gap)
+            c = QColor(color)
+            c.setAlpha(int(255 * (1 - age)))
+            painter.setPen(QPen(c, 6))
+            painter.setBrush(Qt.NoBrush)
+            painter.drawRoundedRect(QRectF(x, top, bw, bh), 18, 18)
+            painter.setPen(c)
+            painter.setFont(QFont("Helvetica", 30, QFont.Black))
+            painter.drawText(QRectF(x, top - 50 - 30 * age, bw, 44), Qt.AlignCenter, text)
 
         if self.bank is not None and (not self.bank.ok or (self.player and self.player.silent)):
             painter.setPen(QColor("#F97316"))

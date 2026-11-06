@@ -9,6 +9,7 @@ class SessionState:
         self.subject_number = "1"
         self.current_condition = "training"
         self.training_active = False
+        self.game_mode = "normal"     # "normal" | "hard"
         self.language = "en"          # "en" | "es" | "de" (radio + participant screens)
         self.training_sequence = []   # built per session in training mode
         self.controller = None        # the main window (set in main.py)
