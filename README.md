@@ -14,7 +14,7 @@ Missing a voice: Windows Settings > Time & language > Speech > Add voices
 (Spanish (Mexico), German (Germany)), then re-run the generator.
 After editing `radio_script.py`, re-run the generator; it only redoes changed clips.
 
-Folders that must sit next to `main.py`: `audios/`, `log_files/`, `workpieces/`,
+Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `workpieces/`,
 `model/` (Vosk), `radio_audio/` (generated) and `robot_sequence.py`.
 
 ## The game
@@ -61,6 +61,53 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/`, `workpieces/`,
 | `game.py` | the radio button game (left panel) |
 | `texts.py` | participant screen text in EN / ES / DE |
 | `screens/` | setup (incl. language), tutorial, start, dual task, scoreboard |
+| `sequences.py` | loads `log_files/sXX_<condition>.txt` |
+| `generate_log_files.py` | makes `log_files/` + answer-key PDF |
+| `live_evaluator.py` | camera PC: YOLO tray check, follows the GUI over LSL, sends verdicts |
+| `evaluator_link.py` | GUI side: receives the camera verdicts |
+
+## Battery sequences (`log_files/`)
+
+* `log_files/sXX_<condition>.txt` (s01-s25): 17 pieces each, tab separated `piece sum instruction answer`.
+  File names: `audio`, `audio_haptics`, `baseline`, `fast`, `haptics`, `slow`
+  (GUI conditions `audio`, `audio_haptic`, `baseline`, `robot_fast`, `haptic`, `robot_slow`).
+* The GUI loads the file of the chosen subject + condition (round N = piece N, first 8 pieces used) and
+  sends the marker `Sequence_File_<name>`. Missing file -> fallback `s06_haptics.txt` (`Sequence_File_fallback`).
+* `log_files/Answer_Key_s01-s25.pdf`: every subject and condition with the answers (one page per subject).
+* `python generate_log_files.py [--subjects 30] [--seed 2026]` rebuilds all files + the PDF (seeded:
+  the same seed gives the same files). Needs `reportlab` for the PDF.
+
+## Camera evaluator on a second PC (`live_evaluator.py`)
+
+Runs on the camera PC with the YOLO model (`live_test.py` settings). Both PCs on the same network;
+LSL finds the streams by itself, no IP setup.
+
+```
+GUI PC  --LSL "ParadigmMarkers"-->  camera PC   (subject, condition, round, deliver, handover ...)
+GUI PC  <--LSL "BatteryEvaluator"--  camera PC  (Eval_Prediction_..., Eval_Verdict_Round_<r>_correct|incorrect_...)
+```
+
+* Mirrors the GUI timers (retrieval, assembly 15/20/25 s, delivery window, overtime) from the markers.
+* Expected answer = `log_files/sXX_<condition>.txt`, checked against the sum + instruction the GUI showed
+  (on a mismatch it uses what the GUI showed and sends `Eval_Log_Mismatch_...`).
+* A tray reading counts once it is stable for `STABLE_FRAMES` frames with no hand in view. While building
+  it predicts `on_track / off_track / correct / wrong`; at the handover it sends the verdict.
+* GUI: the verdict is applied like the y / c keys, whichever comes first
+  (`Assembly_Evaluation_Source_camera|researcher_Round_<r>`). `USE_REMOTE_EVALUATOR = False` in config.py
+  turns this off. No verdict (`Eval_NoVerdict_...`) if fewer than 3 batteries were read -> evaluate with y / c.
+* Writes `logs/evaluator_sXX_<condition>_<time>.csv` on the camera PC (expected vs read, verdict, researcher
+  evaluation, time until the tray was first correct vs first "deliver", ...).
+
+```powershell
+python live_evaluator.py                  # camera + YOLO
+python live_evaluator.py --no-camera      # test the link: prints the GUI phase/timer it follows
+python live_evaluator.py --predict-only   # never send verdicts, only predict and log
+python live_evaluator.py --subject 3 --condition audio   # started after the GUI setup screen
+```
+
+The camera PC needs this repo (for `log_files/`, `config.py`, `sequences.py`), `pylsl` and the
+`live_test.py` packages (ultralytics, torch, opencv, XIMEA API). Allow Python through the Windows
+firewall on both PCs (private network) or LSL cannot see the other PC.
 
 ## Logs
 

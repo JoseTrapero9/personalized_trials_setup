@@ -71,7 +71,43 @@ def load_synch_sequence(path=os.path.join(base_dir, "log_files", "s06_haptics.tx
     return sequence
 
 
-WORKPIECE_SEQUENCE = load_synch_sequence()
+WORKPIECE_SEQUENCE = load_synch_sequence()   # fallback when a subject has no file for a condition
+
+# GUI condition -> file-name suffix used in log_files/ (sXX_<suffix>.txt)
+CONDITION_FILE_NAMES = {
+    "baseline": "baseline",
+    "audio": "audio",
+    "haptic": "haptics",
+    "audio_haptic": "audio_haptics",
+    "robot_fast": "fast",
+    "robot_slow": "slow",
+}
+
+
+def subject_tag(subject_number):
+    try:
+        return f"s{int(subject_number):02d}"
+    except (TypeError, ValueError):
+        return f"s_{subject_number}"
+
+
+def sequence_path(subject_number, condition):
+    """log_files/sXX_<condition>.txt for this subject, or None (training / unknown condition)."""
+    suffix = CONDITION_FILE_NAMES.get(condition)
+    if suffix is None:
+        return None
+    return os.path.join(base_dir, "log_files", f"{subject_tag(subject_number)}_{suffix}.txt")
+
+
+def load_condition_sequence(subject_number, condition):
+    """Returns (sequence, file name). Falls back to WORKPIECE_SEQUENCE if the file is missing."""
+    path = sequence_path(subject_number, condition)
+    if path and os.path.exists(path):
+        seq = load_synch_sequence(path)
+        if seq:
+            return seq, os.path.basename(path)
+    print(f"Warning: no sequence file for subject {subject_number} / {condition} ({path}). Using fallback.")
+    return WORKPIECE_SEQUENCE, "fallback"
 COLOR_NAMES = {1: "Blue", 2: "Red", 3: "Yellow", 4: "Green"}
 
 

@@ -8,6 +8,7 @@ from audio import audio_sys
 from config import (
     MAX_ROUNDS_PER_CONDITION,
     TRAINING_ROUNDS,
+    USE_REMOTE_EVALUATOR,
     mistake_audio,
     mode_audio_haptic,
     mode_audio_only,
@@ -16,6 +17,7 @@ from config import (
     mode_robot_fast,
     mode_robot_slow
 )
+from evaluator_link import EvaluatorLink
 from haptics import activate_haptic_vest
 from lsl_markers import send_marker
 from robot import send_point_to_robot, set_robot_speed
@@ -73,6 +75,15 @@ class paradigmcontroller(QWidget):
 
         self.c_shortcut = QShortcut(QKeySequence("c"), self)
         self.c_shortcut.activated.connect(lambda: self.dual_task_screen.record_evaluation(False))
+
+        # Camera evaluator on the other PC (live_evaluator.py) - verdicts arrive over LSL
+        self.evaluator_link = None
+        if USE_REMOTE_EVALUATOR:
+            self.evaluator_link = EvaluatorLink(parent=self)
+            self.evaluator_link.verdict_received.connect(self.dual_task_screen.remote_verdict)
+            self.evaluator_link.connection_changed.connect(
+                lambda ok: send_marker("Evaluator_Connected" if ok else "Evaluator_Disconnected"))
+            self.evaluator_link.start()
 
         send_marker("Screen_Setup")
 

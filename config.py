@@ -36,6 +36,8 @@ TRAINING_ROUNDS = 3             # Practice rounds in training mode
 RETRIEVAL_SECONDS = 5           # 5-second safe pause at checkpoint to pick up a piece
 DELIVERY_WINDOW_SECONDS = 5     # 5-second safe pause after saying "deliver"
 TASK_SECONDS_DEFAULT = 20       # Assembly time in baseline / audio / haptic scenarios
+ROBOT_FAST_SECONDS = 15         # Assembly time in robot_fast
+ROBOT_SLOW_SECONDS = 25         # Assembly time in robot_slow
 WARNING_SECONDS = 10            # Red timer + blinking warning threshold
 
 # Voice ("deliver") recognition – offline Vosk
@@ -76,6 +78,22 @@ LATE_PRESS_SECONDS = 0.25
 ROULETTE_DURING_INSTRUCTION = ("hard",)   # modes where the buttons spin + arrows lock while the radio
                                           # speaks; the real buttons appear at ANSWER NOW. Add "normal" to use it there too.
 ROULETTE_FRAME_SECONDS = 0.09             # spin speed          # a press this soon after a button change still counts for the previous one
+
+# Remote camera evaluator (live_evaluator.py on the camera PC, same network).
+# It reads the ParadigmMarkers LSL stream and answers on its own LSL stream; a verdict is applied
+# exactly like the researcher's y / c keys (whichever comes first counts).
+USE_REMOTE_EVALUATOR = True
+EVALUATOR_STREAM_NAME = "BatteryEvaluator"
+
+
+def assembly_seconds(scenario):
+    """Assembly time per scenario (shared by the GUI and live_evaluator.py)."""
+    if scenario == "robot_fast":
+        return ROBOT_FAST_SECONDS
+    if scenario == "robot_slow":
+        return ROBOT_SLOW_SECONDS
+    return TASK_SECONDS_DEFAULT
+
 
 LOG_TRAINING_CSV = False
 TRAINING_MARKER_PREFIX = "TRAIN_"
