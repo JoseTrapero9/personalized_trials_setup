@@ -94,6 +94,10 @@ python live_evaluator.py --test s03_audio --webcam 0   # normal webcam instead o
 
 Row 1 starts right away. Say "deliver" (Vosk, same as the GUI) or press D: the row is evaluated and
 the next one starts. R = redo the row, Q = quit. Log: `logs/evaluator_test_<file>_<time>.csv`.
+Test mode plays feedback on the subject's audio output (Trekz; `--audio-out NAME` for another device,
+`--no-sounds` to turn it off): a random `audios/positive_sound1-3.wav` for a correct row, `buzzer.wav` or
+`incorrect_answer.wav` for a mistake. Every clip is cut to 1 s with a short fade-out (the files are not changed).
+Live mode plays no sounds for now.
 
 **Evaluation rules (test and live):**
 
