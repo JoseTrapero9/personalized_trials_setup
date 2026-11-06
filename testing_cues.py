@@ -5,35 +5,29 @@ import time
 import random
 import threading
 import websocket
-from PyQt5.QtCore import QPointF, QRectF, QTimer, Qt, QUrl
-from PyQt5.QtGui import QBrush, QColor, QFont, QFontMetrics, QLinearGradient, QPainter, QPainterPath, QPen
+from PyQt5.QtCore import QRectF, QTimer, Qt, QUrl
+from PyQt5.QtGui import QBrush, QColor, QFont, QLinearGradient, QPainter, QPen
 from PyQt5.QtWidgets import (
     QApplication, QComboBox, QDialog, QFormLayout, QHBoxLayout,
-    QLabel, QPushButton, QVBoxLayout, QWidget
+    QLabel, QLineEdit, QMessageBox, QPushButton, QVBoxLayout, QWidget
 )
 from PyQt5.QtMultimedia import QSoundEffect
 
-COLOR_HEX = {
-    "red": "#E53935",
-    "blue": "#1E5BD8",
-    "green": "#1E9E4A",
-    "yellow": "#F5C518",
-    "purple": "#8E44C9"
-}
-LABELS = {
-    "red": "RED",
-    "blue": "BLUE",
-    "green": "GREEN",
-    "yellow": "YELLOW",
-    "purple": "PURPLE"
-}
+# game parameters
+STEP_HIT_POINTS = 10
+UNIT_BONUS_POINTS = 20
+STEP_WRONG_PENALTY = 5
+TIME_TEST = 120  # game duration in seconds (120 = 2 minutes)
+
+STEPS_INFO = [
+    ("STEP 1: BASE ALIGNMENT", ["PORT A", "PORT B", "PORT C"]),
+    ("STEP 2: CORE INSERTION", ["CELL X", "CELL Y", "CELL Z"]),
+    ("STEP 3: CONDUIT ROUTING", ["LINE 1", "LINE 2", "LINE 3"]),
+    ("STEP 4: SEAL LOCKING", ["LOCK L", "LOCK C", "LOCK R"])
+]
 KEY_GLYPHS = ["←", "↑", "→"]
 
-# game parameters
-SHUFFLE_SECONDS = 2.5
-LATE_PRESS_SECONDS = 0.25
-IDLE_HIT_POINTS = 10
-IDLE_WRONG_PENALTY = 5
+LEADERBOARD_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "leaderboard.txt")
 
 # x16 motor group definitions (mapped across the 0-19 coordinate grid)
 BACK_ALL = list(range(20))
@@ -47,12 +41,57 @@ FRONT_LEFT = [0, 1, 4, 5, 8, 9, 12, 13, 16, 17]
 FRONT_RIGHT = [2, 3, 6, 7, 10, 11, 14, 15, 18, 19]
 
 
-class FeedbackController:
-    """manages persistent bhaptics player websocket connection, stimulus variants, and wav playback."""
+def load_leaderboard():
+    """reads leaderboard text file and returns entries sorted descending by score."""
+    scores = []
+    if os.path.exists(LEADERBOARD_FILE):
+        try:
+            with open(LEADERBOARD_FILE, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or ":" not in line:
+                        continue
+                    parts = line.rsplit(":", 1)
+                    name = parts[0].strip()
+                    try:
+                        score = int(parts[1].strip())
+                        scores.append((name, score))
+                    except ValueError:
+                        pass
+        except Exception as e:
+            print(f"error reading leaderboard file: {e}")
+    scores.sort(key=lambda x: x[1], reverse=True)
+    return scores
 
-    def __init__(self, base_dir=".", pos_mode="positive_1", neg_mode="negative_1"):
+
+def save_score(name, score):
+    """appends a score entry to the text file."""
+    try:
+        with open(LEADERBOARD_FILE, "a", encoding="utf-8") as f:
+            f.write(f"{name}: {score}\n")
+    except Exception as e:
+        print(f"error writing score to leaderboard file: {e}")
+
+
+def clear_leaderboard_file():
+    """wipes the leaderboard text file."""
+    try:
+        with open(LEADERBOARD_FILE, "w", encoding="utf-8") as f:
+            f.write("")
+    except Exception as e:
+        print(f"error clearing leaderboard file: {e}")
+
+
+class FeedbackController:
+    """manages persistent bhaptics player websocket connection, stimulus variants, spatial mapping, audio toggling, and wav playback."""
+
+    def __init__(self, base_dir=".", pos_mode="positive_1", neg_mode="negative_1", mapping_mode="correct_back", audio_enabled=True):
         self.pos_mode = pos_mode
         self.neg_mode = neg_mode
+        self.mapping_mode = mapping_mode
+        self.audio_enabled = audio_enabled
+        self._update_positions()
+
         self.ws_app = None
         self.connected = False
         self._start_bhaptics_client()
@@ -76,12 +115,23 @@ class FeedbackController:
         else:
             print(f"warning: audio file not found at {incorrect_path}")
 
-    def set_modes(self, pos_mode, neg_mode):
+    def set_modes(self, pos_mode, neg_mode, mapping_mode="correct_back", audio_enabled=True):
         self.pos_mode = pos_mode
         self.neg_mode = neg_mode
+        self.mapping_mode = mapping_mode
+        self.audio_enabled = audio_enabled
+        self._update_positions()
+
+    def _update_positions(self):
+        if self.mapping_mode == "correct_front":
+            self.pos_position = "VestFront"
+            self.neg_position = "VestBack"
+        else:  # default: correct_back
+            self.pos_position = "VestBack"
+            self.neg_position = "VestFront"
 
     def _start_bhaptics_client(self):
-        url = "ws://127.0.0.1:15881/v2/feedbacks?app_id=stroop_x16&app_name=Stroop_Haptic_Game"
+        url = "ws://127.0.0.1:15881/v2/feedbacks?app_id=assembly_x16&app_name=Procedural_Assembly_Game"
 
         def on_open(ws):
             self.connected = True
@@ -117,12 +167,13 @@ class FeedbackController:
     def _send_dot_frame(self, key, position, motor_tuples, duration_ms):
         if not self.connected or self.ws_app is None:
             return
+        unique_key = f"{key}_{time.time_ns()}"
         dots = [{"index": int(idx), "intensity": int(val)} for idx, val in motor_tuples]
         payload = {
             "Submit": [
                 {
                     "Type": "frame",
-                    "Key": key,
+                    "Key": unique_key,
                     "Frame": {
                         "position": position,
                         "dotPoints": dots,
@@ -138,7 +189,8 @@ class FeedbackController:
             print(f"bhaptics send error: {e}")
 
     def trigger_correct(self, mode_override=None):
-        if self.snd_correct.isLoaded():
+        if self.audio_enabled and self.snd_correct.isLoaded():
+            self.snd_correct.stop()
             self.snd_correct.play()
         mode = mode_override or self.pos_mode
         target_map = {
@@ -150,7 +202,8 @@ class FeedbackController:
         threading.Thread(target=fn, daemon=True).start()
 
     def trigger_incorrect(self, mode_override=None):
-        if self.snd_incorrect.isLoaded():
+        if self.audio_enabled and self.snd_incorrect.isLoaded():
+            self.snd_incorrect.stop()
             self.snd_incorrect.play()
         mode = mode_override or self.neg_mode
         target_map = {
@@ -161,61 +214,58 @@ class FeedbackController:
         fn = target_map.get(mode, self._neg_1_0p5hz)
         threading.Thread(target=fn, daemon=True).start()
 
-    # ------------------------------------------------------------------ positive patterns (back, < 1s)
+    # ------------------------------------------------------------------ positive patterns (<= 500 ms)
     def _pos_1_1p4hz(self):
-        # 1.4 hz modulation -> period is ~714 ms between pulse onsets
-        # pulse 1 at t = 0 ms (soft ramp up and down over 200 ms)
-        self._send_dot_frame("p1_a", "VestBack", [(i, 35) for i in BACK_ALL], 80)
-        time.sleep(0.07)
-        self._send_dot_frame("p1_b", "VestBack", [(i, 60) for i in BACK_ALL], 130)
-        # wait until t = 714 ms for the second 1.4 hz cycle
-        time.sleep(0.644)
-        # pulse 2 at t = 714 ms (200 ms duration -> total 914 ms)
-        self._send_dot_frame("p1_c", "VestBack", [(i, 35) for i in BACK_ALL], 80)
-        time.sleep(0.07)
-        self._send_dot_frame("p1_d", "VestBack", [(i, 60) for i in BACK_ALL], 130)
+        pos = self.pos_position
+        self._send_dot_frame("p1_a", pos, [(i, 35) for i in BACK_ALL], 60)
+        time.sleep(0.05)
+        self._send_dot_frame("p1_b", pos, [(i, 60) for i in BACK_ALL], 100)
+        time.sleep(0.18)
+        self._send_dot_frame("p1_c", pos, [(i, 35) for i in BACK_ALL], 60)
+        time.sleep(0.05)
+        self._send_dot_frame("p1_d", pos, [(i, 60) for i in BACK_ALL], 120)
 
     def _pos_2_upward_wave(self):
-        # smooth upward spatial wave from lower back to upper back (total ~600 ms)
-        self._send_dot_frame("p2_low", "VestBack", [(i, 35) for i in BACK_LOWER], 220)
-        time.sleep(0.18)
-        self._send_dot_frame("p2_mid", "VestBack", [(i, 50) for i in BACK_ALL], 200)
-        time.sleep(0.18)
-        self._send_dot_frame("p2_high", "VestBack", [(i, 65) for i in BACK_UPPER], 240)
+        pos = self.pos_position
+        self._send_dot_frame("p2_low", pos, [(i, 35) for i in BACK_LOWER], 160)
+        time.sleep(0.15)
+        self._send_dot_frame("p2_mid", pos, [(i, 50) for i in BACK_ALL], 160)
+        time.sleep(0.15)
+        self._send_dot_frame("p2_high", pos, [(i, 65) for i in BACK_UPPER], 180)
 
     def _pos_3_warm_swell(self):
-        # gentle gaussian-like envelope expanding from spine outward (total ~800 ms)
-        self._send_dot_frame("p3_1", "VestBack", [(i, 25) for i in BACK_CENTER], 200)
-        time.sleep(0.18)
-        self._send_dot_frame("p3_2", "VestBack", [(i, 55) for i in BACK_ALL], 350)
-        time.sleep(0.32)
-        self._send_dot_frame("p3_3", "VestBack", [(i, 25) for i in BACK_OUTER], 300)
+        pos = self.pos_position
+        self._send_dot_frame("p3_1", pos, [(i, 25) for i in BACK_CENTER], 150)
+        time.sleep(0.14)
+        self._send_dot_frame("p3_2", pos, [(i, 55) for i in BACK_ALL], 200)
+        time.sleep(0.14)
+        self._send_dot_frame("p3_3", pos, [(i, 25) for i in BACK_OUTER], 200)
 
-    # ------------------------------------------------------------------ negative patterns (front, < 1s)
+    # ------------------------------------------------------------------ negative patterns (<= 500 ms)
     def _neg_1_0p5hz(self):
-        # 0.5 hz modulation -> 2.0 s full period (active half-cycle = 950 ms heavy thud within 1s cap)
-        # heavy sustained chest compression that builds and cuts off abruptly
-        self._send_dot_frame("n1_a", "VestFront", [(i, 95) for i in FRONT_ALL], 450)
-        time.sleep(0.43)
-        self._send_dot_frame("n1_b", "VestFront", [(i, 100) for i in FRONT_ALL], 500)
+        pos = self.neg_position
+        self._send_dot_frame("n1_a", pos, [(i, 95) for i in FRONT_ALL], 240)
+        time.sleep(0.24)
+        self._send_dot_frame("n1_b", pos, [(i, 100) for i in FRONT_ALL], 240)
 
     def _neg_2_sharp_staccato(self):
-        # 3 rapid 100% intensity rectangular alarm bursts (~4 hz burst rate, total 620 ms)
+        pos = self.neg_position
         front_max = [(i, 100) for i in FRONT_ALL]
         for step in range(3):
-            self._send_dot_frame(f"n2_{step}", "VestFront", front_max, 120)
+            duration = 120 if step == 2 else 100
+            self._send_dot_frame(f"n2_{step}", pos, front_max, duration)
             if step < 2:
-                time.sleep(0.25)
+                time.sleep(0.18)
 
     def _neg_3_chest_jitter(self):
-        # jarring left-right alternating high-intensity buzz across the front (total 700 ms)
+        pos = self.neg_position
         left_max = [(i, 100) for i in FRONT_LEFT]
         right_max = [(i, 100) for i in FRONT_RIGHT]
         for step in range(5):
             pattern = left_max if step % 2 == 0 else right_max
-            self._send_dot_frame(f"n3_{step}", "VestFront", pattern, 130)
+            self._send_dot_frame(f"n3_{step}", pos, pattern, 90)
             if step < 4:
-                time.sleep(0.14)
+                time.sleep(0.09)
 
     def close(self):
         if self.ws_app is not None:
@@ -226,16 +276,20 @@ class FeedbackController:
 
 
 class StimulusConfigDialog(QDialog):
-    """startup selector allowing the experimenter to preview and pick haptic conditions."""
+    """startup selector allowing player name entry, haptic spatial mapping, audio modality, and haptic conditions preview."""
 
     def __init__(self, feedback_ctrl):
         super().__init__()
         self.feedback = feedback_ctrl
         self.setWindowTitle("Select Haptic Stimulus Conditions")
-        self.setMinimumWidth(440)
+        self.setMinimumWidth(500)
         self.setStyleSheet("""
             QDialog { background-color: #0F172A; color: #F8FAFC; }
             QLabel { color: #E2E8F0; font-size: 14px; font-weight: bold; }
+            QLineEdit {
+                background-color: #1E293B; color: #F8FAFC; border: 1px solid #475569;
+                border-radius: 6px; padding: 6px; font-size: 14px;
+            }
             QComboBox {
                 background-color: #1E293B; color: #F8FAFC; border: 1px solid #475569;
                 border-radius: 6px; padding: 6px; font-size: 13px;
@@ -245,6 +299,10 @@ class StimulusConfigDialog(QDialog):
                 border-radius: 6px; padding: 7px 14px; font-size: 13px; font-weight: bold;
             }
             QPushButton:hover { background-color: #475569; }
+            QPushButton#clearBtn {
+                background-color: #991B1B; border-color: #EF4444; font-size: 12px;
+            }
+            QPushButton#clearBtn:hover { background-color: #7F1D1D; }
             QPushButton#startBtn {
                 background-color: #16A34A; border-color: #22C55E; font-size: 15px; padding: 10px;
             }
@@ -258,81 +316,149 @@ class StimulusConfigDialog(QDialog):
         form = QFormLayout()
         form.setSpacing(14)
 
+        # player name field
+        self.name_input = QLineEdit()
+        self.name_input.setPlaceholderText("Enter your name")
+        self.name_input.setText("Player 1")
+        form.addRow(QLabel("Player Name:"), self.name_input)
+
+        # feedback modality selector (Haptic + Audio vs. Haptics Only)
+        self.modality_combo = QComboBox()
+        self.modality_combo.addItem("Haptics + Audio", True)
+        self.modality_combo.addItem("Haptics Only", False)
+        form.addRow(QLabel("Feedback Modality:"), self.modality_combo)
+
+        # spatial mapping selector
+        self.map_combo = QComboBox()
+        self.map_combo.addItem("Correct -> Back  |  Incorrect -> Front", "correct_back")
+        self.map_combo.addItem("Correct -> Front |  Incorrect -> Back", "correct_front")
+        self.map_combo.currentIndexChanged.connect(self._update_preview_labels)
+        form.addRow(QLabel("Location Mapping:"), self.map_combo)
+
         # positive selector + preview button
         pos_row = QHBoxLayout()
         self.pos_combo = QComboBox()
-        self.pos_combo.addItem("positive_1  (1.4 Hz Rhythmic Pulse - Back)", "positive_1")
-        self.pos_combo.addItem("positive_2  (Upward Spatial Wave - Back)", "positive_2")
-        self.pos_combo.addItem("positive_3  (Warm Gaussian Swell - Back)", "positive_3")
+        self.pos_combo.addItem("positive_1  (1.4 Hz Rhythmic Pulse)", "positive_1")
+        self.pos_combo.addItem("positive_2  (Upward Spatial Wave)", "positive_2")
+        self.pos_combo.addItem("positive_3  (Warm Gaussian Swell)", "positive_3")
         btn_test_pos = QPushButton("Test")
-        btn_test_pos.clicked.connect(lambda: self.feedback.trigger_correct(self.pos_combo.currentData()))
+        btn_test_pos.clicked.connect(self._test_positive)
         pos_row.addWidget(self.pos_combo, stretch=1)
         pos_row.addWidget(btn_test_pos)
-        form.addRow(QLabel("Correct (Back):"), pos_row)
+        self.lbl_pos = QLabel("Correct Cue:")
+        form.addRow(self.lbl_pos, pos_row)
 
         # negative selector + preview button
         neg_row = QHBoxLayout()
         self.neg_combo = QComboBox()
-        self.neg_combo.addItem("negative_1  (0.5 Hz Heavy Thud - Front)", "negative_1")
-        self.neg_combo.addItem("negative_2  (4 Hz Sharp Staccato - Front)", "negative_2")
-        self.neg_combo.addItem("negative_3  (5 Hz Left/Right Jitter - Front)", "negative_3")
+        self.neg_combo.addItem("negative_1  (0.5 Hz Heavy Thud)", "negative_1")
+        self.neg_combo.addItem("negative_2  (4 Hz Sharp Staccato)", "negative_2")
+        self.neg_combo.addItem("negative_3  (5 Hz Left/Right Jitter)", "negative_3")
         btn_test_neg = QPushButton("Test")
-        btn_test_neg.clicked.connect(lambda: self.feedback.trigger_incorrect(self.neg_combo.currentData()))
+        btn_test_neg.clicked.connect(self._test_negative)
         neg_row.addWidget(self.neg_combo, stretch=1)
         neg_row.addWidget(btn_test_neg)
-        form.addRow(QLabel("Incorrect (Front):"), neg_row)
+        self.lbl_neg = QLabel("Incorrect Cue:")
+        form.addRow(self.lbl_neg, neg_row)
 
         layout.addLayout(form)
 
-        # start button
-        btn_start = QPushButton("Start Stroop Game")
+        # clear leaderboard & start controls
+        bottom_row = QHBoxLayout()
+        btn_clear = QPushButton("Clear Leaderboard")
+        btn_clear.setObjectName("clearBtn")
+        btn_clear.clicked.connect(self._clear_leaderboard_action)
+        bottom_row.addWidget(btn_clear)
+
+        btn_start = QPushButton("Start Assembly Task")
         btn_start.setObjectName("startBtn")
         btn_start.clicked.connect(self.accept)
-        layout.addWidget(btn_start)
+        bottom_row.addWidget(btn_start, stretch=1)
+
+        layout.addLayout(bottom_row)
+        self._update_preview_labels()
+
+    def _update_preview_labels(self):
+        mapping = self.map_combo.currentData()
+        if mapping == "correct_front":
+            self.lbl_pos.setText("Correct (Front):")
+            self.lbl_neg.setText("Incorrect (Back):")
+        else:
+            self.lbl_pos.setText("Correct (Back):")
+            self.lbl_neg.setText("Incorrect (Front):")
+
+    def _test_positive(self):
+        self.feedback.set_modes(
+            self.pos_combo.currentData(),
+            self.neg_combo.currentData(),
+            self.map_combo.currentData(),
+            self.modality_combo.currentData()
+        )
+        self.feedback.trigger_correct()
+
+    def _test_negative(self):
+        self.feedback.set_modes(
+            self.pos_combo.currentData(),
+            self.neg_combo.currentData(),
+            self.map_combo.currentData(),
+            self.modality_combo.currentData()
+        )
+        self.feedback.trigger_incorrect()
+
+    def _clear_leaderboard_action(self):
+        reply = QMessageBox.question(
+            self, "Clear Leaderboard",
+            "Are you sure you want to clear all leaderboard entries?",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+        )
+        if reply == QMessageBox.Yes:
+            clear_leaderboard_file()
+            QMessageBox.information(self, "Leaderboard Cleared", "The leaderboard text file has been cleared.")
 
     def get_selections(self):
-        return self.pos_combo.currentData(), self.neg_combo.currentData()
+        name = self.name_input.text().strip() or "Player 1"
+        return (
+            self.pos_combo.currentData(),
+            self.neg_combo.currentData(),
+            self.map_combo.currentData(),
+            self.modality_combo.currentData(),
+            name
+        )
 
 
-def generate_stroop_round(rng):
-    """returns a 3-button layout where exactly one button has matching fill and label."""
-    colors = list(COLOR_HEX.keys())
-    target_pos = rng.randrange(3)
-    layout = []
+class ProceduralAssemblyGame(QWidget):
+    """manual-progression assembly where rejected units remain frozen until user advances to a new unit."""
 
-    for pos in range(3):
-        if pos == target_pos:
-            c = rng.choice(colors)
-            layout.append((c, c))
-        else:
-            fill = rng.choice(colors)
-            label = rng.choice([c for c in colors if c != fill])
-            layout.append((fill, label))
-
-    return layout, target_pos
-
-
-class StroopHapticGame(QWidget):
-    def __init__(self, feedback_ctrl):
+    def __init__(self, feedback_ctrl, player_name="Player 1"):
         super().__init__()
         self.feedback = feedback_ctrl
+        self.player_name = player_name
+        audio_str = "Audio ON" if self.feedback.audio_enabled else "Haptics Only"
         self.setWindowTitle(
-            f"Stroop Task - bHaptics X16 [{self.feedback.pos_mode} | {self.feedback.neg_mode}]"
+            f"Procedural Assembly - bHaptics X16 [{self.feedback.pos_mode} | {self.feedback.neg_mode} | Map: {self.feedback.mapping_mode} | {audio_str}]"
         )
-        self.setMinimumSize(640, 480)
+        self.setMinimumSize(840, 620)
         self.setFocusPolicy(Qt.StrongFocus)
 
         self.rng = random.Random()
-        self.score = 0
-        self.round_n = 0
-        self.current_round = None
-        self.prev_round = None
-        self.layout = [("red", "blue"), ("green", "yellow"), ("purple", "red")]
+        self.visible_score = 0
+        self.pending_score = 0
+        self.units_completed = 0
+        self.game_start_time = 0.0
+        self.is_game_over = False
+        self.score_saved = False
+        self.leaderboard_data = []
 
-        self.flash = None
-        self.key_flash = [0.0, 0.0, 0.0]
-        self.popups = []
-        self.next_shuffle_at = 0.0
+        # assembly state variables
+        self.target_sequence = []
+        self.current_step = 0
+        self.installed_choices = [None, None, None, None]
+        self.step_awarded = [False, False, False, False]
+        self.unit_submitted = False
+        self.reveal_success = False
+
+        self.undo_flash = 0.0
+        self.advance_flash = 0.0
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)
@@ -340,76 +466,131 @@ class StroopHapticGame(QWidget):
 
     def start(self):
         now = time.perf_counter()
-        self.score = 0
-        self.round_n = 0
-        self._new_round(now)
+        self.visible_score = 0
+        self.pending_score = 0
+        self.units_completed = 0
+        self.game_start_time = now
+        self.is_game_over = False
+        self.score_saved = False
+        self._new_unit()
         self.timer.start(30)
 
+    def _new_unit(self):
+        """generates a brand-new hidden 4-step assembly configuration."""
+        self.target_sequence = [self.rng.randrange(3) for _ in range(4)]
+        self.current_step = 0
+        self.installed_choices = [None, None, None, None]
+        self.step_awarded = [False, False, False, False]
+        self.unit_submitted = False
+        self.reveal_success = False
+
     def keyPressEvent(self, event):
-        if event.isAutoRepeat():
-            return
-        if event.key() == Qt.Key_Left:
-            self.press(0)
-        elif event.key() == Qt.Key_Up:
-            self.press(1)
-        elif event.key() == Qt.Key_Right:
-            self.press(2)
-        elif event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key_Escape:
             self.close()
+            return
+        if self.is_game_over or event.isAutoRepeat():
+            return
 
-    def press(self, pos):
         now = time.perf_counter()
-        self.key_flash[pos] = now
 
-        if not self._check_late_press(pos, now):
-            if self.current_round is not None:
-                self._evaluate_answer(self.current_round, pos, now)
+        # manual extract / undo on the current step (E key)
+        if event.key() == Qt.Key_E:
+            if not self.unit_submitted:
+                self._undo_step(now)
+            return
+
+        # manual advance to next step, submit unit, or move from rejected unit to a new unit
+        if event.key() in (Qt.Key_Space, Qt.Key_Return, Qt.Key_Enter):
+            if self.unit_submitted:
+                self._new_unit()
+            else:
+                self._manual_advance(now)
+            return
+
+        # seat a component option on the current step
+        if not self.unit_submitted:
+            if event.key() == Qt.Key_Left:
+                self._seat_component(0)
+            elif event.key() == Qt.Key_Up:
+                self._seat_component(1)
+            elif event.key() == Qt.Key_Right:
+                self._seat_component(2)
+
+    def _undo_step(self, now):
+        """extracts the currently seated component on the active step so the user can select another."""
+        if self.installed_choices[self.current_step] is not None:
+            self.installed_choices[self.current_step] = None
+            self.undo_flash = now
+            self.update()
+
+    def _seat_component(self, choice_idx):
+        """seats a part on the active step and delivers haptic/audio feedback without advancing."""
+        if self.installed_choices[self.current_step] is not None:
+            self.feedback.trigger_incorrect()
+            return
+
+        self.installed_choices[self.current_step] = choice_idx
+        target = self.target_sequence[self.current_step]
+
+        if choice_idx == target:
+            if not self.step_awarded[self.current_step]:
+                self.pending_score += STEP_HIT_POINTS
+                self.step_awarded[self.current_step] = True
+            self.feedback.trigger_correct()
+        else:
+            self.pending_score -= STEP_WRONG_PENALTY
+            if self.visible_score + self.pending_score < 0:
+                self.pending_score = -self.visible_score
+            self.feedback.trigger_incorrect()
 
         self.update()
 
-    def _new_round(self, now):
-        if self.current_round is not None:
-            self.current_round["closed_at"] = now
-            self.prev_round = self.current_round
-
-        self.layout, target = generate_stroop_round(self.rng)
-        self.round_n += 1
-        self.current_round = {
-            "n": self.round_n,
-            "layout": self.layout,
-            "target": target,
-            "shown_at": now,
-            "answered": False
-        }
-        self.next_shuffle_at = now + SHUFFLE_SECONDS
-
-    def _check_late_press(self, pos, now):
-        pr = self.prev_round
-        if pr is not None and not pr["answered"] and (now - pr["closed_at"]) <= LATE_PRESS_SECONDS:
-            self._evaluate_answer(pr, pos, now)
-            return True
-        return False
-
-    def _evaluate_answer(self, rnd, pos, now):
-        if rnd["answered"]:
-            return
-        rnd["answered"] = True
-
-        if pos == rnd["target"]:
-            self.score += IDLE_HIT_POINTS
-            self.flash = ("correct", now)
-            self.popups.append((pos, f"+{IDLE_HIT_POINTS}", "#4ADE80", now))
-            self.feedback.trigger_correct()
-        else:
-            self.score = max(0, self.score - IDLE_WRONG_PENALTY)
-            self.flash = ("wrong", now)
-            self.popups.append((pos, f"-{IDLE_WRONG_PENALTY}", "#F87171", now))
+    def _manual_advance(self, now):
+        """manually moves to the next step (or evaluates the full unit after step 4)."""
+        if self.installed_choices[self.current_step] is None:
             self.feedback.trigger_incorrect()
+            return
+
+        self.advance_flash = now
+
+        if self.current_step < 3:
+            self.current_step += 1
+        else:
+            self.unit_submitted = True
+            all_correct = all(
+                self.installed_choices[i] == self.target_sequence[i]
+                for i in range(4)
+            )
+            if all_correct:
+                self.units_completed += 1
+                self.pending_score += UNIT_BONUS_POINTS
+                self.visible_score = max(0, self.visible_score + self.pending_score)
+                self.pending_score = 0
+                self.reveal_success = True
+            else:
+                self.pending_score -= STEP_WRONG_PENALTY
+                self.visible_score = max(0, self.visible_score + self.pending_score)
+                self.pending_score = 0
+                self.reveal_success = False
+                self.feedback.trigger_incorrect()
+
+        self.update()
 
     def _tick(self):
         now = time.perf_counter()
-        if now >= self.next_shuffle_at:
-            self._new_round(now)
+        if now - self.game_start_time >= TIME_TEST:
+            if not self.is_game_over:
+                self.is_game_over = True
+                self.timer.stop()
+                final_score = max(0, self.visible_score + self.pending_score)
+                self.visible_score = final_score
+                self.pending_score = 0
+                if not self.score_saved:
+                    save_score(self.player_name, self.visible_score)
+                    self.score_saved = True
+                self.leaderboard_data = load_leaderboard()
+            self.update()
+            return
         self.update()
 
     def paintEvent(self, event):
@@ -418,107 +599,245 @@ class StroopHapticGame(QWidget):
         w, h = self.width(), self.height()
         now = time.perf_counter()
 
+        # background gradient
         bg = QLinearGradient(0, 0, 0, h)
         bg.setColorAt(0, QColor("#0B1220"))
         bg.setColorAt(1, QColor("#111A2E"))
         painter.fillRect(0, 0, w, h, QBrush(bg))
 
-        if self.flash is not None and now - self.flash[1] < 0.5:
-            col = QColor("#22C55E") if self.flash[0] == "correct" else QColor("#EF4444")
-            painter.setPen(QPen(col, 8))
+        # outer border highlight if unit is submitted
+        if self.unit_submitted:
+            border_c = QColor("#22C55E") if self.reveal_success else QColor("#EF4444")
+            painter.setPen(QPen(border_c, 6))
             painter.setBrush(Qt.NoBrush)
             painter.drawRoundedRect(QRectF(4, 4, w - 8, h - 8), 14, 14)
 
-        # top hud with live vest status and selected modes
+        # top hud bar
         hud = QRectF(16, 16, w - 32, 56)
         painter.setPen(Qt.NoPen)
         painter.setBrush(QColor(15, 23, 42, 220))
         painter.drawRoundedRect(hud, 10, 10)
-        painter.setFont(QFont("Helvetica", 18, QFont.Bold))
+        painter.setFont(QFont("Helvetica", 16, QFont.Bold))
         painter.setPen(QColor("#F8FAFC"))
-        painter.drawText(hud.adjusted(16, 0, -16, 0), Qt.AlignLeft | Qt.AlignVCenter, f"SCORE: {self.score:04d}")
+        painter.drawText(
+            hud.adjusted(16, 0, -16, 0),
+            Qt.AlignLeft | Qt.AlignVCenter,
+            f"SCORE: {self.visible_score:04d}   |   UNITS: {self.units_completed}"
+        )
 
         vest_status = "VEST: OK" if self.feedback.connected else "VEST: DISCONNECTED"
-        mode_label = f"{vest_status}  ({self.feedback.pos_mode} | {self.feedback.neg_mode})"
-        painter.setFont(QFont("Helvetica", 11, QFont.Bold))
+        pos_loc = "FRONT" if self.feedback.pos_position == "VestFront" else "BACK"
+        neg_loc = "FRONT" if self.feedback.neg_position == "VestFront" else "BACK"
+        snd_label = "+AUDIO" if self.feedback.audio_enabled else "NO AUDIO"
+        mode_label = f"{vest_status}  (+{pos_loc} | -{neg_loc} | {snd_label})"
+        painter.setFont(QFont("Helvetica", 10, QFont.Bold))
         painter.setPen(QColor("#4ADE80") if self.feedback.connected else QColor("#F87171"))
         painter.drawText(hud, Qt.AlignCenter, mode_label)
 
-        painter.setFont(QFont("Helvetica", 18, QFont.Bold))
+        remaining = max(0, TIME_TEST - (now - self.game_start_time if not self.is_game_over else TIME_TEST))
+        mins, secs = divmod(int(remaining), 60)
+        time_str = f"{mins:02d}:{secs:02d}"
+
+        painter.setFont(QFont("Helvetica", 16, QFont.Bold))
         painter.setPen(QColor("#38BDF8"))
-        painter.drawText(hud.adjusted(16, 0, -16, 0), Qt.AlignRight | Qt.AlignVCenter, f"ROUND: {self.round_n}")
+        painter.drawText(
+            hud.adjusted(16, 0, -16, 0),
+            Qt.AlignRight | Qt.AlignVCenter,
+            f"TIME: {time_str}"
+        )
 
-        # status banner
-        srect = QRectF(w * 0.12, 92, w * 0.76, 46)
-        col = QColor("#4ADE80")
-        painter.setPen(QPen(col, 2))
-        bgc = QColor(col)
-        bgc.setAlpha(35)
-        painter.setBrush(bgc)
-        painter.drawRoundedRect(srect, 12, 12)
-        painter.setFont(QFont("Helvetica", 16, QFont.Black))
-        painter.setPen(col)
-        painter.drawText(srect, Qt.AlignCenter, "PRESS THE MATCHING COLOR & WORD")
-
-        # 3 stroop buttons
-        top = srect.bottom() + 40
-        gap = w * 0.04
-        bw = (w - 2 * w * 0.06 - 2 * gap) / 3
-        bh = min(bw * 0.9, h - top - 110)
-
-        for pos, (fill, label) in enumerate(self.layout):
-            x = w * 0.06 + pos * (bw + gap)
-            rect = QRectF(x, top, bw, bh)
-            painter.setPen(QPen(QColor("#E2E8F0"), 3))
-            painter.setBrush(QColor(COLOR_HEX[fill]))
-            painter.drawRoundedRect(rect, 18, 18)
-
-            if now - self.key_flash[pos] < 0.15:
-                painter.setPen(Qt.NoPen)
-                painter.setBrush(QColor(255, 255, 255, 90))
-                painter.drawRoundedRect(rect, 18, 18)
-
-            self._draw_label(painter, rect, LABELS[label])
-
-            cap = QRectF(rect.center().x() - 34, rect.bottom() + 16, 68, 52)
-            painter.setPen(QPen(QColor("#64748B"), 2))
-            painter.setBrush(QColor("#1E293B"))
-            painter.drawRoundedRect(cap, 10, 10)
+        # instruction / submission status banner
+        srect = QRectF(w * 0.06, 84, w * 0.88, 44)
+        if self.unit_submitted:
+            if self.reveal_success:
+                painter.setPen(QPen(QColor("#22C55E"), 2))
+                painter.setBrush(QColor(20, 83, 45, 210))
+                painter.drawRoundedRect(srect, 10, 10)
+                painter.setFont(QFont("Helvetica", 13, QFont.Black))
+                painter.setPen(QColor("#4ADE80"))
+                painter.drawText(srect, Qt.AlignCenter, "UNIT VERIFIED!  [PRESS SPACE TO START NEW UNIT]")
+            else:
+                painter.setPen(QPen(QColor("#EF4444"), 2))
+                painter.setBrush(QColor(127, 29, 29, 210))
+                painter.drawRoundedRect(srect, 10, 10)
+                painter.setFont(QFont("Helvetica", 13, QFont.Black))
+                painter.setPen(QColor("#FCA5A5"))
+                painter.drawText(srect, Qt.AlignCenter, "UNIT REJECTED (FAULTS FOUND)!  [PRESS SPACE TO WORK ON NEW UNIT]")
+        else:
+            painter.setPen(QPen(QColor("#475569"), 2))
+            painter.setBrush(QColor(30, 41, 59, 180))
+            painter.drawRoundedRect(srect, 10, 10)
+            painter.setFont(QFont("Helvetica", 11, QFont.Bold))
             painter.setPen(QColor("#E2E8F0"))
-            painter.setFont(QFont("Helvetica", 24, QFont.Bold))
-            painter.drawText(cap, Qt.AlignCenter, KEY_GLYPHS[pos])
+            painter.drawText(
+                srect,
+                Qt.AlignCenter,
+                f"{pos_loc} PULSE = CORRECT (SPACE = NEXT STEP)  |  {neg_loc} BUZZ = FAULT (E = EXTRACT)"
+            )
 
-        # floating score popups
-        self.popups = [pp for pp in self.popups if now - pp[3] < 0.8]
-        for pos, text, color, t0 in self.popups:
-            age = (now - t0) / 0.8
-            x = w * 0.06 + pos * (bw + gap)
-            c = QColor(color)
-            c.setAlpha(int(255 * (1 - age)))
-            painter.setPen(QPen(c, 5))
-            painter.setBrush(Qt.NoBrush)
-            painter.drawRoundedRect(QRectF(x, top, bw, bh), 18, 18)
-            painter.setPen(c)
-            painter.setFont(QFont("Helvetica", 28, QFont.Black))
-            painter.drawText(QRectF(x, top - 45 - 25 * age, bw, 40), Qt.AlignCenter, text)
+        # 4 assembly step rows
+        top_start = srect.bottom() + 18
+        available_h = h - top_start - 95
+        row_gap = 12
+        row_h = (available_h - 3 * row_gap) / 4
 
-    def _draw_label(self, painter, rect, text):
-        size = int(rect.height() * 0.24)
-        font = QFont("Helvetica", size, QFont.Black)
-        while size > 10 and QFontMetrics(font).horizontalAdvance(text) > rect.width() * 0.84:
-            size -= 1
-            font.setPointSize(size)
-        fm = QFontMetrics(font)
-        path = QPainterPath()
-        x = rect.center().x() - fm.horizontalAdvance(text) / 2
-        y = rect.center().y() + (fm.ascent() - fm.descent()) / 2
-        path.addText(QPointF(x, y), font, text)
-        painter.setPen(QPen(QColor("#0B0F19"), max(3, size // 8), Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-        painter.setBrush(Qt.NoBrush)
-        painter.drawPath(path)
-        painter.setPen(Qt.NoPen)
-        painter.setBrush(QColor("#FFFFFF"))
-        painter.drawPath(path)
+        for step_idx, (step_title, options) in enumerate(STEPS_INFO):
+            ry = top_start + step_idx * (row_h + row_gap)
+            row_rect = QRectF(w * 0.06, ry, w * 0.88, row_h)
+
+            has_part = (self.installed_choices[step_idx] is not None)
+            is_active = (step_idx == self.current_step) and not self.unit_submitted
+            step_is_correct = (self.installed_choices[step_idx] == self.target_sequence[step_idx])
+
+            if self.unit_submitted:
+                if step_is_correct:
+                    border_col = QColor("#22C55E")
+                    bg_col = QColor(20, 83, 45, 110)
+                    status_str = "VERIFIED CORRECT"
+                    status_col = QColor("#4ADE80")
+                else:
+                    border_col = QColor("#EF4444")
+                    bg_col = QColor(127, 29, 29, 110)
+                    status_str = "FAULT DETECTED"
+                    status_col = QColor("#F87171")
+            elif is_active:
+                border_col = QColor("#38BDF8")
+                bg_col = QColor(30, 41, 59, 225)
+                if has_part:
+                    status_str = "PART SEATED (E EXTRACT  |  SPACE NEXT)"
+                    status_col = QColor("#E2E8F0")
+                else:
+                    status_str = "ACTIVE STEP: SELECT [← / ↑ / →]"
+                    status_col = QColor("#38BDF8")
+            else:
+                border_col = QColor("#475569") if has_part else QColor("#334155")
+                bg_col = QColor(30, 41, 59, 150) if has_part else QColor(15, 23, 42, 130)
+                status_str = "PART SEATED" if has_part else "PENDING"
+                status_col = QColor("#94A3B8") if has_part else QColor("#64748B")
+
+            painter.setPen(QPen(border_col, 3 if is_active else 2))
+            painter.setBrush(bg_col)
+            painter.drawRoundedRect(row_rect, 12, 12)
+
+            # left label column inside step row
+            title_rect = QRectF(row_rect.x() + 18, row_rect.y() + 10, row_rect.width() * 0.38, row_rect.height() - 20)
+            painter.setFont(QFont("Helvetica", 13, QFont.Bold))
+            painter.setPen(QColor("#F8FAFC") if (is_active or has_part or self.unit_submitted) else QColor("#64748B"))
+            painter.drawText(title_rect, Qt.AlignLeft | Qt.AlignTop, step_title)
+
+            painter.setFont(QFont("Helvetica", 10, QFont.Bold))
+            painter.setPen(status_col)
+            painter.drawText(title_rect, Qt.AlignLeft | Qt.AlignBottom, status_str)
+
+            # 3 component option slots on the right side of the row
+            opt_area_x = row_rect.x() + row_rect.width() * 0.41
+            opt_area_w = row_rect.width() * 0.57
+            opt_gap = 12
+            opt_w = (opt_area_w - 2 * opt_gap) / 3
+            opt_h = row_rect.height() - 20
+            opt_y = row_rect.y() + 10
+
+            for opt_idx, opt_label in enumerate(options):
+                ox = opt_area_x + opt_idx * (opt_w + opt_gap)
+                orect = QRectF(ox, opt_y, opt_w, opt_h)
+
+                chosen_here = (self.installed_choices[step_idx] == opt_idx)
+
+                if self.unit_submitted and chosen_here:
+                    if step_is_correct:
+                        oborder = QColor("#22C55E")
+                        obg = QColor("#15803D")
+                        otext_col = QColor("#FFFFFF")
+                    else:
+                        oborder = QColor("#EF4444")
+                        obg = QColor("#991B1B")
+                        otext_col = QColor("#FEE2E2")
+                elif chosen_here:
+                    oborder = QColor("#38BDF8")
+                    obg = QColor("#1E3A8A")
+                    otext_col = QColor("#F8FAFC")
+                elif is_active:
+                    oborder = QColor("#64748B")
+                    obg = QColor("#1E293B")
+                    otext_col = QColor("#E2E8F0")
+                else:
+                    oborder = QColor("#334155")
+                    obg = QColor("#0F172A")
+                    otext_col = QColor("#64748B")
+
+                painter.setPen(QPen(oborder, 2))
+                painter.setBrush(obg)
+                painter.drawRoundedRect(orect, 8, 8)
+
+                painter.setFont(QFont("Helvetica", 12, QFont.Bold))
+                painter.setPen(otext_col)
+                label_with_key = f"{KEY_GLYPHS[opt_idx]}  {opt_label}"
+                painter.drawText(orect, Qt.AlignCenter, label_with_key)
+
+        # bottom controls bar
+        footer_y = h - 68
+        ctrl_rect = QRectF(w * 0.06, footer_y, w * 0.88, 50)
+        act_flash = (now - self.undo_flash < 0.18) or (now - self.advance_flash < 0.18)
+        painter.setPen(QPen(QColor("#38BDF8") if act_flash else QColor("#475569"), 2))
+        painter.setBrush(QColor("#334155") if act_flash else QColor("#1E293B"))
+        painter.drawRoundedRect(ctrl_rect, 10, 10)
+
+        painter.setFont(QFont("Helvetica", 12, QFont.Bold))
+        painter.setPen(QColor("#F8FAFC"))
+        painter.drawText(
+            ctrl_rect,
+            Qt.AlignCenter,
+            "CONTROLS:  [← / ↑ / →] Seat Part   |   [E] Extract Part   |   [SPACE / ENTER] Next Step / New Unit"
+        )
+
+        # game over & leaderboard overlay
+        if self.is_game_over:
+            painter.setPen(Qt.NoPen)
+            painter.setBrush(QColor(15, 23, 42, 245))
+            painter.drawRect(0, 0, int(w), int(h))
+
+            painter.setPen(QColor("#F8FAFC"))
+            painter.setFont(QFont("Helvetica", 32, QFont.Black))
+            painter.drawText(QRectF(0, h * 0.07, w, 46), Qt.AlignCenter, "SHIFT COMPLETE!")
+
+            painter.setPen(QColor("#4ADE80"))
+            painter.setFont(QFont("Helvetica", 20, QFont.Bold))
+            painter.drawText(
+                QRectF(0, h * 0.15, w, 36),
+                Qt.AlignCenter,
+                f"{self.player_name}'s Score: {self.visible_score:04d}   ({self.units_completed} Units Built)"
+            )
+
+            # leaderboard box
+            lb_rect = QRectF(w * 0.18, h * 0.24, w * 0.64, h * 0.58)
+            painter.setPen(QPen(QColor("#334155"), 2))
+            painter.setBrush(QColor(30, 41, 59, 230))
+            painter.drawRoundedRect(lb_rect, 14, 14)
+
+            painter.setPen(QColor("#38BDF8"))
+            painter.setFont(QFont("Helvetica", 18, QFont.Bold))
+            painter.drawText(QRectF(lb_rect.x(), lb_rect.y() + 15, lb_rect.width(), 30), Qt.AlignCenter, "LEADERBOARD")
+
+            # top 5 entries
+            top_scores = self.leaderboard_data[:5]
+            y_offset = lb_rect.y() + 60
+            painter.setFont(QFont("Helvetica", 14, QFont.Normal))
+
+            for i, (name, sc) in enumerate(top_scores):
+                rank_str = f"#{i+1}   {name}"
+                score_str = f"{sc:04d} pts"
+
+                is_current = (name == self.player_name and sc == self.visible_score)
+                painter.setPen(QColor("#F5C518") if is_current else QColor("#E2E8F0"))
+
+                row_rect = QRectF(lb_rect.x() + 30, y_offset, lb_rect.width() - 60, 30)
+                painter.drawText(row_rect, Qt.AlignLeft | Qt.AlignVCenter, rank_str)
+                painter.drawText(row_rect, Qt.AlignRight | Qt.AlignVCenter, score_str)
+                y_offset += 34
+
+            painter.setPen(QColor("#94A3B8"))
+            painter.setFont(QFont("Helvetica", 13, QFont.Bold))
+            painter.drawText(QRectF(0, h * 0.86, w, 36), Qt.AlignCenter, "Press ESC to Exit")
 
     def closeEvent(self, event):
         self.timer.stop()
@@ -531,12 +850,11 @@ if __name__ == "__main__":
     base_dir = os.path.dirname(os.path.abspath(__file__))
     feedback = FeedbackController(base_dir=base_dir)
 
-    # show startup dialog to choose positive_1..3 and negative_1..3
     dialog = StimulusConfigDialog(feedback)
     if dialog.exec_() == QDialog.Accepted:
-        pos_choice, neg_choice = dialog.get_selections()
-        feedback.set_modes(pos_choice, neg_choice)
-        window = StroopHapticGame(feedback)
+        pos_choice, neg_choice, map_choice, audio_choice, player_name = dialog.get_selections()
+        feedback.set_modes(pos_choice, neg_choice, map_choice, audio_choice)
+        window = ProceduralAssemblyGame(feedback, player_name=player_name)
         window.show()
         sys.exit(app.exec_())
     else:
