@@ -7,7 +7,10 @@ import threading
 import websocket
 from PyQt5.QtCore import QPointF, QRectF, QTimer, Qt, QUrl
 from PyQt5.QtGui import QBrush, QColor, QFont, QFontMetrics, QLinearGradient, QPainter, QPainterPath, QPen
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import (
+    QApplication, QComboBox, QDialog, QFormLayout, QHBoxLayout,
+    QLabel, QPushButton, QVBoxLayout, QWidget
+)
 from PyQt5.QtMultimedia import QSoundEffect
 
 COLOR_HEX = {
@@ -32,11 +35,24 @@ LATE_PRESS_SECONDS = 0.25
 IDLE_HIT_POINTS = 10
 IDLE_WRONG_PENALTY = 5
 
+# x16 motor group definitions (mapped across the 0-19 coordinate grid)
+BACK_ALL = list(range(20))
+BACK_LOWER = [4, 5, 6, 7, 12, 13, 14, 15, 16, 17, 18, 19]
+BACK_UPPER = [0, 1, 2, 3, 8, 9, 10, 11]
+BACK_CENTER = [1, 2, 5, 6, 9, 10, 13, 14, 17, 18]
+BACK_OUTER = [0, 3, 4, 7, 8, 11, 12, 15, 16, 19]
+
+FRONT_ALL = list(range(20))
+FRONT_LEFT = [0, 1, 4, 5, 8, 9, 12, 13, 16, 17]
+FRONT_RIGHT = [2, 3, 6, 7, 10, 11, 14, 15, 18, 19]
+
 
 class FeedbackController:
-    """manages persistent bhaptics player websocket connection and wav playback."""
+    """manages persistent bhaptics player websocket connection, stimulus variants, and wav playback."""
 
-    def __init__(self, base_dir="."):
+    def __init__(self, base_dir=".", pos_mode="positive_1", neg_mode="negative_1"):
+        self.pos_mode = pos_mode
+        self.neg_mode = neg_mode
         self.ws_app = None
         self.connected = False
         self._start_bhaptics_client()
@@ -60,8 +76,11 @@ class FeedbackController:
         else:
             print(f"warning: audio file not found at {incorrect_path}")
 
+    def set_modes(self, pos_mode, neg_mode):
+        self.pos_mode = pos_mode
+        self.neg_mode = neg_mode
+
     def _start_bhaptics_client(self):
-        # explicit 127.0.0.1 avoids windows ipv6 localhost resolution delays
         url = "ws://127.0.0.1:15881/v2/feedbacks?app_id=stroop_x16&app_name=Stroop_Haptic_Game"
 
         def on_open(ws):
@@ -75,7 +94,6 @@ class FeedbackController:
             self.connected = False
 
         def on_message(ws, message):
-            # consume incoming status frames from bhaptics player so buffer never blocks
             pass
 
         self.ws_app = websocket.WebSocketApp(
@@ -86,7 +104,6 @@ class FeedbackController:
             on_message=on_message
         )
 
-        # run the websocket loop in a background daemon thread with auto-reconnect
         def run_loop():
             while True:
                 try:
@@ -98,7 +115,6 @@ class FeedbackController:
         threading.Thread(target=run_loop, daemon=True).start()
 
     def _send_dot_frame(self, key, position, motor_tuples, duration_ms):
-        """sends a dot-mode frame to bhaptics player."""
         if not self.connected or self.ws_app is None:
             return
         dots = [{"index": int(idx), "intensity": int(val)} for idx, val in motor_tuples]
@@ -121,38 +137,85 @@ class FeedbackController:
         except Exception as e:
             print(f"bhaptics send error: {e}")
 
-    def trigger_correct(self):
-        """plays correct_answer.wav and triggers a positive upward wave on the back (< 1s)."""
+    def trigger_correct(self, mode_override=None):
         if self.snd_correct.isLoaded():
             self.snd_correct.play()
-        threading.Thread(target=self._haptic_correct_pattern, daemon=True).start()
+        mode = mode_override or self.pos_mode
+        target_map = {
+            "positive_1": self._pos_1_1p4hz,
+            "positive_2": self._pos_2_upward_wave,
+            "positive_3": self._pos_3_warm_swell
+        }
+        fn = target_map.get(mode, self._pos_1_1p4hz)
+        threading.Thread(target=fn, daemon=True).start()
 
-    def trigger_incorrect(self):
-        """plays incorrect_answer.wav and triggers a negative double pulse on the front (< 1s)."""
+    def trigger_incorrect(self, mode_override=None):
         if self.snd_incorrect.isLoaded():
             self.snd_incorrect.play()
-        threading.Thread(target=self._haptic_incorrect_pattern, daemon=True).start()
+        mode = mode_override or self.neg_mode
+        target_map = {
+            "negative_1": self._neg_1_0p5hz,
+            "negative_2": self._neg_2_sharp_staccato,
+            "negative_3": self._neg_3_chest_jitter
+        }
+        fn = target_map.get(mode, self._neg_1_0p5hz)
+        threading.Thread(target=fn, daemon=True).start()
 
-    def _haptic_correct_pattern(self):
-        # vestback has its own 0-19 coordinate space (for x16, top row is 0-3, bottom row is 4-7,
-        # plus 8-19 if mapped across the full 5x4 grid; we include both to guarantee x16 activation)
-        lower_back = [(i, 40) for i in (4, 5, 6, 7, 12, 13, 14, 15, 16, 17, 18, 19)]
-        upper_back = [(i, 65) for i in (0, 1, 2, 3, 8, 9, 10, 11)]
+    # ------------------------------------------------------------------ positive patterns (back, < 1s)
+    def _pos_1_1p4hz(self):
+        # 1.4 hz modulation -> period is ~714 ms between pulse onsets
+        # pulse 1 at t = 0 ms (soft ramp up and down over 200 ms)
+        self._send_dot_frame("p1_a", "VestBack", [(i, 35) for i in BACK_ALL], 80)
+        time.sleep(0.07)
+        self._send_dot_frame("p1_b", "VestBack", [(i, 60) for i in BACK_ALL], 130)
+        # wait until t = 714 ms for the second 1.4 hz cycle
+        time.sleep(0.644)
+        # pulse 2 at t = 714 ms (200 ms duration -> total 914 ms)
+        self._send_dot_frame("p1_c", "VestBack", [(i, 35) for i in BACK_ALL], 80)
+        time.sleep(0.07)
+        self._send_dot_frame("p1_d", "VestBack", [(i, 60) for i in BACK_ALL], 130)
 
-        # step 1: soft lower-back onset (180 ms)
-        self._send_dot_frame("pos_wave_1", "VestBack", lower_back, 180)
-        time.sleep(0.16)
-        # step 2: smooth upward crest on upper back (320 ms) -> total ~480 ms
-        self._send_dot_frame("pos_wave_2", "VestBack", upper_back, 320)
+    def _pos_2_upward_wave(self):
+        # smooth upward spatial wave from lower back to upper back (total ~600 ms)
+        self._send_dot_frame("p2_low", "VestBack", [(i, 35) for i in BACK_LOWER], 220)
+        time.sleep(0.18)
+        self._send_dot_frame("p2_mid", "VestBack", [(i, 50) for i in BACK_ALL], 200)
+        time.sleep(0.18)
+        self._send_dot_frame("p2_high", "VestBack", [(i, 65) for i in BACK_UPPER], 240)
 
-    def _haptic_incorrect_pattern(self):
-        # vestfront: activate all front motors at 100% in two sharp staccato bursts
-        front_all = [(i, 100) for i in range(20)]
+    def _pos_3_warm_swell(self):
+        # gentle gaussian-like envelope expanding from spine outward (total ~800 ms)
+        self._send_dot_frame("p3_1", "VestBack", [(i, 25) for i in BACK_CENTER], 200)
+        time.sleep(0.18)
+        self._send_dot_frame("p3_2", "VestBack", [(i, 55) for i in BACK_ALL], 350)
+        time.sleep(0.32)
+        self._send_dot_frame("p3_3", "VestBack", [(i, 25) for i in BACK_OUTER], 300)
 
-        # burst 1 (120 ms) -> gap (100 ms) -> burst 2 (120 ms) -> total 340 ms
-        self._send_dot_frame("neg_burst_1", "VestFront", front_all, 120)
-        time.sleep(0.22)
-        self._send_dot_frame("neg_burst_2", "VestFront", front_all, 120)
+    # ------------------------------------------------------------------ negative patterns (front, < 1s)
+    def _neg_1_0p5hz(self):
+        # 0.5 hz modulation -> 2.0 s full period (active half-cycle = 950 ms heavy thud within 1s cap)
+        # heavy sustained chest compression that builds and cuts off abruptly
+        self._send_dot_frame("n1_a", "VestFront", [(i, 95) for i in FRONT_ALL], 450)
+        time.sleep(0.43)
+        self._send_dot_frame("n1_b", "VestFront", [(i, 100) for i in FRONT_ALL], 500)
+
+    def _neg_2_sharp_staccato(self):
+        # 3 rapid 100% intensity rectangular alarm bursts (~4 hz burst rate, total 620 ms)
+        front_max = [(i, 100) for i in FRONT_ALL]
+        for step in range(3):
+            self._send_dot_frame(f"n2_{step}", "VestFront", front_max, 120)
+            if step < 2:
+                time.sleep(0.25)
+
+    def _neg_3_chest_jitter(self):
+        # jarring left-right alternating high-intensity buzz across the front (total 700 ms)
+        left_max = [(i, 100) for i in FRONT_LEFT]
+        right_max = [(i, 100) for i in FRONT_RIGHT]
+        for step in range(5):
+            pattern = left_max if step % 2 == 0 else right_max
+            self._send_dot_frame(f"n3_{step}", "VestFront", pattern, 130)
+            if step < 4:
+                time.sleep(0.14)
 
     def close(self):
         if self.ws_app is not None:
@@ -160,6 +223,75 @@ class FeedbackController:
                 self.ws_app.close()
             except Exception:
                 pass
+
+
+class StimulusConfigDialog(QDialog):
+    """startup selector allowing the experimenter to preview and pick haptic conditions."""
+
+    def __init__(self, feedback_ctrl):
+        super().__init__()
+        self.feedback = feedback_ctrl
+        self.setWindowTitle("Select Haptic Stimulus Conditions")
+        self.setMinimumWidth(440)
+        self.setStyleSheet("""
+            QDialog { background-color: #0F172A; color: #F8FAFC; }
+            QLabel { color: #E2E8F0; font-size: 14px; font-weight: bold; }
+            QComboBox {
+                background-color: #1E293B; color: #F8FAFC; border: 1px solid #475569;
+                border-radius: 6px; padding: 6px; font-size: 13px;
+            }
+            QPushButton {
+                background-color: #334155; color: #F8FAFC; border: 1px solid #64748B;
+                border-radius: 6px; padding: 7px 14px; font-size: 13px; font-weight: bold;
+            }
+            QPushButton:hover { background-color: #475569; }
+            QPushButton#startBtn {
+                background-color: #16A34A; border-color: #22C55E; font-size: 15px; padding: 10px;
+            }
+            QPushButton#startBtn:hover { background-color: #15803D; }
+        """)
+
+        layout = QVBoxLayout(self)
+        layout.setSpacing(16)
+        layout.setContentsMargins(20, 20, 20, 20)
+
+        form = QFormLayout()
+        form.setSpacing(14)
+
+        # positive selector + preview button
+        pos_row = QHBoxLayout()
+        self.pos_combo = QComboBox()
+        self.pos_combo.addItem("positive_1  (1.4 Hz Rhythmic Pulse - Back)", "positive_1")
+        self.pos_combo.addItem("positive_2  (Upward Spatial Wave - Back)", "positive_2")
+        self.pos_combo.addItem("positive_3  (Warm Gaussian Swell - Back)", "positive_3")
+        btn_test_pos = QPushButton("Test")
+        btn_test_pos.clicked.connect(lambda: self.feedback.trigger_correct(self.pos_combo.currentData()))
+        pos_row.addWidget(self.pos_combo, stretch=1)
+        pos_row.addWidget(btn_test_pos)
+        form.addRow(QLabel("Correct (Back):"), pos_row)
+
+        # negative selector + preview button
+        neg_row = QHBoxLayout()
+        self.neg_combo = QComboBox()
+        self.neg_combo.addItem("negative_1  (0.5 Hz Heavy Thud - Front)", "negative_1")
+        self.neg_combo.addItem("negative_2  (4 Hz Sharp Staccato - Front)", "negative_2")
+        self.neg_combo.addItem("negative_3  (5 Hz Left/Right Jitter - Front)", "negative_3")
+        btn_test_neg = QPushButton("Test")
+        btn_test_neg.clicked.connect(lambda: self.feedback.trigger_incorrect(self.neg_combo.currentData()))
+        neg_row.addWidget(self.neg_combo, stretch=1)
+        neg_row.addWidget(btn_test_neg)
+        form.addRow(QLabel("Incorrect (Front):"), neg_row)
+
+        layout.addLayout(form)
+
+        # start button
+        btn_start = QPushButton("Start Stroop Game")
+        btn_start.setObjectName("startBtn")
+        btn_start.clicked.connect(self.accept)
+        layout.addWidget(btn_start)
+
+    def get_selections(self):
+        return self.pos_combo.currentData(), self.neg_combo.currentData()
 
 
 def generate_stroop_round(rng):
@@ -181,16 +313,16 @@ def generate_stroop_round(rng):
 
 
 class StroopHapticGame(QWidget):
-    def __init__(self):
+    def __init__(self, feedback_ctrl):
         super().__init__()
-        self.setWindowTitle("Stroop Task - bHaptics X16")
+        self.feedback = feedback_ctrl
+        self.setWindowTitle(
+            f"Stroop Task - bHaptics X16 [{self.feedback.pos_mode} | {self.feedback.neg_mode}]"
+        )
         self.setMinimumSize(640, 480)
         self.setFocusPolicy(Qt.StrongFocus)
 
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        self.feedback = FeedbackController(base_dir=base_dir)
         self.rng = random.Random()
-
         self.score = 0
         self.round_n = 0
         self.current_round = None
@@ -297,7 +429,7 @@ class StroopHapticGame(QWidget):
             painter.setBrush(Qt.NoBrush)
             painter.drawRoundedRect(QRectF(4, 4, w - 8, h - 8), 14, 14)
 
-        # top hud with live vest connection status
+        # top hud with live vest status and selected modes
         hud = QRectF(16, 16, w - 32, 56)
         painter.setPen(Qt.NoPen)
         painter.setBrush(QColor(15, 23, 42, 220))
@@ -307,9 +439,10 @@ class StroopHapticGame(QWidget):
         painter.drawText(hud.adjusted(16, 0, -16, 0), Qt.AlignLeft | Qt.AlignVCenter, f"SCORE: {self.score:04d}")
 
         vest_status = "VEST: OK" if self.feedback.connected else "VEST: DISCONNECTED"
-        painter.setFont(QFont("Helvetica", 12, QFont.Bold))
+        mode_label = f"{vest_status}  ({self.feedback.pos_mode} | {self.feedback.neg_mode})"
+        painter.setFont(QFont("Helvetica", 11, QFont.Bold))
         painter.setPen(QColor("#4ADE80") if self.feedback.connected else QColor("#F87171"))
-        painter.drawText(hud, Qt.AlignCenter, vest_status)
+        painter.drawText(hud, Qt.AlignCenter, mode_label)
 
         painter.setFont(QFont("Helvetica", 18, QFont.Bold))
         painter.setPen(QColor("#38BDF8"))
@@ -395,6 +528,17 @@ class StroopHapticGame(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = StroopHapticGame()
-    window.show()
-    sys.exit(app.exec_())
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    feedback = FeedbackController(base_dir=base_dir)
+
+    # show startup dialog to choose positive_1..3 and negative_1..3
+    dialog = StimulusConfigDialog(feedback)
+    if dialog.exec_() == QDialog.Accepted:
+        pos_choice, neg_choice = dialog.get_selections()
+        feedback.set_modes(pos_choice, neg_choice)
+        window = StroopHapticGame(feedback)
+        window.show()
+        sys.exit(app.exec_())
+    else:
+        feedback.close()
+        sys.exit(0)

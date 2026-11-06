@@ -1,0 +1,18 @@
+piece	sum	instruction	answer
+1	17	Use 1 Red and 2 Yellow	Red, Yellow, Yellow
+2	16	Use 1 Blue and 2 Yellow	Blue, Yellow, Yellow
+3	18	Use 1 Red and 2 Green	Green, Green, Red
+4	14	Use 1 Blue and 2 Yellow	Yellow, Blue, Yellow
+5	10	Use 1 Blue and 2 Red	Red, Blue, Red
+6	16	Use 1 Red and 2 Yellow	Yellow, Red, Yellow
+7	8	Use 2 Blue and 1 Yellow	Yellow, Blue, Blue
+8	8	Use 2 Blue and 1 Red	Blue, Red, Blue
+9	12	Use 2 Blue and 1 Green	Blue, Green, Blue
+10	18	Use 2 Red and 1 Green	Red, Red, Green
+11	16	Use 1 Blue and 2 Yellow	Blue, Yellow, Yellow
+12	9	Use 2 Blue and 1 Red	Blue, Blue, Red
+13	15	Use 1 Blue and 2 Green	Green, Green, Blue
+14	16	Use 1 Red and 2 Yellow	Yellow, Red, Yellow
+15	16	Use 2 Red and 1 Green	Red, Green, Red
+16	15	Use 1 Red and 2 Yellow	Yellow, Yellow, Red
+17	11	Use 1 Blue and 2 Red	Blue, Red, Red
