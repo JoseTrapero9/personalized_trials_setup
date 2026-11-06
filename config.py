@@ -42,6 +42,12 @@ WARNING_SECONDS = 10            # Red timer + blinking warning threshold
 
 # Voice ("deliver") recognition – offline Vosk
 VOSK_MODEL_DIR = os.path.join(base_dir, "model")   # downloaded Vosk model, renamed to "model"
+if os.path.isdir(VOSK_MODEL_DIR) and not os.path.isdir(os.path.join(VOSK_MODEL_DIR, "am")):
+    # model unzipped one level deeper (model/vosk-model-small-en-us-0.15/...): use that folder
+    for _name in sorted(os.listdir(VOSK_MODEL_DIR)):
+        if os.path.isdir(os.path.join(VOSK_MODEL_DIR, _name, "am")):
+            VOSK_MODEL_DIR = os.path.join(VOSK_MODEL_DIR, _name)
+            break
 VOSK_SAMPLE_RATE = 16000                           # 16 kHz mono int16 is what Vosk expects
 DELIVER_WORDS = ("deliver", "delivery", "ready")   # grammar-locked trigger words
 VOICE_INPUT_KEYWORD = None                         # e.g. "Realtek" to force a specific mic; None = system default
@@ -80,8 +86,8 @@ ROULETTE_DURING_INSTRUCTION = ("hard",)   # modes where the buttons spin + arrow
 ROULETTE_FRAME_SECONDS = 0.09             # spin speed          # a press this soon after a button change still counts for the previous one
 
 # Remote camera evaluator (live_evaluator.py on the camera PC, same network).
-# It reads the ParadigmMarkers LSL stream and answers on its own LSL stream; a verdict is applied
-# exactly like the researcher's y / c keys (whichever comes first counts).
+# It reads the ParadigmMarkers LSL stream and answers on its own LSL stream; its verdict is applied
+# right away. While True the manual y / c evaluation keys are disabled.
 USE_REMOTE_EVALUATOR = True
 EVALUATOR_STREAM_NAME = "BatteryEvaluator"
 

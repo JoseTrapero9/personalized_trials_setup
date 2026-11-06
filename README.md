@@ -79,24 +79,45 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 
 ## Camera evaluator on a second PC (`live_evaluator.py`)
 
-Runs on the camera PC with the YOLO model (`live_test.py` settings). Both PCs on the same network;
-LSL finds the streams by itself, no IP setup.
+Runs on the camera PC with the YOLO model (`live_test.py` settings). The window shows the camera
+next to the answer table of the log file (like the PDF): every battery gets a check or a cross as soon
+as the camera sees it. Marks are **green while the evaluation is active** and turn **black** once the
+row is evaluated. The Result column shows OK / MISTAKE.
+
+**Test it now (no GUI):**
+
+```powershell
+python live_evaluator.py --test                   # choose the log file in a window
+python live_evaluator.py --test s03_audio         # or name it
+python live_evaluator.py --test s03_audio --webcam 0   # normal webcam instead of the XIMEA
+```
+
+Row 1 starts right away. Say "deliver" (Vosk, same as the GUI) or press D: the row is evaluated and
+the next one starts. R = redo the row, Q = quit. Log: `logs/evaluator_test_<file>_<time>.csv`.
+
+**Evaluation rules (test and live):**
+
+* Evaluated at the first of: the tray leaves the station (no tray, no hand for 1 s, `--tray-gone`),
+  "deliver", or the handover. Someone who says deliver after picking the tray up is judged on the tray
+  as it was on the station.
+* Correct only if all 3 slots match the log file; a slot not seen counts as wrong
+  (fewer than 3 batteries in view = mistake).
+* A reading counts when it is stable for `STABLE_FRAMES` frames with no hand in view. The previous
+  round's tray does not count until the station was cleared or the tray changed.
+
+**Live, with the GUI:** both PCs on the same network; LSL finds the streams by itself, no IP setup.
 
 ```
 GUI PC  --LSL "ParadigmMarkers"-->  camera PC   (subject, condition, round, deliver, handover ...)
-GUI PC  <--LSL "BatteryEvaluator"--  camera PC  (Eval_Prediction_..., Eval_Verdict_Round_<r>_correct|incorrect_...)
+GUI PC  <--LSL "BatteryEvaluator"--  camera PC  (Eval_Prediction_..., Eval_Verdict_Round_<r>_correct|incorrect_..._Trigger_...)
 ```
 
 * Mirrors the GUI timers (retrieval, assembly 15/20/25 s, delivery window, overtime) from the markers.
-* Expected answer = `log_files/sXX_<condition>.txt`, checked against the sum + instruction the GUI showed
-  (on a mismatch it uses what the GUI showed and sends `Eval_Log_Mismatch_...`).
-* A tray reading counts once it is stable for `STABLE_FRAMES` frames with no hand in view. While building
-  it predicts `on_track / off_track / correct / wrong`; at the handover it sends the verdict.
-* GUI: the verdict is applied like the y / c keys, whichever comes first
-  (`Assembly_Evaluation_Source_camera|researcher_Round_<r>`). `USE_REMOTE_EVALUATOR = False` in config.py
-  turns this off. No verdict (`Eval_NoVerdict_...`) if fewer than 3 batteries were read -> evaluate with y / c.
-* Writes `logs/evaluator_sXX_<condition>_<time>.csv` on the camera PC (expected vs read, verdict, researcher
-  evaluation, time until the tray was first correct vs first "deliver", ...).
+* The table is the subject's log file (rows 1-8 = the 8 rounds). The expected answer is checked
+  against the sum + instruction the GUI showed (on a mismatch it uses what the GUI showed).
+* The GUI applies the verdict right away (`Assembly_Evaluation_Source_camera_Round_<r>`). While
+  `USE_REMOTE_EVALUATOR = True` (config.py) the manual y / c keys are disabled.
+* Writes `logs/evaluator_sXX_<condition>_<time>.csv` on the camera PC.
 
 ```powershell
 python live_evaluator.py                  # camera + YOLO
@@ -105,9 +126,10 @@ python live_evaluator.py --predict-only   # never send verdicts, only predict an
 python live_evaluator.py --subject 3 --condition audio   # started after the GUI setup screen
 ```
 
-The camera PC needs this repo (for `log_files/`, `config.py`, `sequences.py`), `pylsl` and the
-`live_test.py` packages (ultralytics, torch, opencv, XIMEA API). Allow Python through the Windows
-firewall on both PCs (private network) or LSL cannot see the other PC.
+The camera PC needs this repo (for `log_files/`, `config.py`, `sequences.py`), `pylsl`, and the
+`live_test.py` packages (ultralytics, torch, opencv, XIMEA API); for voice in test mode also `vosk`,
+`sounddevice`, `PyQt5` and the `model/` folder. Allow Python through the Windows firewall on both PCs
+(private network) or LSL cannot see the other PC.
 
 ## Logs
 
