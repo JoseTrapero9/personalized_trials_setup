@@ -1,0 +1,8 @@
+subject_name,feedback_modality,location_mapping,location,stimulus_type,chosen_correctly,reaction_time
+Player 1,Haptics + Audio,correct_back,Back,positive_2,yes,1.3562
+Player 1,Haptics + Audio,correct_back,Back,positive_3,no,0.3155
+Player 1,Haptics + Audio,correct_back,Back,positive_2,yes,0.8685
+Player 1,Haptics + Audio,correct_back,Back,positive_1,yes,0.7709
+Player 1,Haptics + Audio,correct_back,Front,negative_2,no,1.1145
+Player 1,Haptics + Audio,correct_back,Back,positive_2,no,1.5709
+Player 1,Haptics + Audio,correct_back,Back,positive_1,yes,1.2519

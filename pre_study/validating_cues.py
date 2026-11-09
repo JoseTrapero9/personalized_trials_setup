@@ -4,6 +4,7 @@ import json
 import time
 import random
 import threading
+import csv
 import websocket
 from PyQt5.QtCore import QRectF, QTimer, Qt, QUrl
 from PyQt5.QtGui import QBrush, QColor, QFont, QLinearGradient, QPainter, QPen
@@ -13,14 +14,18 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtMultimedia import QSoundEffect
 
-# validation task parameters
+# Path resolution:
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(SCRIPT_DIR)
+
+# Validation task parameters
 HIT_POINTS = 5
 WRONG_PENALTY = 5
 TIME_TEST = 120  # task duration in seconds (120 = 2 minutes)
 
-VALIDATION_LEADERBOARD_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "validation_leaderboard.txt"
-)
+# File paths
+VALIDATION_LEADERBOARD_FILE = os.path.join(SCRIPT_DIR, "validation_leaderboard.txt")
+ANSWERS_DIR = os.path.join(SCRIPT_DIR, "validation_cues_answers")
 
 # x16 motor group definitions (mapped across the 0-19 coordinate grid)
 BACK_ALL = list(range(20))
@@ -80,7 +85,7 @@ def clear_leaderboard_file():
 class FeedbackController:
     """manages persistent bhaptics player websocket connection, stimulus variants, spatial mapping, and audio playback."""
 
-    def __init__(self, base_dir=".", pos_mode="positive_1", neg_mode="negative_1", mapping_mode="correct_back", audio_enabled=True):
+    def __init__(self, base_dir=BASE_DIR, pos_mode="positive_1", neg_mode="negative_1", mapping_mode="correct_back", audio_enabled=True):
         self.pos_mode = pos_mode
         self.neg_mode = neg_mode
         self.mapping_mode = mapping_mode
@@ -95,16 +100,21 @@ class FeedbackController:
         self.snd_correct = QSoundEffect()
         self.snd_incorrect = QSoundEffect()
 
-        correct_path = os.path.join(base_dir, "audios/correct_answer.wav")
-        incorrect_path = os.path.join(base_dir, "audios/incorrect_answer.wav")
+        # Audio files are pulled from main project directory (BASE_DIR)
+        correct_path = os.path.join(base_dir, "audios", "correct_answer.wav")
+        incorrect_path = os.path.join(base_dir, "audios", "incorrect_answer.wav")
 
         if os.path.exists(correct_path):
             self.snd_correct.setSource(QUrl.fromLocalFile(os.path.abspath(correct_path)))
             self.snd_correct.setVolume(0.9)
+        else:
+            print(f"warning: audio file not found at {correct_path}")
 
         if os.path.exists(incorrect_path):
             self.snd_incorrect.setSource(QUrl.fromLocalFile(os.path.abspath(incorrect_path)))
             self.snd_incorrect.setVolume(0.9)
+        else:
+            print(f"warning: audio file not found at {incorrect_path}")
 
     def set_modes(self, pos_mode, neg_mode, mapping_mode="correct_back", audio_enabled=True):
         self.pos_mode = pos_mode
@@ -434,7 +444,7 @@ class CueValidationGame(QWidget):
         self.feedback = feedback_ctrl
         self.player_name = player_name
 
-        audio_str = "Audio ON" if self.feedback.audio_enabled else "Haptics Only"
+        audio_str = "Haptics + Audio" if self.feedback.audio_enabled else "Haptics Only"
         self.setWindowTitle(
             f"Haptic Cue Validation Task - bHaptics X16 [{audio_str}]"
         )
@@ -449,9 +459,11 @@ class CueValidationGame(QWidget):
         self.error_rate = 0.0
 
         self.game_start_time = 0.0
+        self.trial_start_time = 0.0
         self.is_game_over = False
         self.score_saved = False
         self.leaderboard_data = []
+        self.trial_records = []  # Stores trial responses for CSV output
 
         self.active_cue_type = None  # "positive" or "negative"
         self.active_pattern_mode = ""
@@ -473,6 +485,7 @@ class CueValidationGame(QWidget):
         self.game_start_time = now
         self.is_game_over = False
         self.score_saved = False
+        self.trial_records = []
         self._next_trial()
         self.timer.start(30)
 
@@ -487,8 +500,40 @@ class CueValidationGame(QWidget):
         else:
             self.active_pattern_mode = self.feedback.trigger_negative()
 
+        self.trial_start_time = time.perf_counter()
         self.waiting_for_input = True
         self.update()
+
+    def save_trial_data_csv(self):
+        """Saves trial responses and metadata to a CSV file inside validation_cues_answers folder."""
+        if not os.path.exists(ANSWERS_DIR):
+            os.makedirs(ANSWERS_DIR, exist_ok=True)
+
+        safe_name = "".join(c for c in self.player_name if c.isalnum() or c in ("_", "-")).rstrip()
+        if not safe_name:
+            safe_name = "subject"
+
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        filename = os.path.join(ANSWERS_DIR, f"{safe_name}_{timestamp}.csv")
+
+        fieldnames = [
+            "subject_name",
+            "feedback_modality",
+            "location_mapping",
+            "location",
+            "stimulus_type",
+            "chosen_correctly",
+            "reaction_time"
+        ]
+
+        try:
+            with open(filename, "w", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(self.trial_records)
+            print(f"Saved trial data for subject to {filename}")
+        except Exception as e:
+            print(f"Error saving trial CSV file: {e}")
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
@@ -510,11 +555,35 @@ class CueValidationGame(QWidget):
 
         # check answer selection: Left Arrow (Positive) vs Right Arrow (Negative)
         if self.waiting_for_input and event.key() in (Qt.Key_Left, Qt.Key_Right):
+            reaction_time = now - self.trial_start_time
             user_guess = "positive" if event.key() == Qt.Key_Left else "negative"
+            is_correct = (user_guess == self.active_cue_type)
+            chosen_correctly_str = "yes" if is_correct else "no"
+
             self.waiting_for_input = False
             self.total_trials += 1
 
-            if user_guess == self.active_cue_type:
+            # Determine tactile location (Front vs Back) for current cue
+            loc_raw = (
+                self.feedback.pos_position
+                if self.active_cue_type == "positive"
+                else self.feedback.neg_position
+            )
+            location = "Front" if "Front" in loc_raw else "Back"
+            modality_str = "Haptics + Audio" if self.feedback.audio_enabled else "Haptics Only"
+
+            # Log trial metadata & metrics
+            self.trial_records.append({
+                "subject_name": self.player_name,
+                "feedback_modality": modality_str,
+                "location_mapping": self.feedback.mapping_mode,
+                "location": location,
+                "stimulus_type": self.active_pattern_mode,
+                "chosen_correctly": chosen_correctly_str,
+                "reaction_time": round(reaction_time, 4)
+            })
+
+            if is_correct:
                 self.score += HIT_POINTS
                 self.correct_trials += 1
                 self.last_result = "CORRECT"
@@ -538,6 +607,7 @@ class CueValidationGame(QWidget):
                 self.timer.stop()
                 if not self.score_saved:
                     save_score(self.player_name, self.score, self.error_rate)
+                    self.save_trial_data_csv()
                     self.score_saved = True
                 self.leaderboard_data = load_leaderboard()
             self.update()
@@ -627,7 +697,7 @@ class CueValidationGame(QWidget):
 
         painter.setFont(QFont("Helvetica", 28, QFont.Black))
         painter.setPen(QColor("#4ADE80"))
-        painter.drawText(QRectF(left_rect.x(), left_rect.y() + 30, left_rect.width(), 45), Qt.AlignCenter, "←  LEFT ARROW")
+        painter.drawText(QRectF(left_rect.x(), left_rect.y() + 30, left_rect.width(), 45), Qt.AlignCenter, "←   LEFT ARROW")
 
         painter.setFont(QFont("Helvetica", 18, QFont.Bold))
         painter.setPen(QColor("#F8FAFC"))
@@ -649,7 +719,7 @@ class CueValidationGame(QWidget):
 
         painter.setFont(QFont("Helvetica", 28, QFont.Black))
         painter.setPen(QColor("#F87171"))
-        painter.drawText(QRectF(right_rect.x(), right_rect.y() + 30, right_rect.width(), 45), Qt.AlignCenter, "RIGHT ARROW  →")
+        painter.drawText(QRectF(right_rect.x(), right_rect.y() + 30, right_rect.width(), 45), Qt.AlignCenter, "RIGHT ARROW   →")
 
         painter.setFont(QFont("Helvetica", 18, QFont.Bold))
         painter.setPen(QColor("#F8FAFC"))
@@ -675,7 +745,7 @@ class CueValidationGame(QWidget):
         painter.drawText(
             ctrl_rect,
             Qt.AlignCenter,
-            "CONTROLS:  [← Left] Positive Cue   |   [→ Right] Negative Cue   |   [SPACE / R] Replay Cue   |   [ESC] Exit"
+            "CONTROLS:   [← Left] Positive Cue   |   [→ Right] Negative Cue   |   [SPACE / R] Replay Cue   |   [ESC] Exit"
         )
 
         # game over & leaderboard overlay
@@ -693,7 +763,7 @@ class CueValidationGame(QWidget):
             painter.drawText(
                 QRectF(0, h * 0.14, w, 32),
                 Qt.AlignCenter,
-                f"{self.player_name}  —  Score: {self.score} pts   |   Error Rate: {self.error_rate:.1f}% ({self.total_trials} Trials)"
+                f"{self.player_name}   —   Score: {self.score} pts   |   Error Rate: {self.error_rate:.1f}% ({self.total_trials} Trials)"
             )
 
             # leaderboard box
@@ -728,14 +798,16 @@ class CueValidationGame(QWidget):
 
     def closeEvent(self, event):
         self.timer.stop()
+        if not self.score_saved and self.trial_records:
+            self.save_trial_data_csv()
+            self.score_saved = True
         self.feedback.close()
         super().closeEvent(event)
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    feedback = FeedbackController(base_dir=base_dir)
+    feedback = FeedbackController(base_dir=BASE_DIR)
 
     dialog = StimulusConfigDialog(feedback)
     if dialog.exec_() == QDialog.Accepted:

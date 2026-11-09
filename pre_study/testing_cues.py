@@ -1,10 +1,13 @@
 import sys
 import os
+import csv
 import json
 import time
 import random
 import threading
 import websocket
+from datetime import datetime
+from itertools import zip_longest
 from PyQt5.QtCore import QRectF, QTimer, Qt, QUrl
 from PyQt5.QtGui import QBrush, QColor, QFont, QLinearGradient, QPainter, QPen
 from PyQt5.QtWidgets import (
@@ -14,9 +17,8 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtMultimedia import QSoundEffect
 
 # game parameters
-STEP_HIT_POINTS = 10
-UNIT_BONUS_POINTS = 20
-STEP_WRONG_PENALTY = 5
+UNIT_BONUS_POINTS = 20  # points gained for a correct 4-piece submission
+UNIT_WRONG_PENALTY = 20  # points lost for an incorrect 4-piece submission
 TIME_TEST = 120  # game duration in seconds (120 = 2 minutes)
 AUDIO_GONE_IN = 30  # duration in seconds after which audio cues disappear
 
@@ -28,7 +30,12 @@ STEPS_INFO = [
 ]
 KEY_GLYPHS = ["←", "↑", "→"]
 
-LEADERBOARD_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "leaderboard.txt")
+# current script folder (pre_study) and parent project folder (personalized_trials_setup)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+
+LEADERBOARD_FILE = os.path.join(BASE_DIR, "testing_leaderboard.txt")
+RESULTS_DIR = os.path.join(BASE_DIR, "testing_cues_answers")
 
 # x16 motor group definitions (mapped across the 0-19 coordinate grid)
 BACK_ALL = list(range(20))
@@ -83,6 +90,58 @@ def clear_leaderboard_file():
         print(f"error clearing leaderboard file: {e}")
 
 
+def save_subject_csv(player_name, modality_str, mapping_mode, pos_mode, neg_mode,
+                     cycle_times, correct_submissions, incorrect_submissions):
+    """saves subject metadata, cycle times, and unit submission counts to a csv file."""
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+    safe_name = "".join(c if c.isalnum() or c in ("-", "_") else "_" for c in player_name).strip("_") or "subject"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(RESULTS_DIR, f"{safe_name}_{timestamp}.csv")
+
+    # first column holds the 5 metadata values
+    metadata_col = [
+        f"player_name: {player_name}",
+        f"feedback_modality: {modality_str}",
+        f"location_mapping: {mapping_mode}",
+        f"positive_cue: {pos_mode}",
+        f"negative_cue: {neg_mode}"
+    ]
+
+    formatted_cycles = [f"{t:.4f}" for t in cycle_times]
+    total_submissions = correct_submissions + incorrect_submissions
+
+    # single-value summary columns placed alongside the cycle_time_s column
+    correct_col = [str(correct_submissions)]
+    incorrect_col = [str(incorrect_submissions)]
+    total_col = [str(total_submissions)]
+
+    headers = [
+        "metadata",
+        "cycle_time_s",
+        "correct_submissions",
+        "incorrect_submissions",
+        "total_submissions"
+    ]
+
+    rows = zip_longest(
+        metadata_col,
+        formatted_cycles,
+        correct_col,
+        incorrect_col,
+        total_col,
+        fillvalue=""
+    )
+
+    try:
+        with open(file_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(headers)
+            writer.writerows(rows)
+        print(f"saved subject data to {file_path}")
+    except Exception as e:
+        print(f"error saving subject csv file: {e}")
+
+
 class FeedbackController:
     """manages persistent bhaptics player websocket connection, stimulus variants, spatial mapping, audio toggling, and wav playback."""
 
@@ -101,8 +160,8 @@ class FeedbackController:
         self.snd_correct = QSoundEffect()
         self.snd_incorrect = QSoundEffect()
 
-        correct_path = os.path.join(base_dir, "audios/correct_answer.wav")
-        incorrect_path = os.path.join(base_dir, "audios/incorrect_answer.wav")
+        correct_path = os.path.join(base_dir, "audios", "correct_answer.wav")
+        incorrect_path = os.path.join(base_dir, "audios", "incorrect_answer.wav")
 
         if os.path.exists(correct_path):
             self.snd_correct.setSource(QUrl.fromLocalFile(os.path.abspath(correct_path)))
@@ -435,6 +494,7 @@ class ProceduralAssemblyGame(QWidget):
         self.feedback = feedback_ctrl
         self.player_name = player_name
         self.initial_audio_enabled = self.feedback.audio_enabled
+        self.modality_label = "Haptics + Audio" if self.initial_audio_enabled else "Haptics Only"
 
         audio_str = "Audio ON" if self.feedback.audio_enabled else "Haptics Only"
         self.setWindowTitle(
@@ -445,18 +505,21 @@ class ProceduralAssemblyGame(QWidget):
 
         self.rng = random.Random()
         self.visible_score = 0
-        self.pending_score = 0
         self.units_completed = 0
+        self.incorrect_submissions = 0
         self.game_start_time = 0.0
         self.is_game_over = False
         self.score_saved = False
         self.leaderboard_data = []
 
+        # experimental metrics tracking
+        self.cycle_start_time = 0.0
+        self.cycle_times = []
+
         # assembly state variables
         self.target_sequence = []
         self.current_step = 0
         self.installed_choices = [None, None, None, None]
-        self.step_awarded = [False, False, False, False]
         self.unit_submitted = False
         self.reveal_success = False
 
@@ -470,23 +533,40 @@ class ProceduralAssemblyGame(QWidget):
     def start(self):
         now = time.perf_counter()
         self.visible_score = 0
-        self.pending_score = 0
         self.units_completed = 0
+        self.incorrect_submissions = 0
         self.game_start_time = now
         self.is_game_over = False
         self.score_saved = False
+        self.cycle_times = []
         self.feedback.audio_enabled = self.initial_audio_enabled
         self._new_unit()
         self.timer.start(30)
 
     def _new_unit(self):
-        """generates a brand-new hidden 4-step assembly configuration."""
+        """generates a brand-new hidden 4-step assembly configuration and resets cycle timer."""
         self.target_sequence = [self.rng.randrange(3) for _ in range(4)]
         self.current_step = 0
         self.installed_choices = [None, None, None, None]
-        self.step_awarded = [False, False, False, False]
         self.unit_submitted = False
         self.reveal_success = False
+        self.cycle_start_time = time.perf_counter()
+
+    def _save_session_results(self):
+        """saves leaderboard score and writes subject metrics to csv once per session."""
+        if not self.score_saved:
+            save_score(self.player_name, self.visible_score)
+            save_subject_csv(
+                player_name=self.player_name,
+                modality_str=self.modality_label,
+                mapping_mode=self.feedback.mapping_mode,
+                pos_mode=self.feedback.pos_mode,
+                neg_mode=self.feedback.neg_mode,
+                cycle_times=self.cycle_times,
+                correct_submissions=self.units_completed,
+                incorrect_submissions=self.incorrect_submissions
+            )
+            self.score_saved = True
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
@@ -528,7 +608,7 @@ class ProceduralAssemblyGame(QWidget):
             self.update()
 
     def _seat_component(self, choice_idx):
-        """seats a part on the active step and delivers haptic/audio feedback without advancing."""
+        """seats a part on the active step and delivers haptic/audio feedback without altering score."""
         if self.installed_choices[self.current_step] is not None:
             self.feedback.trigger_incorrect()
             return
@@ -536,15 +616,10 @@ class ProceduralAssemblyGame(QWidget):
         self.installed_choices[self.current_step] = choice_idx
         target = self.target_sequence[self.current_step]
 
+        # provide haptic/audio feedback based on whether the choice matches the target
         if choice_idx == target:
-            if not self.step_awarded[self.current_step]:
-                self.pending_score += STEP_HIT_POINTS
-                self.step_awarded[self.current_step] = True
             self.feedback.trigger_correct()
         else:
-            self.pending_score -= STEP_WRONG_PENALTY
-            if self.visible_score + self.pending_score < 0:
-                self.pending_score = -self.visible_score
             self.feedback.trigger_incorrect()
 
         self.update()
@@ -561,20 +636,20 @@ class ProceduralAssemblyGame(QWidget):
             self.current_step += 1
         else:
             self.unit_submitted = True
+            cycle_duration = now - self.cycle_start_time
+            self.cycle_times.append(cycle_duration)
+
             all_correct = all(
                 self.installed_choices[i] == self.target_sequence[i]
                 for i in range(4)
             )
             if all_correct:
                 self.units_completed += 1
-                self.pending_score += UNIT_BONUS_POINTS
-                self.visible_score = max(0, self.visible_score + self.pending_score)
-                self.pending_score = 0
+                self.visible_score = max(0, self.visible_score + UNIT_BONUS_POINTS)
                 self.reveal_success = True
             else:
-                self.pending_score -= STEP_WRONG_PENALTY
-                self.visible_score = max(0, self.visible_score + self.pending_score)
-                self.pending_score = 0
+                self.incorrect_submissions += 1
+                self.visible_score = max(0, self.visible_score - UNIT_WRONG_PENALTY)
                 self.reveal_success = False
                 self.feedback.trigger_incorrect()
 
@@ -592,12 +667,7 @@ class ProceduralAssemblyGame(QWidget):
             if not self.is_game_over:
                 self.is_game_over = True
                 self.timer.stop()
-                final_score = max(0, self.visible_score + self.pending_score)
-                self.visible_score = final_score
-                self.pending_score = 0
-                if not self.score_saved:
-                    save_score(self.player_name, self.visible_score)
-                    self.score_saved = True
+                self._save_session_results()
                 self.leaderboard_data = load_leaderboard()
             self.update()
             return
@@ -851,14 +921,15 @@ class ProceduralAssemblyGame(QWidget):
 
     def closeEvent(self, event):
         self.timer.stop()
+        # ensure data is saved even if the window is closed before the timer expires
+        self._save_session_results()
         self.feedback.close()
         super().closeEvent(event)
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    feedback = FeedbackController(base_dir=base_dir)
+    feedback = FeedbackController(base_dir=PROJECT_ROOT)
 
     dialog = StimulusConfigDialog(feedback)
     if dialog.exec_() == QDialog.Accepted:
