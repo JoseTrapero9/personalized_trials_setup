@@ -20,7 +20,7 @@ from PyQt5.QtMultimedia import QSoundEffect
 UNIT_BONUS_POINTS = 20  # points gained for a correct 4-piece submission
 UNIT_WRONG_PENALTY = 20  # points lost for an incorrect 4-piece submission
 TIME_TEST = 120  # game duration in seconds (120 = 2 minutes)
-AUDIO_GONE_IN = 30  # duration in seconds after which audio cues disappear
+AUDIO_GONE_IN = 60  # duration in seconds after which audio cues disappear
 
 STEPS_INFO = [
     ("STEP 1: BASE ALIGNMENT", ["PORT A", "PORT B", "PORT C"]),
