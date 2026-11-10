@@ -226,17 +226,17 @@ class PreStudyQuestionnaire(QWidget):
             QWidget { background-color: #0F172A; color: #F8FAFC; font-family: Helvetica, Arial; }
             QGroupBox {
                 background-color: #1E293B; border: 1px solid #334155; border-radius: 8px;
-                margin-top: 12px; padding: 14px; font-weight: bold; font-size: 14px; color: #38BDF8;
+                margin-top: 12px; padding: 14px; font-weight: bold; font-size: 16px; color: #38BDF8;
             }
             QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 4px; }
-            QLabel { color: #E2E8F0; font-size: 13px; font-weight: bold; }
+            QLabel { color: #E2E8F0; font-size: 15px; font-weight: bold; }
             QLineEdit, QComboBox {
                 background-color: #0F172A; color: #F8FAFC; border: 1px solid #475569;
-                border-radius: 6px; padding: 6px; font-size: 13px;
+                border-radius: 6px; padding: 6px; font-size: 15px;
             }
             QPushButton {
                 background-color: #334155; color: #F8FAFC; border: 1px solid #64748B;
-                border-radius: 6px; padding: 7px 14px; font-size: 13px; font-weight: bold;
+                border-radius: 6px; padding: 7px 14px; font-size: 15px; font-weight: bold;
             }
             QPushButton:hover { background-color: #475569; }
             QPushButton#triggerBtn {
@@ -248,7 +248,7 @@ class PreStudyQuestionnaire(QWidget):
             }
             QPushButton#mapFeelBtn:hover { background-color: #B45309; }
             QPushButton#saveBtn {
-                background-color: #16A34A; border-color: #22C55E; font-size: 16px; padding: 12px;
+                background-color: #16A34A; border-color: #22C55E; font-size: 18px; padding: 12px;
             }
             QPushButton#saveBtn:hover { background-color: #15803D; }
             QSlider::groove:horizontal {
@@ -271,7 +271,7 @@ class PreStudyQuestionnaire(QWidget):
 
         # Title Header
         title_lbl = QLabel("PRE-STUDY HAPTIC EVALUATION")
-        title_lbl.setStyleSheet("font-size: 20px; font-weight: bold; color: #38BDF8;")
+        title_lbl.setStyleSheet("font-size: 22px; font-weight: bold; color: #38BDF8;")
         title_lbl.setAlignment(Qt.AlignCenter)
         scroll_layout.addWidget(title_lbl)
 
@@ -308,7 +308,7 @@ class PreStudyQuestionnaire(QWidget):
         # Guidance Length Drop-down
         self.guidance_length_combo = QComboBox()
         self.guidance_length_combo.addItems(["Keep length", "Increase length", "Decrease length"])
-        setup_form.addRow(QLabel("Guidance Length Preference:"), self.guidance_length_combo)
+        setup_form.addRow(QLabel("Duration of cues:"), self.guidance_length_combo)
 
         setup_group.setLayout(setup_form)
         scroll_layout.addWidget(setup_group)

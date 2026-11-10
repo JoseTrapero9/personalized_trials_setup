@@ -701,14 +701,14 @@ class CueValidationGame(QWidget):
 
         painter.setFont(QFont("Helvetica", 18, QFont.Bold))
         painter.setPen(QColor("#F8FAFC"))
-        painter.drawText(QRectF(left_rect.x(), left_rect.y() + 85, left_rect.width(), 35), Qt.AlignCenter, "POSITIVE / CORRECT")
+        painter.drawText(QRectF(left_rect.x(), left_rect.y() + 85, left_rect.width(), 35), Qt.AlignCenter, "CORRECT")
 
         painter.setFont(QFont("Helvetica", 11, QFont.Normal))
         painter.setPen(QColor("#86EFAC"))
         painter.drawText(
             QRectF(left_rect.x() + 16, left_rect.y() + 130, left_rect.width() - 32, 60),
             Qt.AlignCenter | Qt.TextWordWrap,
-            "Press Left Arrow if you perceived a Positive / Correct haptic pattern."
+            "Press Left Arrow if you perceived a Correct haptic pattern."
         )
 
         # Right Card (Negative / Incorrect Cue)
@@ -723,14 +723,14 @@ class CueValidationGame(QWidget):
 
         painter.setFont(QFont("Helvetica", 18, QFont.Bold))
         painter.setPen(QColor("#F8FAFC"))
-        painter.drawText(QRectF(right_rect.x(), right_rect.y() + 85, right_rect.width(), 35), Qt.AlignCenter, "NEGATIVE / INCORRECT")
+        painter.drawText(QRectF(right_rect.x(), right_rect.y() + 85, right_rect.width(), 35), Qt.AlignCenter, "INCORRECT")
 
         painter.setFont(QFont("Helvetica", 11, QFont.Normal))
         painter.setPen(QColor("#FCA5A5"))
         painter.drawText(
             QRectF(right_rect.x() + 16, right_rect.y() + 130, right_rect.width() - 32, 60),
             Qt.AlignCenter | Qt.TextWordWrap,
-            "Press Right Arrow if you perceived a Negative / Incorrect haptic pattern."
+            "Press Right Arrow if you perceived a Incorrect haptic pattern."
         )
 
         # bottom controls bar
