@@ -1,9 +1,26 @@
+# Everything the project needs except the YOLO model libraries (see the bottom of this file).
+#   pip install -r requirements.txt
+
+# GUI (main.py) and the camera evaluator
 numpy
 sounddevice
 soundfile
 pylsl
 PyQt5
-openpyxl         # Excel summary files of the questionnaires
-vosk
-pywin32          # offline TTS for generate_radio_audio.py (Windows)
-bhaptics-python  # Python 3.8-3.12, Windows x64
+vosk               # "deliver" voice trigger (voice.py)
+openpyxl           # Excel summary files of the questionnaires
+
+# Tools and pre-study scripts
+reportlab          # generate_log_files.py (answer-key PDF)
+websocket-client   # pre_study/*.py (bHaptics Player connection)
+opencv-python      # live_evaluator.py, live_test.py, autolabeler.py (camera window)
+
+# Windows only
+pywin32; sys_platform == "win32"           # offline TTS for generate_radio_audio.py
+bhaptics-python; sys_platform == "win32"   # haptic vest (haptics.py), Python 3.8-3.12, Windows x64
+
+# NOT installed from this file: the YOLO model side, which runs on the camera PC with its own
+# Python / CUDA setup (live_evaluator.py, live_test.py, autolabeler.py):
+#   ultralytics
+#   torch            (install the build that matches the PC's GPU, see pytorch.org)
+#   XIMEA Python API (comes with the XIMEA software package, C:\XIMEA\API\Python\v3 - not on pip)
