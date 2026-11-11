@@ -347,7 +347,7 @@ class QuestionnaireScreen(QWidget):
             p.setFont(_font(21))
             p.drawText(QRectF(LEFT + 24, y + 46, 860, inner - 52), Qt.AlignTop | Qt.TextWordWrap, row["text"])
 
-            base = y + inner * 0.52                              # scale baseline, ticks go up from it
+            base = y + inner * 0.42                              # scale baseline, ticks go up from it
             p.setPen(QPen(QColor("#111827"), 2))
             p.drawLine(QPointF(TLX_X0, base), QPointF(TLX_X1, base))
             for k in range(q.TLX_STEPS):
@@ -359,10 +359,17 @@ class QuestionnaireScreen(QWidget):
                 p.setPen(QPen(QColor("#0F766E"), 3))
                 p.setBrush(QColor("#14B8A6"))
                 p.drawEllipse(QPointF(x, base - 11), 13, 13)
+            # number under every gradation = the score that is saved (0, 5, ... 100)
+            for k in range(q.TLX_STEPS):
+                chosen = self.answers[i] == k
+                p.setPen(QColor("#0F766E" if chosen else "#475569"))
+                p.setFont(_font(17 if chosen else 15, chosen))
+                p.drawText(QRectF(self._point_x(k) - 20, base + 3, 40, 22), Qt.AlignCenter,
+                           str(k * 100 // (q.TLX_STEPS - 1)))
             p.setPen(QColor("#334155"))
             p.setFont(_font(19))
-            p.drawText(QRectF(TLX_X0 - 20, base + 6, 300, 28), Qt.AlignVCenter | Qt.AlignLeft, row["low"])
-            p.drawText(QRectF(TLX_X1 - 280, base + 6, 300, 28), Qt.AlignVCenter | Qt.AlignRight, row["high"])
+            p.drawText(QRectF(TLX_X0 - 20, base + 27, 300, 28), Qt.AlignVCenter | Qt.AlignLeft, row["low"])
+            p.drawText(QRectF(TLX_X1 - 280, base + 27, 300, 28), Qt.AlignVCenter | Qt.AlignRight, row["high"])
 
     def _paint_message(self, p, page):
         p.setBrush(QColor("white"))
