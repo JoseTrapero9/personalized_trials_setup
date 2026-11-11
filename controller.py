@@ -2,7 +2,7 @@
 
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QApplication, QShortcut, QStackedWidget, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QApplication, QMessageBox, QShortcut, QStackedWidget, QVBoxLayout, QWidget
 
 from audio import audio_sys
 from config import (
@@ -20,8 +20,10 @@ from config import (
 from evaluator_link import EvaluatorLink
 from haptics import activate_haptic_vest
 from lsl_markers import send_marker
+from questionnaires import QUESTIONNAIRE_CONDITIONS, missing_conditions
 from robot import send_point_to_robot, set_robot_speed
 from screens.dual_task_screen import DualTaskScreen
+from screens.questionnaire_screen import QuestionnaireScreen
 from screens.scoreboard_screen import ArcadeScoreboardScreen
 from screens.setup_screen import setupscreen
 from screens.start_screen import startscreen
@@ -37,7 +39,7 @@ class paradigmcontroller(QWidget):
         self.mistake_on_cooldown = False
 
         self.stacked_widget = QStackedWidget()
-        self.setup_screen = setupscreen(self.setup_finished_callback)
+        self.setup_screen = setupscreen(self.setup_finished_callback, self.start_sus_questionnaire)
         self.tutorial_screen = tutorialscreen(self.tutorial_finished_callback)
         self.start_screen = startscreen(self.start_experiment_tracking)
         self.dual_task_screen = DualTaskScreen(
@@ -45,13 +47,15 @@ class paradigmcontroller(QWidget):
             condition_complete_cb=self.on_condition_complete,
             get_scenario_cb=self.get_current_scenario
         )
-        self.scoreboard_screen = ArcadeScoreboardScreen(self.return_to_setup)
+        self.scoreboard_screen = ArcadeScoreboardScreen(self.after_scoreboard)
+        self.questionnaire_screen = QuestionnaireScreen()
 
         self.stacked_widget.addWidget(self.setup_screen)       # 0
         self.stacked_widget.addWidget(self.tutorial_screen)    # 1
         self.stacked_widget.addWidget(self.start_screen)       # 2
         self.stacked_widget.addWidget(self.dual_task_screen)   # 3
         self.stacked_widget.addWidget(self.scoreboard_screen)  # 4
+        self.stacked_widget.addWidget(self.questionnaire_screen)  # 5
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -170,6 +174,39 @@ class paradigmcontroller(QWidget):
         self.stacked_widget.setCurrentIndex(4)
         self.scoreboard_screen.start_scoreboard(state.current_condition, final_score)
         self.scoreboard_screen.setFocus()
+
+    def after_scoreboard(self):
+        """Scoreboard closed: NASA-TLX for the condition that just ended, then the main menu."""
+        if state.current_condition not in QUESTIONNAIRE_CONDITIONS:      # training, robot_fast, robot_slow
+            self.return_to_setup()
+            return
+        self.stacked_widget.setCurrentIndex(5)
+        self.questionnaire_screen.start_nasatlx(
+            state.subject_number, state.current_condition, state.language, state.game_mode,
+            finish_cb=self.return_to_setup)
+
+    def start_sus_questionnaire(self):
+        """'sus' chosen in the condition menu: experience questionnaire for all conditions + summary files."""
+        missing = missing_conditions(state.subject_number, "nasatlx")
+        if missing:
+            box = QMessageBox(self)
+            box.setIcon(QMessageBox.Warning)
+            box.setWindowTitle("Missing conditions")
+            box.setText(f"Subject {state.subject_number} has no NASA-TLX file for:\n\n"
+                        f"    {', '.join(missing)}\n\n"
+                        "These conditions were probably not run (or not finished).\n\n"
+                        "Continue: do the questionnaire and create the subject files without them.\n"
+                        "Go back: return to the main menu.")
+            proceed = box.addButton("Continue", QMessageBox.AcceptRole)
+            back = box.addButton("Go back", QMessageBox.RejectRole)
+            box.setDefaultButton(back)
+            box.setStyleSheet("QLabel { font-size: 20px; } QPushButton { font-size: 20px; padding: 8px 24px; }")
+            box.exec_()
+            if box.clickedButton() is not proceed:
+                send_marker("SUS_Cancelled_Missing_Conditions")
+                return
+        self.stacked_widget.setCurrentIndex(5)
+        self.questionnaire_screen.start_sus(state.subject_number, state.language, finish_cb=self.return_to_setup)
 
     def return_to_setup(self):
         send_marker("Returned_To_Main_Menu")

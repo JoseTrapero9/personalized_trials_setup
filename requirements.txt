@@ -3,6 +3,7 @@ sounddevice
 soundfile
 pylsl
 PyQt5
+openpyxl         # Excel summary files of the questionnaires
 vosk
 pywin32          # offline TTS for generate_radio_audio.py (Windows)
 bhaptics-python  # Python 3.8-3.12, Windows x64

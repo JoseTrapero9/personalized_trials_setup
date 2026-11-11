@@ -9,14 +9,16 @@ import os
 
 from config import ALL_CONDITIONS, GAME_MODES, MAX_ROUNDS_PER_CONDITION, PROBLEMS_PER_CHECKPOINT, RADIO_AUDIO_DIR
 from lsl_markers import send_marker
+from questionnaires import SUS_MENU_ITEM
 from radio_script import LANGUAGES
 from state import state
 
 
 class setupscreen(QWidget):
-    def __init__(self, switch_callback):
+    def __init__(self, switch_callback, questionnaire_callback=None):
         super().__init__()
         self.switch_callback = switch_callback
+        self.questionnaire_callback = questionnaire_callback   # "sus" chosen in the condition menu
         self.init_ui()
 
     def init_ui(self):
@@ -50,6 +52,9 @@ class setupscreen(QWidget):
         self.cond_combo.setFont(main_font)
         self.cond_combo.setFixedWidth(320)
         self.cond_combo.addItems(ALL_CONDITIONS)
+        if self.questionnaire_callback is not None:
+            self.cond_combo.insertSeparator(self.cond_combo.count())
+            self.cond_combo.addItem(SUS_MENU_ITEM)             # questionnaire after all conditions
         layout.addWidget(self.cond_combo, alignment=Qt.AlignCenter)
 
         self.mode_label = QLabel("Game Mode:")
@@ -113,6 +118,15 @@ class setupscreen(QWidget):
             self.audio_status.setStyleSheet("color: #B42318; font-weight: bold;")
 
     def save_and_continue(self):
+
+        if self.cond_combo.currentText() == SUS_MENU_ITEM:
+            # questionnaire only: keep the condition state untouched (no Setup_Complete marker)
+            state.subject_number = self.subj_combo.currentText()
+            state.language = self.lang_combo.currentData()
+            state.training_active = False
+            send_marker(f"Setup_Questionnaire_Subj_{state.subject_number}_Lang_{state.language}")
+            self.questionnaire_callback()
+            return
 
         state.subject_number = self.subj_combo.currentText()
         state.current_condition = self.cond_combo.currentText()
