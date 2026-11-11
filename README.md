@@ -62,6 +62,7 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 | `texts.py` | participant screen text in EN / ES / DE |
 | `screens/` | setup (incl. language), tutorial, start, dual task, scoreboard |
 | `sequences.py` | loads `log_files/sXX_<condition>.txt` |
+| `questionnaires.py` | NASA-TLX + experience questionnaire: text (EN/ES/DE), saving, subject summary files |
 | `generate_log_files.py` | makes `log_files/` + answer-key PDF |
 | `live_evaluator.py` | camera PC: YOLO tray check, follows the GUI over LSL, sends verdicts |
 | `evaluator_link.py` | GUI side: receives the camera verdicts |
@@ -138,6 +139,22 @@ The camera PC needs this repo (for `log_files/`, `config.py`, `sequences.py`), `
 `live_test.py` packages (ultralytics, torch, opencv, XIMEA API); for voice in test mode also `vosk`,
 `sounddevice`, `PyQt5` and the `model/` folder. Allow Python through the Windows firewall on both PCs
 (private network) or LSL cannot see the other PC.
+
+## Questionnaires
+
+* **NASA-TLX after every condition** (baseline, audio, haptic, audio_haptic; not after training,
+  robot_fast or robot_slow): scoreboard -> NASA-TLX -> main menu. Six scales, 21 gradations, raw TLX
+  (no pairwise weighting). Saved as `logs/questionnaires/sXX_<condition>_nasatlx.csv` (scores 0-100 plus
+  `raw_tlx`); running the condition again overwrites the file.
+* **`sus` in the condition menu** (once per subject, after all conditions): experience questionnaire with
+  10 statements per condition on a 5-point agree scale (baseline: 6, the 4 feedback statements are left
+  empty). Saves `sXX_<condition>_sus.csv` after each page, then builds the subject files
+  `sXX_nasatlx_all_conditions.csv/.xlsx` and `sXX_sus_all_conditions.csv/.xlsx` (Excel needs `openpyxl`).
+  If a condition has no NASA-TLX file, a warning lists the missing conditions: Continue or Go back.
+* Answer with the mouse or the keys: UP / DOWN line, LEFT / RIGHT answer (1-5 also work for statements),
+  ENTER continue. Every line must be answered. Language = the participant language of the setup screen.
+* Text, statements and the list of conditions: `questionnaires.py`. Markers: `NasaTLX_Started|Saved_...`,
+  `SUS_Started|Saved|Finished_...`.
 
 ## Logs
 
