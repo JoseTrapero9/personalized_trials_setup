@@ -1,0 +1,11 @@
+metadata,cycle_time_s,correct_submissions,incorrect_submissions,total_submissions
+player_name: s07_practice,17.0408,10,0,10
+feedback_modality: Haptics + Audio,13.7373,,,
+location_mapping: correct_back,13.6219,,,
+positive_cue: positive_1,14.4947,,,
+negative_cue: negative_1,7.9634,,,
+,9.5913,,,
+,7.0970,,,
+,7.6421,,,
+,9.2341,,,
+,8.1146,,,

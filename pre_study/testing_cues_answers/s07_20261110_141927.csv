@@ -1,0 +1,10 @@
+metadata,cycle_time_s,correct_submissions,incorrect_submissions,total_submissions
+player_name: s07,14.7889,8,1,9
+feedback_modality: Haptics + Audio,12.9283,,,
+location_mapping: correct_front,12.4379,,,
+positive_cue: positive_2,9.9145,,,
+negative_cue: negative_3,11.9704,,,
+,11.6596,,,
+,10.2770,,,
+,11.3834,,,
+,11.2988,,,

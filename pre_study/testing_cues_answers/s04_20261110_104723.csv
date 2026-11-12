@@ -1,0 +1,6 @@
+metadata,cycle_time_s,correct_submissions,incorrect_submissions,total_submissions
+player_name: s04,29.2060,4,0,4
+feedback_modality: Haptics + Audio,31.8097,,,
+location_mapping: correct_back,24.0410,,,
+positive_cue: positive_2,18.0266,,,
+negative_cue: negative_2,,,,

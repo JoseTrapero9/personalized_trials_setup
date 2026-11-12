@@ -1,0 +1,9 @@
+metadata,cycle_time_s,correct_submissions,incorrect_submissions,total_submissions
+player_name: Player 1,21.5890,6,2,8
+feedback_modality: Haptics + Audio,13.1220,,,
+location_mapping: correct_back,13.9632,,,
+positive_cue: positive_3,14.7382,,,
+negative_cue: negative_2,7.3039,,,
+,12.4151,,,
+,12.6708,,,
+,10.6667,,,

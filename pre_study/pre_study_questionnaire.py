@@ -368,6 +368,7 @@ class PreStudyQuestionnaire(QWidget):
         self.diff_correct_combo = QComboBox()
         self.diff_correct_combo.addItem("One cue was significantly better for perceiving the correct answer", "significantly_better")
         self.diff_correct_combo.addItem("All correct cues felt almost the same", "almost_same")
+        self.diff_correct_combo.addItem("One cue was significantly worst for perceiving the correct answer", "significantly_worst")
         meta_correct_form.addRow(QLabel("Difference in perception between correct cues:"), self.diff_correct_combo)
 
         correct_meta_box.setLayout(meta_correct_form)
@@ -431,6 +432,7 @@ class PreStudyQuestionnaire(QWidget):
         self.diff_incorrect_combo = QComboBox()
         self.diff_incorrect_combo.addItem("One cue was significantly better for perceiving the incorrect answer", "significantly_better")
         self.diff_incorrect_combo.addItem("All incorrect cues felt almost the same", "almost_same")
+        self.diff_correct_combo.addItem("One cue was significantly worst for perceiving the correct answer", "significantly_worst")
         meta_incorrect_form.addRow(QLabel("Difference in perception between incorrect cues:"), self.diff_incorrect_combo)
 
         incorrect_meta_box.setLayout(meta_incorrect_form)

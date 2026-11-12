@@ -1,0 +1,6 @@
+metadata,cycle_time_s,correct_submissions,incorrect_submissions,total_submissions
+player_name: S06 practice,,0,0,0
+feedback_modality: Haptics + Audio,,,,
+location_mapping: correct_back,,,,
+positive_cue: positive_2,,,,
+negative_cue: negative_1,,,,
