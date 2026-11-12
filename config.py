@@ -50,7 +50,7 @@ if os.path.isdir(VOSK_MODEL_DIR) and not os.path.isdir(os.path.join(VOSK_MODEL_D
             break
 VOSK_SAMPLE_RATE = 16000                           # 16 kHz mono int16 is what Vosk expects
 DELIVER_WORDS = ("deliver", "delivery", "ready")   # grammar-locked trigger words
-VOICE_INPUT_KEYWORD = None                         # e.g. "Realtek" to force a specific mic; None = system default
+VOICE_INPUT_KEYWORD = "Bose"                         # e.g. "Realtek" to force a specific mic; None = system default
 VOICE_COOLDOWN_SECONDS = 1.0                       # ignore repeat triggers from the same utterance
 
 # Radio game (radio_script.py / panel_logic.py / game.py)
@@ -90,6 +90,19 @@ ROULETTE_FRAME_SECONDS = 0.09             # spin speed          # a press this s
 # right away. While True the manual y / c evaluation keys are disabled.
 USE_REMOTE_EVALUATOR = True
 EVALUATOR_STREAM_NAME = "BatteryEvaluator"
+
+
+# Per-battery cues: sent by live_evaluator.py as soon as it sees a battery in a slot
+# (Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect). What the participant gets depends on the condition:
+#   audio -> sound, haptic -> vest, audio_haptic -> both, baseline / training / robot_* -> nothing.
+BATTERY_CUE_CONDITIONS = {"audio": ("audio",), "haptic": ("haptic",), "audio_haptic": ("audio", "haptic")}
+correct_cue_audio = os.path.join(audio_dir, "positive_sound2.wav")   # swap the file name to change the sound
+incorrect_cue_audio = mistake_audio                                  # the mistake sound used so far
+CUE_AUDIO_MAX_SECONDS = 1.0        # every cue sound is cut to this length when played (files untouched)
+HAPTIC_CORRECT_PATTERN = "positive_3"      # warm swell (pre-study)
+HAPTIC_INCORRECT_PATTERN = "negative_2"    # sharp staccato (pre-study)
+HAPTIC_CORRECT_POSITION = "VestBack"       # pre-study mapping "correct_back": correct on the back,
+HAPTIC_INCORRECT_POSITION = "VestFront"    # incorrect on the front
 
 
 def assembly_seconds(scenario):
