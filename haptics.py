@@ -62,6 +62,16 @@ async def close_haptics():
 ALL_MOTORS = list(range(20))
 CENTER_MOTORS = [1, 2, 5, 6, 9, 10, 13, 14, 17, 18]
 OUTER_MOTORS = [0, 3, 4, 7, 8, 11, 12, 15, 16, 19]
+
+BACK_ALL = list(range(20))
+BACK_LOWER = [4, 5, 6, 7, 12, 13, 14, 15, 16, 17, 18, 19]
+BACK_UPPER = [0, 1, 2, 3, 8, 9, 10, 11]
+BACK_CENTER = [1, 2, 5, 6, 9, 10, 13, 14, 17, 18]
+BACK_OUTER = [0, 3, 4, 7, 8, 11, 12, 15, 16, 19]
+
+FRONT_ALL = list(range(20))
+FRONT_LEFT = [0, 1, 4, 5, 8, 9, 12, 13, 16, 17]
+FRONT_RIGHT = [2, 3, 6, 7, 10, 11, 14, 15, 18, 19]
 PLAYER_URL = "ws://127.0.0.1:15881/v2/feedbacks?app_id=assembly_x16&app_name=Dual_Task_Paradigm"
 
 
@@ -114,7 +124,6 @@ class _PlayerLink:
 
 
 player = _PlayerLink()
-
 
 def _positive_3(position):
     """Warm swell: centre -> whole panel -> outer ring (about 0.5 s)."""
