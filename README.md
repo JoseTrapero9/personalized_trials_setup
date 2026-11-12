@@ -120,7 +120,7 @@ Live mode plays no sounds for now.
 
 **Per-battery cues (predictive):** as soon as a battery is seen in a slot for `CUE_STABLE_FRAMES` frames
 (default 4, `--cue-frames`), the evaluator sends `Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect_...`.
-A hand at the station does not block this. The GUI answers during the assembly with the cue of the condition
+A hand at the station does not block this. A battery that is taken out and put in again (same colour or another) gets a new cue every time; a slot only covered by a hand for a moment (under `RECUE_EMPTY_FRAMES` = 12 frames, `--recue-frames`) does not. The GUI answers during the assembly with the cue of the condition
 (marker `Battery_Cue_Round_<r>_Slot_<k>_<result>_<channels>`):
 
 | condition | correct battery | wrong battery |

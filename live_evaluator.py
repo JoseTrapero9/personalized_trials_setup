@@ -24,8 +24,9 @@ How a row / round is evaluated (both modes)
     afterwards the marks are frozen and drawn in black.
   * Per-battery cue (predictive): as soon as a battery is seen in a slot for CUE_STABLE_FRAMES frames,
     Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect_... is sent - also while a hand is at the station.
-    The GUI answers with the vest / sound cue of the condition. One cue per battery; a battery that was
-    only covered by a hand does not cue again.
+    The GUI answers with the vest / sound cue of the condition. One cue per placement: a battery that was
+    only covered by a hand for a moment does not cue again, but every battery that is taken out and put
+    in again (same colour or another one) gets a new cue, as many times as needed.
   * The whole-tray reading for the final verdict counts once it is the same for STABLE_FRAMES frames with
     no hand at the station (so a hand covering batteries cannot turn a correct tray into a mistake).
   * Only the STATION counts (the model's "Station" class): batteries are read only inside a tray
@@ -78,6 +79,9 @@ MARKER_STREAM_NAME = "ParadigmMarkers"     # the GUI's marker stream (lsl_marker
 STABLE_FRAMES = 8                          # same tray reading this many frames in a row (~0.27 s at 30 fps)
 CUE_STABLE_FRAMES = 4                      # a battery seen in a slot this many frames in a row -> per-battery cue
                                            # (hands do NOT block this; lower = faster cue, more false cues)
+RECUE_EMPTY_FRAMES = 12                    # slot empty this many frames while a hand is at the station = the
+                                           # battery was taken out, so the next one cues again (even the same
+                                           # colour). Shorter gaps count as "only covered by the hand".
 TRAY_GONE_FRAMES = 10                      # tray off the station (no hand at it) this many frames -> evaluate
 STATION_CLEAR_SECONDS = 0.3                # no tray on the station this long = cleared (arms "tray left")
 STATION_LABEL = "station"                  # YOLO class of the assembly station (case-insensitive)
@@ -432,11 +436,15 @@ class ParadigmTracker:
                 rec.slot_count[k] += 1
             else:
                 rec.slot_candidate[k], rec.slot_count[k] = color, 1
-            if rec.slot_count[k] != self.cue_frames:
-                continue
             if color is None:
-                if not hand:
-                    rec.slot_cued[k] = None              # really taken out (not just covered by a hand)
+                # taken out: seen empty with no hand, or empty long enough while a hand is there.
+                # Then the next battery in this slot gets its own cue again, as often as needed.
+                if rec.slot_count[k] >= (self.cue_frames if not hand else max(self.cue_frames, RECUE_EMPTY_FRAMES)):
+                    if rec.slot_cued[k] is not None and rec.row is not None:
+                        self.table[rec.row]["marks"][k] = None
+                    rec.slot_cued[k] = None
+                continue
+            if rec.slot_count[k] != self.cue_frames:
                 continue
             if color == rec.slot_cued[k]:
                 continue                                 # same battery seen again after being covered
@@ -1433,7 +1441,7 @@ def run_live(args):
 
 
 def main():
-    global SEND_VERDICTS, TRAY_GONE_FRAMES
+    global SEND_VERDICTS, TRAY_GONE_FRAMES, RECUE_EMPTY_FRAMES
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--test", nargs="?", const="pick", metavar="FILE",
                     help="test mode without the GUI; FILE like s03_audio (no FILE = choose in a window)")
@@ -1444,6 +1452,8 @@ def main():
     ap.add_argument("--stable-frames", type=int, default=STABLE_FRAMES)
     ap.add_argument("--cue-frames", type=int, default=CUE_STABLE_FRAMES,
                     help="frames a battery must be seen in a slot before its cue is sent (default 4)")
+    ap.add_argument("--recue-frames", type=int, default=RECUE_EMPTY_FRAMES,
+                    help="frames a slot must be empty under a hand before the next battery cues again (default 12)")
     ap.add_argument("--tray-gone", type=int, default=TRAY_GONE_FRAMES,
                     help="frames the tray must be off the station before the round is evaluated (default 10)")
     ap.add_argument("--predict-only", action="store_true", help="live mode: never send verdicts to the GUI")
@@ -1453,6 +1463,7 @@ def main():
     args = ap.parse_args()
     SEND_VERDICTS = SEND_VERDICTS and not args.predict_only
     TRAY_GONE_FRAMES = args.tray_gone
+    RECUE_EMPTY_FRAMES = args.recue_frames
     if args.test:
         run_test(args)
     else:
