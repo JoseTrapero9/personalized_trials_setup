@@ -51,10 +51,12 @@ Needs: pylsl (live mode) and everything live_test.py needs (ultralytics, torch, 
 
 import argparse
 import csv
+import faulthandler
 import itertools
 import os
 import queue
 import re
+import sys
 import threading
 import time
 
@@ -668,7 +670,7 @@ def render_panel(tracker, width=700, height=640, now=None):
     return img
 
 
-def compose(camera_img, tracker, link_text=None, link_ok=True, now=None):
+def compose(camera_img, tracker, link_text=None, link_ok=True, now=None, alert=""):
     """Camera image (left, 1024x576) + notes below it + answer table (right)."""
     import cv2
     import numpy as np
@@ -683,6 +685,9 @@ def compose(camera_img, tracker, link_text=None, link_ok=True, now=None):
     if link_text:
         cv2.putText(canvas, link_text, (cam_w - 190, 630), cv2.FONT_HERSHEY_SIMPLEX, 0.55,
                     (0, 200, 0) if link_ok else (0, 0, 255), 2, cv2.LINE_AA)
+    if alert:                                    # camera problem: red banner over the (frozen) image
+        cv2.rectangle(canvas, (0, 250), (cam_w, 326), (0, 0, 200), -1)
+        cv2.putText(canvas, alert[:60], (20, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
     canvas[:, cam_w:] = render_panel(tracker, panel_w, h, now)
     return canvas
 
@@ -804,11 +809,230 @@ def draw_station(img, reading):
     return img
 
 
+CAMERA_FRAME_TIMEOUT_MS = 1000     # camera process: wait this long for one frame
+CAMERA_RESTART_SECONDS = 3.0       # no frame this long -> the camera process is killed and started again
+CAMERA_OPEN_SECONDS = 20.0         # time a new camera process gets to deliver its first frame
+CAMERA_BUFFER_BYTES = 64 * 1024 * 1024
+
+
+def _ximea_worker(preset, fps, sys_path, shm_name, meta, lock, new_frame, status_q):
+    """Runs in its OWN PROCESS: opens the XIMEA camera and copies every frame into shared memory.
+
+    The camera driver is only ever called here. If one of its calls hangs (seen after error 10 when the
+    acquisition was restarted), the evaluator simply kills this process and starts a new one - the window,
+    the model and the link to the GUI keep running.
+    """
+    import numpy as np
+    from multiprocessing import shared_memory
+    sys.path[:] = sys_path
+    shm = shared_memory.SharedMemory(name=shm_name)
+
+    def say(text):
+        try:
+            status_q.put_nowait(text)
+        except Exception:
+            pass
+
+    try:
+        from ximea import xiapi
+    except Exception as e:
+        say(f"CAMERA: XIMEA API not found ({e})")
+        return
+
+    def open_camera():
+        probe = xiapi.Camera()
+        for i in range(probe.get_number_devices()):
+            cam = xiapi.Camera(dev_id=i)
+            cam.open_device()
+            raw = cam.get_param("device_name")
+            name = raw.decode("utf-8") if isinstance(raw, bytes) else str(raw)
+            if preset["name_match"] not in name:
+                cam.close_device()
+                continue
+            cam.set_imgdataformat("XI_RGB24")
+            try:
+                cam.set_param("buffer_policy", "XI_BP_SAFE")
+                cam.set_param("recent_frame", 1)
+            except Exception:
+                pass
+            if preset.get("binning", False):
+                try:
+                    cam.set_param("downsampling_type", "XI_BINNING")
+                    cam.set_param("downsampling", "XI_DWN_2x2")
+                except Exception:
+                    try:
+                        cam.set_param("downsampling", "XI_DWN_2x2")
+                    except Exception:
+                        pass
+            cam.set_exposure(preset["exposure"])
+            cam.set_gain(preset["gain"])
+            cam.set_gammaY(preset["gammaY"])
+            cam.set_param("wb_kr", preset["wb_kr"])
+            cam.set_param("wb_kb", preset["wb_kb"])
+            try:
+                cam.set_param("acq_timing_mode", "XI_ACQ_TIMING_MODE_FRAME_RATE")
+                cam.set_param("framerate", float(fps))
+            except Exception:
+                pass
+            cam.start_acquisition()
+            return cam, name
+        raise RuntimeError(f"no camera matching '{preset['name_match']}' found")
+
+    cam = None
+    while cam is None:
+        try:
+            cam, name = open_camera()
+            say(f"OPENED {name}")
+        except Exception as e:
+            say(f"CAMERA NOT FOUND - check the USB cable ({e})")
+            time.sleep(2.0)
+    img = xiapi.Image()
+    while True:
+        try:
+            cam.get_image(img, timeout=CAMERA_FRAME_TIMEOUT_MS)
+        except xiapi.Xi_error as err:
+            # no restart calls here: just report; the evaluator replaces this process if frames stay away
+            say(f"CAMERA: no frames (XIMEA error {getattr(err, 'status', '?')})")
+            continue
+        frame = np.ascontiguousarray(img.get_image_data_numpy())
+        if frame.ndim == 2:
+            frame = frame[:, :, None]
+        if frame.nbytes > shm.size:
+            say("CAMERA: frame larger than the shared buffer")
+            continue
+        with lock:
+            np.ndarray(frame.shape, np.uint8, buffer=shm.buf)[:] = frame
+            meta[1], meta[2], meta[3] = frame.shape
+            meta[0] += 1
+        new_frame.set()
+
+
+class XimeaProcessCamera:
+    """XIMEA camera in a separate process, restarted automatically when frames stop.
+    Same interface as the capture threads: .frame_queue, .start(), .stop(), plus .status ('' = frames arrive)."""
+
+    def __init__(self, preset, fps):
+        import multiprocessing as mp
+        from multiprocessing import shared_memory
+        self.preset, self.fps = preset, fps
+        self.ctx = mp.get_context("spawn")
+        self.shm = shared_memory.SharedMemory(create=True, size=CAMERA_BUFFER_BYTES)
+        self.frame_queue = queue.Queue(maxsize=2)
+        self.status = "CAMERA: starting"
+        self.restarts = 0
+        self.running = True
+        self.proc = None
+        self.thread = threading.Thread(target=self._supervise, daemon=True)
+
+    def start(self):
+        self.thread.start()
+
+    def _spawn(self):
+        # new lock / counters for every process: a killed process may die while holding the old lock
+        self.meta = self.ctx.Array("q", 4, lock=False)
+        self.lock = self.ctx.Lock()
+        self.new_frame = self.ctx.Event()
+        self.status_q = self.ctx.Queue()
+        self.proc = self.ctx.Process(
+            target=_ximea_worker, daemon=True,
+            args=(self.preset, self.fps, list(sys.path), self.shm.name, self.meta, self.lock,
+                  self.new_frame, self.status_q))
+        self.proc.start()
+        self.seen = 0
+        self.last_frame = None
+        self.opened = None
+        self.spawned = time.monotonic()
+
+    def _kill(self):
+        proc, self.proc = self.proc, None
+        if proc is None:
+            return
+        try:
+            proc.terminate()
+            proc.join(2.0)
+            if proc.is_alive():
+                proc.kill()
+                proc.join(2.0)
+        except Exception:
+            pass
+
+    def _supervise(self):
+        import numpy as np
+        self._spawn()
+        while self.running:
+            got = self.new_frame.wait(0.1)
+            now = time.monotonic()
+            try:                                        # messages from the camera process
+                while True:
+                    msg = self.status_q.get_nowait()
+                    if msg.startswith("OPENED"):
+                        print(f"[CAMERA] {msg[7:]} opened")
+                        self.opened = now
+                    else:
+                        if msg != self.status:
+                            print(f"[CAMERA] {msg}")
+                        self.status = msg
+            except queue.Empty:
+                pass
+            if got:
+                self.new_frame.clear()
+                frame = None
+                if self.lock.acquire(timeout=0.5):
+                    try:
+                        if self.meta[0] != self.seen:
+                            self.seen = self.meta[0]
+                            shape = (self.meta[1], self.meta[2], self.meta[3])
+                            frame = np.ndarray(shape, np.uint8, buffer=self.shm.buf).copy()
+                    finally:
+                        self.lock.release()
+                if frame is not None:
+                    if self.status:
+                        print("[CAMERA] frames are arriving")
+                    self.status, self.last_frame = "", now
+                    if frame.shape[2] == 1:
+                        frame = frame[:, :, 0]
+                    if self.frame_queue.full():
+                        try:
+                            self.frame_queue.get_nowait()
+                        except queue.Empty:
+                            pass
+                    self.frame_queue.put(frame)
+                    continue
+            # no new frame: decide whether the camera process has to be replaced
+            if self.last_frame is not None or self.opened is not None:
+                since = now - (self.last_frame if self.last_frame is not None else self.opened)
+                stalled = since > CAMERA_RESTART_SECONDS
+                if since > 1.0 and not self.status:
+                    self.status = "CAMERA: no frames"
+            else:                                       # still opening the camera
+                stalled = now - self.spawned > CAMERA_OPEN_SECONDS and not self.status.startswith("CAMERA NOT FOUND")
+            if stalled or not self.proc.is_alive():
+                self.restarts += 1
+                why = "stopped" if not self.proc.is_alive() else "delivers no frames"
+                print(f"[CAMERA] camera process {why} - restarting it (restart {self.restarts})")
+                self.status = f"CAMERA LOST - restarting the camera (restart {self.restarts})"
+                self._kill()
+                time.sleep(0.5)
+                if self.running:
+                    self._spawn()
+
+    def stop(self):
+        self.running = False
+        if self.thread.is_alive():
+            self.thread.join(3.0)
+        self._kill()
+        try:
+            self.shm.close()
+            self.shm.unlink()
+        except Exception:
+            pass
+
+
 class CameraModel:
     def __init__(self, webcam=None):
         import torch
         from ultralytics import YOLO
-        from live_test import CONFIDENCE, FPS_XIMEA, MC050_PRESET, MODEL_PATH, XimeaCaptureThread
+        from live_test import CONFIDENCE, FPS_XIMEA, MC050_PRESET, MODEL_PATH
         if not os.path.exists(MODEL_PATH):
             raise FileNotFoundError(f"Model not found at: {MODEL_PATH}")
         self.device = 0 if torch.cuda.is_available() else "cpu"
@@ -818,8 +1042,13 @@ class CameraModel:
         print(f"[INFO] YOLO on {self.device}, classes {self.model.names}")
         if not any(str(n).lower() == STATION_LABEL for n in self.model.names.values()):
             print(f"[WARN] The model has no '{STATION_LABEL}' class - the whole image is used.")
-        self.cam = XimeaCaptureThread(MC050_PRESET, fps=FPS_XIMEA) if webcam is None else WebcamCaptureThread(webcam)
+        self.cam = XimeaProcessCamera(MC050_PRESET, FPS_XIMEA) if webcam is None else WebcamCaptureThread(webcam)
         self.cam.start()
+
+    @property
+    def status(self):
+        """'' while frames arrive, otherwise what the camera thread is doing about it."""
+        return getattr(self.cam, "status", "")
 
     def read(self):
         """(annotated image, station reading dict) or None if no new frame."""
@@ -1029,6 +1258,67 @@ def start_voice(on_deliver):
 
 
 # ---------------------------------------------------------------------------
+# Freeze protection
+# ---------------------------------------------------------------------------
+class _AsyncConsole:
+    """Console output through a background thread. A blocked console (for example text selected with the
+    mouse in the Windows console, which pauses every print) can then no longer freeze the evaluator."""
+
+    def __init__(self, stream):
+        self.stream = stream
+        self.q = queue.Queue(maxsize=5000)
+        threading.Thread(target=self._writer, daemon=True).start()
+
+    def _writer(self):
+        while True:
+            text = self.q.get()
+            try:
+                self.stream.write(text)
+                self.stream.flush()
+            except Exception:
+                pass
+
+    def write(self, text):
+        try:
+            self.q.put_nowait(text)
+        except queue.Full:
+            pass                       # console blocked for a long time: drop instead of waiting
+        return len(text)
+
+    def flush(self):
+        pass
+
+    def __getattr__(self, name):
+        return getattr(self.stream, name)
+
+
+def protect_console():
+    if not isinstance(sys.stdout, _AsyncConsole) and sys.stdout is not None:
+        sys.stdout = _AsyncConsole(sys.stdout)
+
+
+class FreezeWatch:
+    """If the main loop stops for `seconds`, write where every thread is stuck to logs/evaluator_freeze.log."""
+
+    def __init__(self, seconds=6):
+        self.seconds = seconds
+        log_dir = os.path.join(base_dir, "logs")
+        os.makedirs(log_dir, exist_ok=True)
+        self.path = os.path.join(log_dir, "evaluator_freeze.log")
+        self.file = open(self.path, "a", encoding="utf-8")
+        self.file.write(f"\n===== evaluator started {time.strftime('%Y-%m-%d %H:%M:%S')} =====\n")
+        self.file.flush()
+
+    def kick(self):
+        faulthandler.dump_traceback_later(self.seconds, repeat=False, file=self.file)
+
+    def stop(self):
+        faulthandler.cancel_dump_traceback_later()
+        self.file.write(f"===== evaluator closed {time.strftime('%Y-%m-%d %H:%M:%S')} =====\n")
+        self.file.close()
+
+
+# ---------------------------------------------------------------------------
 # Main loops
 # ---------------------------------------------------------------------------
 def run_test(args):
@@ -1049,8 +1339,11 @@ def run_test(args):
     voice = start_voice(deliver_event.set)
     cv2.namedWindow("Battery evaluator - TEST", cv2.WINDOW_NORMAL)
     image = None
+    protect_console()
+    watch = FreezeWatch()
     try:
         while True:
+            watch.kick()
             got = camera.read()
             if got is not None:
                 image, reading = got
@@ -1060,7 +1353,8 @@ def run_test(args):
                 deliver_event.clear()
                 tracker.deliver()
             cv2.imshow("Battery evaluator - TEST",
-                       compose(image, tracker, "voice ON" if voice else "D = deliver", voice is not None))
+                       compose(image, tracker, "voice ON" if voice else "D = deliver", voice is not None,
+                               alert=camera.status))
             key = cv2.waitKey(1) & 0xFF
             if key in (ord("q"), ord("Q"), 27):
                 break
@@ -1069,6 +1363,7 @@ def run_test(args):
             elif key in (ord("r"), ord("R")):
                 tracker.redo_row()
     finally:
+        watch.stop()
         if voice is not None:
             voice.stop()
         camera.stop()
@@ -1107,8 +1402,11 @@ def run_live(args):
             camera = CameraModel(args.webcam)
             cv2.namedWindow("Battery evaluator", cv2.WINDOW_NORMAL)
             image = None
+            protect_console()
+            watch = FreezeWatch()
             try:
                 while True:
+                    watch.kick()
                     drain(q, tracker)
                     got = camera.read()
                     if got is not None:
@@ -1116,10 +1414,12 @@ def run_live(args):
                         tracker.update_reading(reading["slots"], reading["hand"], reading["tray_on_station"],
                                                detail=camera_detail(reading))
                     link = "GUI linked" if listener.connected else "GUI NOT FOUND"
-                    cv2.imshow("Battery evaluator", compose(image, tracker, link, listener.connected))
+                    cv2.imshow("Battery evaluator", compose(image, tracker, link, listener.connected,
+                                                            alert=camera.status))
                     if (cv2.waitKey(1) & 0xFF) in (ord("q"), ord("Q"), 27):
                         break
             finally:
+                watch.stop()
                 camera.stop()
                 cv2.destroyAllWindows()
     finally:
