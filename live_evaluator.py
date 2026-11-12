@@ -51,10 +51,12 @@ Needs: pylsl (live mode) and everything live_test.py needs (ultralytics, torch, 
 
 import argparse
 import csv
+import faulthandler
 import itertools
 import os
 import queue
 import re
+import sys
 import threading
 import time
 
@@ -1116,6 +1118,67 @@ def start_voice(on_deliver):
 
 
 # ---------------------------------------------------------------------------
+# Freeze protection
+# ---------------------------------------------------------------------------
+class _AsyncConsole:
+    """Console output through a background thread. A blocked console (for example text selected with the
+    mouse in the Windows console, which pauses every print) can then no longer freeze the evaluator."""
+
+    def __init__(self, stream):
+        self.stream = stream
+        self.q = queue.Queue(maxsize=5000)
+        threading.Thread(target=self._writer, daemon=True).start()
+
+    def _writer(self):
+        while True:
+            text = self.q.get()
+            try:
+                self.stream.write(text)
+                self.stream.flush()
+            except Exception:
+                pass
+
+    def write(self, text):
+        try:
+            self.q.put_nowait(text)
+        except queue.Full:
+            pass                       # console blocked for a long time: drop instead of waiting
+        return len(text)
+
+    def flush(self):
+        pass
+
+    def __getattr__(self, name):
+        return getattr(self.stream, name)
+
+
+def protect_console():
+    if not isinstance(sys.stdout, _AsyncConsole) and sys.stdout is not None:
+        sys.stdout = _AsyncConsole(sys.stdout)
+
+
+class FreezeWatch:
+    """If the main loop stops for `seconds`, write where every thread is stuck to logs/evaluator_freeze.log."""
+
+    def __init__(self, seconds=6):
+        self.seconds = seconds
+        log_dir = os.path.join(base_dir, "logs")
+        os.makedirs(log_dir, exist_ok=True)
+        self.path = os.path.join(log_dir, "evaluator_freeze.log")
+        self.file = open(self.path, "a", encoding="utf-8")
+        self.file.write(f"\n===== evaluator started {time.strftime('%Y-%m-%d %H:%M:%S')} =====\n")
+        self.file.flush()
+
+    def kick(self):
+        faulthandler.dump_traceback_later(self.seconds, repeat=False, file=self.file)
+
+    def stop(self):
+        faulthandler.cancel_dump_traceback_later()
+        self.file.write(f"===== evaluator closed {time.strftime('%Y-%m-%d %H:%M:%S')} =====\n")
+        self.file.close()
+
+
+# ---------------------------------------------------------------------------
 # Main loops
 # ---------------------------------------------------------------------------
 def run_test(args):
@@ -1136,8 +1199,11 @@ def run_test(args):
     voice = start_voice(deliver_event.set)
     cv2.namedWindow("Battery evaluator - TEST", cv2.WINDOW_NORMAL)
     image = None
+    protect_console()
+    watch = FreezeWatch()
     try:
         while True:
+            watch.kick()
             got = camera.read()
             if got is not None:
                 image, reading = got
@@ -1157,6 +1223,7 @@ def run_test(args):
             elif key in (ord("r"), ord("R")):
                 tracker.redo_row()
     finally:
+        watch.stop()
         if voice is not None:
             voice.stop()
         camera.stop()
@@ -1195,8 +1262,11 @@ def run_live(args):
             camera = CameraModel(args.webcam)
             cv2.namedWindow("Battery evaluator", cv2.WINDOW_NORMAL)
             image = None
+            protect_console()
+            watch = FreezeWatch()
             try:
                 while True:
+                    watch.kick()
                     drain(q, tracker)
                     got = camera.read()
                     if got is not None:
@@ -1209,6 +1279,7 @@ def run_live(args):
                     if (cv2.waitKey(1) & 0xFF) in (ord("q"), ord("Q"), 27):
                         break
             finally:
+                watch.stop()
                 camera.stop()
                 cv2.destroyAllWindows()
     finally:
