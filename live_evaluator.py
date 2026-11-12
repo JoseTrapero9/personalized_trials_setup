@@ -22,7 +22,12 @@ LIVE (with the GUI on the other PC, same network):
 How a row / round is evaluated (both modes)
   * Evaluation is ACTIVE (marks drawn in green) from the start of the round until it is evaluated;
     afterwards the marks are frozen and drawn in black.
-  * A tray reading counts once it is the same for STABLE_FRAMES frames with no hand at the station.
+  * Per-battery cue (predictive): as soon as a battery is seen in a slot for CUE_STABLE_FRAMES frames,
+    Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect_... is sent - also while a hand is at the station.
+    The GUI answers with the vest / sound cue of the condition. One cue per battery; a battery that was
+    only covered by a hand does not cue again.
+  * The whole-tray reading for the final verdict counts once it is the same for STABLE_FRAMES frames with
+    no hand at the station (so a hand covering batteries cannot turn a correct tray into a mistake).
   * Only the STATION counts (the model's "Station" class): batteries are read only inside a tray
     whose centre is on the station. Batteries lying around (dropped on the table / floor), trays
     elsewhere and hands away from the station are ignored. The station box is remembered, so it
@@ -70,6 +75,8 @@ from sequences import sequence_path, subject_tag
 # ================= CONFIGURATION =================
 MARKER_STREAM_NAME = "ParadigmMarkers"     # the GUI's marker stream (lsl_markers.py)
 STABLE_FRAMES = 8                          # same tray reading this many frames in a row (~0.27 s at 30 fps)
+CUE_STABLE_FRAMES = 4                      # a battery seen in a slot this many frames in a row -> per-battery cue
+                                           # (hands do NOT block this; lower = faster cue, more false cues)
 TRAY_GONE_SECONDS = 0.5                    # tray off the station (no hand at it) this long -> evaluate
 STATION_CLEAR_SECONDS = 0.3                # no tray on the station this long = cleared (arms "tray left")
 STATION_LABEL = "station"                  # YOLO class of the assembly station (case-insensitive)
@@ -145,6 +152,10 @@ class RoundRecord:
         self.expected_source = ""
         self.active = True              # evaluation running (green marks)
         self.armed = False              # station cleared / tray changed since the round started
+        self.slot_candidate = [None] * 3    # per-battery cues: colour currently seen in each slot ...
+        self.slot_count = [0] * 3           # ... for this many frames in a row
+        self.slot_cued = [None] * 3         # colour the last cue of each slot was sent for
+        self.cues = []                      # [(seconds since round start, slot 1-3, colour, correct)]
         self.tray_seen = False          # a tray was read on the station after arming
         self.stable_slots = None
         self.prediction = "waiting"
@@ -163,13 +174,14 @@ class RoundRecord:
 
 class ParadigmTracker:
     def __init__(self, clock, send, subject=None, condition=None, stable_frames=STABLE_FRAMES,
-                 log_dir=None, mode="live"):
+                 log_dir=None, mode="live", cue_frames=CUE_STABLE_FRAMES):
         self.clock = clock
         self.send = send
         self.mode = mode                # "live" (follows the GUI) | "test" (keys / voice)
         self.subject = subject
         self.condition = condition
         self.stable_frames = stable_frames
+        self.cue_frames = cue_frames
         self.training = False
         self.answer_file = ""
         self.table = []                 # rows: piece, sum, instruction, answer, marks, result, used
@@ -378,7 +390,11 @@ class ParadigmTracker:
         """slots: tray on the station; hand: hand at the station; tray_seen: a tray is ON the station."""
         ts = self.clock() if ts is None else ts
         self.hand, self.tray, self.camera_detail = hand, tray_seen, detail
+        if tray_seen:
+            self._battery_cues(tuple(slots), hand, ts)       # per battery, also while a hand is at the station
         if hand:
+            # the whole-tray reading used for the final verdict still waits for the hand to leave
+            # (a hand covering batteries must not turn a correct tray into a mistake)
             self._candidate, self._candidate_count, self._absent_since = None, 0, None
             return
         if not tray_seen:
@@ -397,6 +413,36 @@ class ParadigmTracker:
             self._candidate, self._candidate_count = slots, 1
         if self._candidate_count == self.stable_frames:
             self._on_stable(slots, ts)
+
+    def _battery_cues(self, slots, hand, ts):
+        """One cue per battery as soon as it is seen in a slot for cue_frames frames (hands do not block)."""
+        rec = self.round
+        if rec is None or not rec.active or rec.expected is None:
+            return
+        if not rec.armed:
+            if slots == self.prev_final and slots != EMPTY:
+                return                                   # still the previous round's tray
+            rec.armed = True
+        for k, color in enumerate(slots):
+            if color == rec.slot_candidate[k]:
+                rec.slot_count[k] += 1
+            else:
+                rec.slot_candidate[k], rec.slot_count[k] = color, 1
+            if rec.slot_count[k] != self.cue_frames:
+                continue
+            if color is None:
+                if not hand:
+                    rec.slot_cued[k] = None              # really taken out (not just covered by a hand)
+                continue
+            if color == rec.slot_cued[k]:
+                continue                                 # same battery seen again after being covered
+            rec.slot_cued[k] = color
+            correct = color == rec.expected[k]
+            rec.cues.append((round(ts - rec.start, 3), k + 1, color, correct))
+            if rec.row is not None:
+                self.table[rec.row]["marks"][k] = correct
+            self.send(f"Eval_Battery_Round_{rec.number}_Slot_{k + 1}_{'correct' if correct else 'incorrect'}"
+                      f"_Color_{color}_Expected_{rec.expected[k]}")
 
     def _check_station(self, ts):
         rec = self.round
@@ -457,7 +503,8 @@ class ParadigmTracker:
                 w.writerow(["subject", "condition", "round", "target_sum", "instruction", "expected",
                             "expected_source", "read_slots", "read_sum", "verdict", "trigger", "eval_s",
                             "first_correct_s", "first_deliver_s", "deliver_count", "handover_s",
-                            "correct_before_deliver", "overtime", "point", "gui_status", "gui_source"])
+                            "correct_before_deliver", "overtime", "point", "gui_status", "gui_source",
+                            "battery_cues"])
             w.writerow([
                 self.subject, self.condition, rec.number, rec.target_sum, rec.instruction,
                 fmt_slots(rec.expected), rec.expected_source, fmt_slots(rec.final_slots),
@@ -466,6 +513,7 @@ class ParadigmTracker:
                 rel(rec.handover),
                 rec.first_correct is not None and (first_deliver is None or rec.first_correct <= first_deliver),
                 rec.overtime, rec.point, rec.gui_status, rec.gui_source,
+                " | ".join(f"{t}s slot{k} {c} {'correct' if ok else 'incorrect'}" for t, k, c, ok in rec.cues),
             ])
 
     def close(self):
@@ -524,7 +572,7 @@ class ParadigmTracker:
             lines.append(("Evaluation inactive", (0, 0, 0)))
 
         if self.hand:
-            cam = "station: hand at the station (holding last reading)"
+            cam = "station: hand at the station (battery cues stay on)"
         elif not self.tray:
             cam = "station: no tray on the station"
         else:
@@ -987,7 +1035,7 @@ def run_test(args):
     import cv2
     path = choose_log_file(args.test)
     tracker = ParadigmTracker(time.monotonic, lambda msg: print(f"[TEST] {msg}"),
-                              stable_frames=args.stable_frames, mode="test")
+                              stable_frames=args.stable_frames, cue_frames=args.cue_frames, mode="test")
     tracker.start_test(path)
     sounds = start_sounds(args)
     if sounds is not None:
@@ -1033,7 +1081,8 @@ def run_test(args):
 def run_live(args):
     import pylsl
     send = make_outlet()
-    tracker = ParadigmTracker(pylsl.local_clock, send, args.subject, args.condition, args.stable_frames)
+    tracker = ParadigmTracker(pylsl.local_clock, send, args.subject, args.condition, args.stable_frames,
+                              cue_frames=args.cue_frames)
     q = queue.Queue()
     listener = MarkerListener(q)
     listener.start()
@@ -1091,6 +1140,8 @@ def main():
     ap.add_argument("--condition", help="live mode: GUI condition name (baseline, audio, haptic, ...)")
     ap.add_argument("--no-camera", action="store_true", help="live mode: only follow the GUI markers")
     ap.add_argument("--stable-frames", type=int, default=STABLE_FRAMES)
+    ap.add_argument("--cue-frames", type=int, default=CUE_STABLE_FRAMES,
+                    help="frames a battery must be seen in a slot before its cue is sent (default 4)")
     ap.add_argument("--tray-gone", type=float, default=TRAY_GONE_SECONDS,
                     help="seconds the tray must be off the station before it is evaluated")
     ap.add_argument("--predict-only", action="store_true", help="live mode: never send verdicts to the GUI")

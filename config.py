@@ -92,6 +92,19 @@ USE_REMOTE_EVALUATOR = True
 EVALUATOR_STREAM_NAME = "BatteryEvaluator"
 
 
+# Per-battery cues: sent by live_evaluator.py as soon as it sees a battery in a slot
+# (Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect). What the participant gets depends on the condition:
+#   audio -> sound, haptic -> vest, audio_haptic -> both, baseline / training / robot_* -> nothing.
+BATTERY_CUE_CONDITIONS = {"audio": ("audio",), "haptic": ("haptic",), "audio_haptic": ("audio", "haptic")}
+correct_cue_audio = os.path.join(audio_dir, "positive_sound2.wav")   # swap the file name to change the sound
+incorrect_cue_audio = mistake_audio                                  # the mistake sound used so far
+CUE_AUDIO_MAX_SECONDS = 1.0        # every cue sound is cut to this length when played (files untouched)
+HAPTIC_CORRECT_PATTERN = "positive_3"      # warm swell (pre-study)
+HAPTIC_INCORRECT_PATTERN = "negative_2"    # sharp staccato (pre-study)
+HAPTIC_CORRECT_POSITION = "VestBack"       # pre-study mapping "correct_back": correct on the back,
+HAPTIC_INCORRECT_POSITION = "VestFront"    # incorrect on the front
+
+
 def assembly_seconds(scenario):
     """Assembly time per scenario (shared by the GUI and live_evaluator.py)."""
     if scenario == "robot_fast":
