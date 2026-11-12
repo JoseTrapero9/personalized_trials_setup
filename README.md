@@ -80,6 +80,8 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 
 ## Camera evaluator on a second PC (`live_evaluator.py`)
 
+Step-by-step guide for running the GUI and the model together: `Model_GUI_Connection_Guide.pdf`.
+
 Runs on the camera PC with the YOLO model (`live_test.py` settings). The window shows the camera
 next to the answer table of the log file (like the PDF): every battery gets a check or a cross as soon
 as the camera sees it. Marks are **green while the evaluation is active** and turn **black** once the
