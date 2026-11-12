@@ -1,0 +1,5 @@
+subject,condition,game_mode,language,problem_id,type,n_steps,steps,layout,targets,presses,counted_for_checkpoint,outcome,rt_from_onset_s,rt_after_instruction_s,paused_s,instruction_replays,score
+1,audio_haptic,hard,en,match0001,match,1,,green:YELLOW|yellow:BLUE|purple:PURPLE,2,,0,miss,,,0,0,0
+1,audio_haptic,hard,en,match0002,match,1,,green:PURPLE|yellow:YELLOW|blue:GREEN,1,,0,miss,,,0,0,0
+1,audio_haptic,hard,en,match0003,match,1,,green:BLUE|red:RED|purple:GREEN,1,,0,miss,,,0,0,0
+1,audio_haptic,hard,en,match0004,match,1,,red:BLUE|yellow:RED|green:GREEN,2,,0,miss,,,0,0,0

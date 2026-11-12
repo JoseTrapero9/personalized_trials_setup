@@ -52,7 +52,7 @@ class Scripter:
     def close_gripper(self):
         # set digital output 0 to True
         self.send_command("set_tool_digital_out(0, True)\n", 0.5)
-       
+
     # Home position
     def move_home(self, wait_time: float = 2.00):
         # define your down position in degrees
@@ -92,17 +92,17 @@ class Scripter:
 
     def move_disposal_up(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [10.32, -95.79, 116.63, -109.07, -91.06, -170.23] 
+        degrees = [182.07, -96.25, 100.1, -96.48, -88.76, 97.41] 
         self._send_movej_degrees(degrees, delay=wait_time)
 
     def movel_disposal_up(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [10.32, -95.79, 116.63, -109.07, -91.06, -170.23] 
+        degrees = [182.07, -96.25, 100.1, -96.48, -88.76, 97.41]
         self._send_movel_degrees(degrees, delay=wait_time, a=0.5)
 
-    def move_disposal_down(self, wait_time: float = 2.00):
+    def move_disposal_down(self, wait_time: float = 2.00,):
         # define your down position in degrees
-        degrees = [10.17,-85.72,127.29,-130.16,-91.10,-170.06] 
+        degrees = [182.03, -92.55, 114.27, -114.36, -88.87, 97.62] 
         self._send_movel_degrees(degrees, delay=wait_time, a=0.5)
 
     def move_return_empty_piece_down(self, wait_time: float = 2.00):
@@ -117,17 +117,17 @@ class Scripter:
 
     def move_pickup_empty_piece_down(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [23.95,-78.61 ,119.66 ,-129.85 ,-90.93,-156.41] 
-        self._send_movel_degrees(degrees, delay=wait_time,a=0.5)
+        degrees = [188.54, -58.50, 89.90, -124.05, -89.30, 104.27]  
+        self._send_movel_degrees(degrees, delay=wait_time, a=0.5)
 
     def move_pickup_empty_piece_up(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [24.00,-88.49,108.69,-109.02,-90.73,-156.62] 
+        degrees = [188.60, -67.31, 68.36, -93.71, -89.09, 103.92] 
         self._send_movej_degrees(degrees, delay=wait_time)
 
     def move_return_midpoint(self, wait_time: float = 2.00):
         # define your down position in degrees
-        degrees = [74.23, -120.19, 131.96, -99.63, -88.65, -106.46] 
+        degrees = [129.6,-88.67 ,108.05 ,-108.22 ,-87.68 ,-51.06]
         self._send_movej_degrees(degrees, delay=wait_time)
 
     def close(self):
