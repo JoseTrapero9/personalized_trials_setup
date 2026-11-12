@@ -62,6 +62,7 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 | `texts.py` | participant screen text in EN / ES / DE |
 | `screens/` | setup (incl. language), tutorial, start, dual task, scoreboard |
 | `sequences.py` | loads `log_files/sXX_<condition>.txt` |
+| `questionnaires.py` | NASA-TLX + experience questionnaire: text (EN/ES/DE), saving, subject summary files |
 | `generate_log_files.py` | makes `log_files/` + answer-key PDF |
 | `live_evaluator.py` | camera PC: YOLO tray check, follows the GUI over LSL, sends verdicts |
 | `evaluator_link.py` | GUI side: receives the camera verdicts |
@@ -79,6 +80,8 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 
 ## Camera evaluator on a second PC (`live_evaluator.py`)
 
+Step-by-step guide for running the GUI and the model together: `Model_GUI_Connection_Guide.pdf`.
+
 Runs on the camera PC with the YOLO model (`live_test.py` settings). The window shows the camera
 next to the answer table of the log file (like the PDF): every battery gets a check or a cross as soon
 as the camera sees it. Marks are **green while the evaluation is active** and turn **black** once the
@@ -94,6 +97,10 @@ python live_evaluator.py --test s03_audio --webcam 0   # normal webcam instead o
 
 Row 1 starts right away. Say "deliver" (Vosk, same as the GUI) or press D: the row is evaluated and
 the next one starts. R = redo the row, Q = quit. Log: `logs/evaluator_test_<file>_<time>.csv`.
+Test mode plays feedback on the subject's audio output (Trekz; `--audio-out NAME` for another device,
+`--no-sounds` to turn it off): a random `audios/positive_sound1-3.wav` for a correct row, `buzzer.wav` or
+`incorrect_answer.wav` for a mistake. Every clip is cut to 1 s with a short fade-out (the files are not changed).
+Live mode plays no sounds for now.
 
 **Evaluation rules (test and live):**
 
@@ -108,6 +115,23 @@ the next one starts. R = redo the row, Q = quit. Log: `logs/evaluator_test_<file
   (fewer than 3 batteries in view = mistake).
 * A reading counts when it is stable for `STABLE_FRAMES` frames with no hand at the station. The previous
   round's tray does not count until the station was cleared or the tray changed.
+
+**Per-battery cues (predictive):** as soon as a battery is seen in a slot for `CUE_STABLE_FRAMES` frames
+(default 4, `--cue-frames`), the evaluator sends `Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect_...`.
+A hand at the station does not block this. The GUI answers during the assembly with the cue of the condition
+(marker `Battery_Cue_Round_<r>_Slot_<k>_<result>_<channels>`):
+
+| condition | correct battery | wrong battery |
+|---|---|---|
+| `audio` | `correct_cue_audio` (positive_sound2.wav) | `incorrect_cue_audio` (the mistake sound) |
+| `haptic` | vest `positive_3` (warm swell, back) | vest `negative_2` (sharp staccato, front) |
+| `audio_haptic` | both | both |
+| baseline, training, robot_* | nothing (marker only) | nothing (marker only) |
+
+Sounds, their 1 s limit (`CUE_AUDIO_MAX_SECONDS`), vest patterns and positions are set in `config.py`; to change
+a sound, change the file name there (any length, it is cut to 1 s when played). The vest cues go through the
+bHaptics Player websocket like the pre-study scripts (`websocket-client`). The whole-tray reading for the
+final verdict still waits until no hand is at the station.
 
 **Live, with the GUI:** both PCs on the same network; LSL finds the streams by itself, no IP setup.
 
@@ -134,6 +158,22 @@ The camera PC needs this repo (for `log_files/`, `config.py`, `sequences.py`), `
 `live_test.py` packages (ultralytics, torch, opencv, XIMEA API); for voice in test mode also `vosk`,
 `sounddevice`, `PyQt5` and the `model/` folder. Allow Python through the Windows firewall on both PCs
 (private network) or LSL cannot see the other PC.
+
+## Questionnaires
+
+* **NASA-TLX after every condition** (baseline, audio, haptic, audio_haptic; not after training,
+  robot_fast or robot_slow): scoreboard -> NASA-TLX -> main menu. Six scales, 21 gradations, raw TLX
+  (no pairwise weighting). Saved as `logs/questionnaires/sXX_<condition>_nasatlx.csv` (scores 0-100 plus
+  `raw_tlx`); running the condition again overwrites the file.
+* **`sus` in the condition menu** (once per subject, after all conditions): experience questionnaire with
+  10 statements per condition on a 5-point agree scale (baseline: 6, the 4 feedback statements are left
+  empty). Saves `sXX_<condition>_sus.csv` after each page, then builds the subject files
+  `sXX_nasatlx_all_conditions.csv/.xlsx` and `sXX_sus_all_conditions.csv/.xlsx` (Excel needs `openpyxl`).
+  If a condition has no NASA-TLX file, a warning lists the missing conditions: Continue or Go back.
+* Answer with the mouse or the keys: UP / DOWN line, LEFT / RIGHT answer (1-5 also work for statements),
+  ENTER continue. Every line must be answered. Language = the participant language of the setup screen.
+* Text, statements and the list of conditions: `questionnaires.py`. Markers: `NasaTLX_Started|Saved_...`,
+  `SUS_Started|Saved|Finished_...`.
 
 ## Logs
 

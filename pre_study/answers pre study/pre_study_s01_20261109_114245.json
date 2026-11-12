@@ -1,0 +1,45 @@
+{
+    "participant": "s01",
+    "timestamp": "20261109_114245",
+    "spatial_mapping_setup": {
+        "current_test_mapping": "correct_back",
+        "preferred_spatial_mapping": "correct_front",
+        "guidance_length_preference": "Keep length"
+    },
+    "assessment_correct_cues": {
+        "cues": {
+            "positive_1": {
+                "guidance_intensity": "Keep intensity",
+                "usefulness_score": 4
+            },
+            "positive_2": {
+                "guidance_intensity": "Keep intensity",
+                "usefulness_score": 8
+            },
+            "positive_3": {
+                "guidance_intensity": "Increase intensity",
+                "usefulness_score": 7
+            }
+        },
+        "most_liked_cue": "positive_1",
+        "perception_difference": "significantly_better"
+    },
+    "assessment_incorrect_cues": {
+        "cues": {
+            "negative_1": {
+                "guidance_intensity": "Decrease intensity",
+                "usefulness_score": 6
+            },
+            "negative_2": {
+                "guidance_intensity": "Keep intensity",
+                "usefulness_score": 8
+            },
+            "negative_3": {
+                "guidance_intensity": "Decrease intensity",
+                "usefulness_score": 4
+            }
+        },
+        "most_liked_cue": "negative_2",
+        "perception_difference": "significantly_better"
+    }
+}

@@ -1,0 +1,11 @@
+metadata,cycle_time_s,correct_submissions,incorrect_submissions,total_submissions
+player_name: s02,10.3944,9,1,10
+feedback_modality: Haptics + Audio,8.7338,,,
+location_mapping: correct_back,7.8549,,,
+positive_cue: positive_2,10.2066,,,
+negative_cue: negative_1,10.8201,,,
+,7.5947,,,
+,14.6957,,,
+,9.3426,,,
+,9.4228,,,
+,11.0475,,,

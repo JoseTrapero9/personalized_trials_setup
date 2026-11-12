@@ -9,6 +9,8 @@ TEST (no GUI needed, run it right now):
   Row 1 of the file is active right away. Build the tray: every battery gets a check or a cross
   in the table as soon as the camera sees it. Say "deliver" (or press D) to evaluate the row and
   move on to the next one. R = redo the current row, Q / Esc = quit.
+  Feedback: a random audios/positive_sound*.wav for a correct row, buzzer.wav or incorrect_answer.wav
+  for a mistake, played on the subject's output (Trekz, --audio-out NAME), each cut to 1 s (--no-sounds = off).
 
 LIVE (with the GUI on the other PC, same network):
     python live_evaluator.py
@@ -20,7 +22,12 @@ LIVE (with the GUI on the other PC, same network):
 How a row / round is evaluated (both modes)
   * Evaluation is ACTIVE (marks drawn in green) from the start of the round until it is evaluated;
     afterwards the marks are frozen and drawn in black.
-  * A tray reading counts once it is the same for STABLE_FRAMES frames with no hand at the station.
+  * Per-battery cue (predictive): as soon as a battery is seen in a slot for CUE_STABLE_FRAMES frames,
+    Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect_... is sent - also while a hand is at the station.
+    The GUI answers with the vest / sound cue of the condition. One cue per battery; a battery that was
+    only covered by a hand does not cue again.
+  * The whole-tray reading for the final verdict counts once it is the same for STABLE_FRAMES frames with
+    no hand at the station (so a hand covering batteries cannot turn a correct tray into a mistake).
   * Only the STATION counts (the model's "Station" class): batteries are read only inside a tray
     whose centre is on the station. Batteries lying around (dropped on the table / floor), trays
     elsewhere and hands away from the station are ignored. The station box is remembered, so it
@@ -60,6 +67,7 @@ from config import (
     VOICE_COOLDOWN_SECONDS,
     WARNING_SECONDS,
     assembly_seconds,
+    audio_dir,
     base_dir,
 )
 from sequences import sequence_path, subject_tag
@@ -67,11 +75,20 @@ from sequences import sequence_path, subject_tag
 # ================= CONFIGURATION =================
 MARKER_STREAM_NAME = "ParadigmMarkers"     # the GUI's marker stream (lsl_markers.py)
 STABLE_FRAMES = 8                          # same tray reading this many frames in a row (~0.27 s at 30 fps)
+CUE_STABLE_FRAMES = 4                      # a battery seen in a slot this many frames in a row -> per-battery cue
+                                           # (hands do NOT block this; lower = faster cue, more false cues)
 TRAY_GONE_SECONDS = 0.5                    # tray off the station (no hand at it) this long -> evaluate
 STATION_CLEAR_SECONDS = 0.3                # no tray on the station this long = cleared (arms "tray left")
 STATION_LABEL = "station"                  # YOLO class of the assembly station (case-insensitive)
 STATION_MARGIN = 0.10                      # tray centre may be this fraction of the station size outside it
 SEND_VERDICTS = True                       # False = only predict / log (--predict-only)
+
+# Feedback sounds (TEST MODE ONLY for now), played on the subject's audio output
+FEEDBACK_SOUNDS = True                     # --no-sounds turns them off
+CORRECT_SOUNDS = ["positive_sound*.wav"]   # audios/positive_sound1-3.wav, one picked at random for a correct row
+MISTAKE_SOUNDS = ["buzzer.wav", "incorrect_answer.wav"]   # one picked at random for a mistake
+FEEDBACK_MAX_SECONDS = 1.0                 # every clip is cut to this length (short fade-out, files untouched)
+PARTICIPANT_AUDIO_KEYWORD = "Trekz"        # subject audio output (same device as the GUI); --audio-out to change
 # =================================================
 
 COLOR_VALUES = {"Blue": 1, "Red": 2, "Yellow": 3, "Green": 4}
@@ -135,6 +152,10 @@ class RoundRecord:
         self.expected_source = ""
         self.active = True              # evaluation running (green marks)
         self.armed = False              # station cleared / tray changed since the round started
+        self.slot_candidate = [None] * 3    # per-battery cues: colour currently seen in each slot ...
+        self.slot_count = [0] * 3           # ... for this many frames in a row
+        self.slot_cued = [None] * 3         # colour the last cue of each slot was sent for
+        self.cues = []                      # [(seconds since round start, slot 1-3, colour, correct)]
         self.tray_seen = False          # a tray was read on the station after arming
         self.stable_slots = None
         self.prediction = "waiting"
@@ -153,13 +174,14 @@ class RoundRecord:
 
 class ParadigmTracker:
     def __init__(self, clock, send, subject=None, condition=None, stable_frames=STABLE_FRAMES,
-                 log_dir=None, mode="live"):
+                 log_dir=None, mode="live", cue_frames=CUE_STABLE_FRAMES):
         self.clock = clock
         self.send = send
         self.mode = mode                # "live" (follows the GUI) | "test" (keys / voice)
         self.subject = subject
         self.condition = condition
         self.stable_frames = stable_frames
+        self.cue_frames = cue_frames
         self.training = False
         self.answer_file = ""
         self.table = []                 # rows: piece, sum, instruction, answer, marks, result, used
@@ -179,6 +201,7 @@ class ParadigmTracker:
         self.hand = False
         self.tray = False
         self.camera_detail = ""         # e.g. "tray off the station", "STATION NOT FOUND"
+        self.on_verdict = None          # optional callback(round_record) after correct / incorrect
         if subject and condition:
             self._load_answer_key_for(subject, condition)
 
@@ -359,13 +382,19 @@ class ParadigmTracker:
         self.send(("Eval_Verdict_" if (self.mode == "live" and SEND_VERDICTS) else "Eval_Result_") + msg)
         self._note(f"Round {rec.number}: {rec.verdict.upper()} ({trigger.replace('_', ' ')}) "
                    f"read {fmt_slots(slots)}, expected {fmt_slots(rec.expected)}")
+        if self.on_verdict is not None:
+            self.on_verdict(rec)
 
     # ---------------- tray readings ----------------
     def update_reading(self, slots, hand, tray_seen, ts=None, detail=""):
         """slots: tray on the station; hand: hand at the station; tray_seen: a tray is ON the station."""
         ts = self.clock() if ts is None else ts
         self.hand, self.tray, self.camera_detail = hand, tray_seen, detail
+        if tray_seen:
+            self._battery_cues(tuple(slots), hand, ts)       # per battery, also while a hand is at the station
         if hand:
+            # the whole-tray reading used for the final verdict still waits for the hand to leave
+            # (a hand covering batteries must not turn a correct tray into a mistake)
             self._candidate, self._candidate_count, self._absent_since = None, 0, None
             return
         if not tray_seen:
@@ -384,6 +413,36 @@ class ParadigmTracker:
             self._candidate, self._candidate_count = slots, 1
         if self._candidate_count == self.stable_frames:
             self._on_stable(slots, ts)
+
+    def _battery_cues(self, slots, hand, ts):
+        """One cue per battery as soon as it is seen in a slot for cue_frames frames (hands do not block)."""
+        rec = self.round
+        if rec is None or not rec.active or rec.expected is None:
+            return
+        if not rec.armed:
+            if slots == self.prev_final and slots != EMPTY:
+                return                                   # still the previous round's tray
+            rec.armed = True
+        for k, color in enumerate(slots):
+            if color == rec.slot_candidate[k]:
+                rec.slot_count[k] += 1
+            else:
+                rec.slot_candidate[k], rec.slot_count[k] = color, 1
+            if rec.slot_count[k] != self.cue_frames:
+                continue
+            if color is None:
+                if not hand:
+                    rec.slot_cued[k] = None              # really taken out (not just covered by a hand)
+                continue
+            if color == rec.slot_cued[k]:
+                continue                                 # same battery seen again after being covered
+            rec.slot_cued[k] = color
+            correct = color == rec.expected[k]
+            rec.cues.append((round(ts - rec.start, 3), k + 1, color, correct))
+            if rec.row is not None:
+                self.table[rec.row]["marks"][k] = correct
+            self.send(f"Eval_Battery_Round_{rec.number}_Slot_{k + 1}_{'correct' if correct else 'incorrect'}"
+                      f"_Color_{color}_Expected_{rec.expected[k]}")
 
     def _check_station(self, ts):
         rec = self.round
@@ -444,7 +503,8 @@ class ParadigmTracker:
                 w.writerow(["subject", "condition", "round", "target_sum", "instruction", "expected",
                             "expected_source", "read_slots", "read_sum", "verdict", "trigger", "eval_s",
                             "first_correct_s", "first_deliver_s", "deliver_count", "handover_s",
-                            "correct_before_deliver", "overtime", "point", "gui_status", "gui_source"])
+                            "correct_before_deliver", "overtime", "point", "gui_status", "gui_source",
+                            "battery_cues"])
             w.writerow([
                 self.subject, self.condition, rec.number, rec.target_sum, rec.instruction,
                 fmt_slots(rec.expected), rec.expected_source, fmt_slots(rec.final_slots),
@@ -453,6 +513,7 @@ class ParadigmTracker:
                 rel(rec.handover),
                 rec.first_correct is not None and (first_deliver is None or rec.first_correct <= first_deliver),
                 rec.overtime, rec.point, rec.gui_status, rec.gui_source,
+                " | ".join(f"{t}s slot{k} {c} {'correct' if ok else 'incorrect'}" for t, k, c, ok in rec.cues),
             ])
 
     def close(self):
@@ -511,7 +572,7 @@ class ParadigmTracker:
             lines.append(("Evaluation inactive", (0, 0, 0)))
 
         if self.hand:
-            cam = "station: hand at the station (holding last reading)"
+            cam = "station: hand at the station (battery cues stay on)"
         elif not self.tray:
             cam = "station: no tray on the station"
         else:
@@ -842,6 +903,80 @@ def drain(q, tracker):
 # ---------------------------------------------------------------------------
 # Test-mode helpers
 # ---------------------------------------------------------------------------
+class FeedbackSounds:
+    """Random correct / mistake clip on the subject's audio output, each cut to FEEDBACK_MAX_SECONDS."""
+
+    def __init__(self, out_keyword=PARTICIPANT_AUDIO_KEYWORD, max_seconds=FEEDBACK_MAX_SECONDS):
+        import glob
+        import numpy as np
+        import sounddevice as sd
+        import soundfile as sf
+        self.np, self.sd, self.sf = np, sd, sf
+        self.max_seconds = max_seconds
+        self.correct = self._load_all([p for pat in CORRECT_SOUNDS for p in sorted(glob.glob(os.path.join(audio_dir, pat)))])
+        self.mistake = self._load_all([p for pat in MISTAKE_SOUNDS for p in sorted(glob.glob(os.path.join(audio_dir, pat)))])
+
+        self.device, self.device_name = None, "default output"
+        for i, d in enumerate(sd.query_devices()):
+            if d["max_output_channels"] > 0 and out_keyword and out_keyword.lower() in d["name"].lower():
+                self.device, self.device_name = i, d["name"]
+                break
+        else:
+            if out_keyword:
+                print(f"[SOUND] No output device matching '{out_keyword}' - using the default output.")
+        self.status = (f"sounds: {len(self.correct)} correct / {len(self.mistake)} mistake "
+                       f"-> {self.device_name}")
+        print(f"[SOUND] {self.status}: correct {[c[0] for c in self.correct]}, "
+              f"mistake {[m[0] for m in self.mistake]}")
+
+    def _load_all(self, paths):
+        clips = []
+        for path in paths:
+            if not os.path.exists(path):
+                print(f"[SOUND] missing: {path}")
+                continue
+            try:
+                data, fs = self.sf.read(path, dtype="float32", always_2d=True)
+            except Exception as e:
+                print(f"[SOUND] cannot read {path}: {e}")
+                continue
+            data = data[: int(fs * self.max_seconds)].copy()          # never longer than max_seconds
+            fade = min(len(data), int(0.03 * fs))                       # 30 ms fade-out: no click at the cut
+            if fade > 0:
+                data[-fade:] *= self.np.linspace(1.0, 0.0, fade, dtype="float32")[:, None]
+            if data.shape[1] == 1:
+                data = self.np.column_stack((data, data))               # stereo, like audio.py
+            clips.append((os.path.basename(path), data, fs))
+        return clips
+
+    def play(self, correct):
+        import random
+        clips = self.correct if correct else self.mistake
+        if not clips:
+            return None
+        name, data, fs = random.choice(clips)
+        threading.Thread(target=self._play, args=(data, fs), daemon=True).start()
+        return name
+
+    def _play(self, data, fs):
+        try:
+            with self.sd.OutputStream(device=self.device, samplerate=fs, channels=data.shape[1],
+                                      dtype="float32") as stream:
+                stream.write(data)
+        except Exception as e:
+            print(f"[SOUND] playback error: {e}")
+
+
+def start_sounds(args):
+    if args.no_sounds:
+        return None
+    try:
+        return FeedbackSounds(args.audio_out)
+    except Exception as e:
+        print(f"[SOUND] Feedback sounds off ({e}).")
+        return None
+
+
 def choose_log_file(arg):
     log_dir = os.path.join(base_dir, "log_files")
     if arg and arg != "pick":
@@ -900,8 +1035,15 @@ def run_test(args):
     import cv2
     path = choose_log_file(args.test)
     tracker = ParadigmTracker(time.monotonic, lambda msg: print(f"[TEST] {msg}"),
-                              stable_frames=args.stable_frames, mode="test")
+                              stable_frames=args.stable_frames, cue_frames=args.cue_frames, mode="test")
     tracker.start_test(path)
+    sounds = start_sounds(args)
+    if sounds is not None:
+        def feedback(rec):
+            name = sounds.play(rec.verdict == "correct")
+            if name:
+                tracker._note(f"Row {rec.number}: played {name}")
+        tracker.on_verdict = feedback
     camera = CameraModel(args.webcam)
     deliver_event = threading.Event()
     voice = start_voice(deliver_event.set)
@@ -939,7 +1081,8 @@ def run_test(args):
 def run_live(args):
     import pylsl
     send = make_outlet()
-    tracker = ParadigmTracker(pylsl.local_clock, send, args.subject, args.condition, args.stable_frames)
+    tracker = ParadigmTracker(pylsl.local_clock, send, args.subject, args.condition, args.stable_frames,
+                              cue_frames=args.cue_frames)
     q = queue.Queue()
     listener = MarkerListener(q)
     listener.start()
@@ -997,9 +1140,14 @@ def main():
     ap.add_argument("--condition", help="live mode: GUI condition name (baseline, audio, haptic, ...)")
     ap.add_argument("--no-camera", action="store_true", help="live mode: only follow the GUI markers")
     ap.add_argument("--stable-frames", type=int, default=STABLE_FRAMES)
+    ap.add_argument("--cue-frames", type=int, default=CUE_STABLE_FRAMES,
+                    help="frames a battery must be seen in a slot before its cue is sent (default 4)")
     ap.add_argument("--tray-gone", type=float, default=TRAY_GONE_SECONDS,
                     help="seconds the tray must be off the station before it is evaluated")
     ap.add_argument("--predict-only", action="store_true", help="live mode: never send verdicts to the GUI")
+    ap.add_argument("--audio-out", default=PARTICIPANT_AUDIO_KEYWORD, metavar="NAME",
+                    help="test mode: output device for the feedback sounds (part of its name, default Trekz)")
+    ap.add_argument("--no-sounds", action="store_true", help="test mode: no correct / mistake sounds")
     args = ap.parse_args()
     SEND_VERDICTS = SEND_VERDICTS and not args.predict_only
     TRAY_GONE_SECONDS = args.tray_gone
