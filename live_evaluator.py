@@ -32,12 +32,11 @@ How a row / round is evaluated (both modes)
     whose centre is on the station. Batteries lying around (dropped on the table / floor), trays
     elsewhere and hands away from the station are ignored. The station box is remembered, so it
     still works while the tray covers the station.
-  * The round is evaluated at the FIRST of:
-      - the tray is off the station (no tray on it and no hand at it for TRAY_GONE_SECONDS),
-        so a participant who says "deliver" after picking the tray up is still judged on the
-        tray as it was on the station;
-      - "deliver" is said;
-      - the handover (live mode, if nothing happened before).
+  * The round is evaluated when the TRAY LEAVES THE STATION: no tray on it (and no hand at it) for
+    TRAY_GONE_FRAMES frames in a row. Not when the third battery is placed, not when the clock runs
+    out and not at "deliver": the participant can still change batteries until the tray is taken away.
+    Safety net (live mode): if the camera never saw the tray leave, the handover ends the round.
+    Test mode: "deliver" / D still closes a row that is open, so you can move on.
   * Correct only if all 3 slots match the answer of the log file. A slot that is not seen counts
     as wrong, so fewer than 3 batteries in view = mistake. There is no manual evaluation any more.
   * The tray from the previous round does not count: tray-leaves-station is only armed after the
@@ -79,7 +78,7 @@ MARKER_STREAM_NAME = "ParadigmMarkers"     # the GUI's marker stream (lsl_marker
 STABLE_FRAMES = 8                          # same tray reading this many frames in a row (~0.27 s at 30 fps)
 CUE_STABLE_FRAMES = 4                      # a battery seen in a slot this many frames in a row -> per-battery cue
                                            # (hands do NOT block this; lower = faster cue, more false cues)
-TRAY_GONE_SECONDS = 0.5                    # tray off the station (no hand at it) this long -> evaluate
+TRAY_GONE_FRAMES = 10                      # tray off the station (no hand at it) this many frames -> evaluate
 STATION_CLEAR_SECONDS = 0.3                # no tray on the station this long = cleared (arms "tray left")
 STATION_LABEL = "station"                  # YOLO class of the assembly station (case-insensitive)
 STATION_MARGIN = 0.10                      # tray centre may be this fraction of the station size outside it
@@ -199,6 +198,7 @@ class ParadigmTracker:
         self._candidate = None
         self._candidate_count = 0
         self._absent_since = None
+        self._absent_frames = 0
         self.live_slots = None
         self.hand = False
         self.tray = False
@@ -259,8 +259,7 @@ class ParadigmTracker:
             self.phase, self.phase_deadline = "ASSEMBLY", None
         elif re.match(r"^Voice_Deliver_Activated_Round_(\d+)", m):
             if self.round:
-                self.round.deliver_times.append(ts)
-                self.evaluate("deliver", ts)
+                self.round.deliver_times.append(ts)     # recorded only: the round ends when the tray leaves
             self.phase, self.phase_deadline = "DELIVERY", ts + DELIVERY_WINDOW_SECONDS
         elif m.startswith("Delivery_Window_Expired"):
             self.phase, self.phase_deadline = "ASSEMBLY", None
@@ -398,15 +397,18 @@ class ParadigmTracker:
             # the whole-tray reading used for the final verdict still waits for the hand to leave
             # (a hand covering batteries must not turn a correct tray into a mistake)
             self._candidate, self._candidate_count, self._absent_since = None, 0, None
+            self._absent_frames = 0
             return
         if not tray_seen:
             self._candidate, self._candidate_count = None, 0
             self.live_slots = None
             if self._absent_since is None:
                 self._absent_since = ts
+            self._absent_frames += 1
             self._check_station(ts)
             return
         self._absent_since = None
+        self._absent_frames = 0
         slots = tuple(slots)
         self.live_slots = slots
         if slots == self._candidate:
@@ -453,7 +455,7 @@ class ParadigmTracker:
         gone = ts - self._absent_since
         if not rec.armed and gone >= STATION_CLEAR_SECONDS:
             rec.armed = True
-        if rec.armed and rec.tray_seen and gone >= TRAY_GONE_SECONDS:
+        if rec.armed and rec.tray_seen and self._absent_frames >= TRAY_GONE_FRAMES:
             self.evaluate("tray_left", ts)
 
     def _on_stable(self, slots, ts):
@@ -1431,7 +1433,7 @@ def run_live(args):
 
 
 def main():
-    global SEND_VERDICTS, TRAY_GONE_SECONDS
+    global SEND_VERDICTS, TRAY_GONE_FRAMES
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--test", nargs="?", const="pick", metavar="FILE",
                     help="test mode without the GUI; FILE like s03_audio (no FILE = choose in a window)")
@@ -1442,15 +1444,15 @@ def main():
     ap.add_argument("--stable-frames", type=int, default=STABLE_FRAMES)
     ap.add_argument("--cue-frames", type=int, default=CUE_STABLE_FRAMES,
                     help="frames a battery must be seen in a slot before its cue is sent (default 4)")
-    ap.add_argument("--tray-gone", type=float, default=TRAY_GONE_SECONDS,
-                    help="seconds the tray must be off the station before it is evaluated")
+    ap.add_argument("--tray-gone", type=int, default=TRAY_GONE_FRAMES,
+                    help="frames the tray must be off the station before the round is evaluated (default 10)")
     ap.add_argument("--predict-only", action="store_true", help="live mode: never send verdicts to the GUI")
     ap.add_argument("--audio-out", default=PARTICIPANT_AUDIO_KEYWORD, metavar="NAME",
                     help="test mode: output device for the feedback sounds (part of its name, default Trekz)")
     ap.add_argument("--no-sounds", action="store_true", help="test mode: no correct / mistake sounds")
     args = ap.parse_args()
     SEND_VERDICTS = SEND_VERDICTS and not args.predict_only
-    TRAY_GONE_SECONDS = args.tray_gone
+    TRAY_GONE_FRAMES = args.tray_gone
     if args.test:
         run_test(args)
     else:
