@@ -52,6 +52,12 @@ VOSK_SAMPLE_RATE = 16000                           # 16 kHz mono int16 is what V
 DELIVER_WORDS = ("deliver", "delivery", "ready")   # grammar-locked trigger words
 VOICE_INPUT_KEYWORD = "Trekz"                         # e.g. "Realtek" to force a specific mic; None = system default
 VOICE_COOLDOWN_SECONDS = 1.0                       # ignore repeat triggers from the same utterance
+VOICE_KEEP_MIC_OPEN = True                         # open the microphone when a condition starts and keep it open.
+                                                   # A Bluetooth headset (Trekz) switches to its hands-free mode while
+                                                   # its microphone is in use, which changes the playback volume and
+                                                   # quality. Opening the mic only for the battery task made the radio
+                                                   # jump in volume at every dual-task phase; open all the time, the
+                                                   # level stays the same. False = old behaviour.
 
 # Radio game (radio_script.py / panel_logic.py / game.py)
 RADIO_AUDIO_DIR = os.path.join(base_dir, "radio_audio")   # made by generate_radio_audio.py

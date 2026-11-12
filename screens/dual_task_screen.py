@@ -20,6 +20,7 @@ from config import (
     RETRIEVAL_SECONDS,
     TASK_SECONDS_DEFAULT,
     USE_RADIO_CONTAINER_CUES,
+    VOICE_KEEP_MIC_OPEN,
     WARNING_SECONDS,
     alarm_audio,
     assembly_seconds,
@@ -190,6 +191,9 @@ class DualTaskScreen(QWidget):
 
     def start_condition_session(self, max_rounds: int):
         self.flush_pending_log()
+        if VOICE_KEEP_MIC_OPEN:
+            # before the radio starts: a Bluetooth headset changes volume when its microphone opens
+            self.voice_listener.open_microphone()
         self.max_rounds = max_rounds
         self.current_round = 0
         self.container_toggle = True
