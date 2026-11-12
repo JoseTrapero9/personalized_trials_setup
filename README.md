@@ -114,6 +114,23 @@ Live mode plays no sounds for now.
 * A reading counts when it is stable for `STABLE_FRAMES` frames with no hand at the station. The previous
   round's tray does not count until the station was cleared or the tray changed.
 
+**Per-battery cues (predictive):** as soon as a battery is seen in a slot for `CUE_STABLE_FRAMES` frames
+(default 4, `--cue-frames`), the evaluator sends `Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect_...`.
+A hand at the station does not block this. The GUI answers during the assembly with the cue of the condition
+(marker `Battery_Cue_Round_<r>_Slot_<k>_<result>_<channels>`):
+
+| condition | correct battery | wrong battery |
+|---|---|---|
+| `audio` | `correct_cue_audio` (positive_sound2.wav) | `incorrect_cue_audio` (the mistake sound) |
+| `haptic` | vest `positive_3` (warm swell, back) | vest `negative_2` (sharp staccato, front) |
+| `audio_haptic` | both | both |
+| baseline, training, robot_* | nothing (marker only) | nothing (marker only) |
+
+Sounds, their 1 s limit (`CUE_AUDIO_MAX_SECONDS`), vest patterns and positions are set in `config.py`; to change
+a sound, change the file name there (any length, it is cut to 1 s when played). The vest cues go through the
+bHaptics Player websocket like the pre-study scripts (`websocket-client`). The whole-tray reading for the
+final verdict still waits until no hand is at the station.
+
 **Live, with the GUI:** both PCs on the same network; LSL finds the streams by itself, no IP setup.
 
 ```

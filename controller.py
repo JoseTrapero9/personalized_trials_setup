@@ -87,6 +87,7 @@ class paradigmcontroller(QWidget):
         if USE_REMOTE_EVALUATOR:
             self.evaluator_link = EvaluatorLink(parent=self)
             self.evaluator_link.verdict_received.connect(self.dual_task_screen.remote_verdict)
+            self.evaluator_link.battery_received.connect(self.dual_task_screen.remote_battery_cue)
             self.evaluator_link.connection_changed.connect(
                 lambda ok: send_marker("Evaluator_Connected" if ok else "Evaluator_Disconnected"))
             self.evaluator_link.start()

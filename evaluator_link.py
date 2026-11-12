@@ -4,6 +4,7 @@ live_evaluator.py runs on the camera PC. It follows the GUI through the Paradigm
 stream (sent by lsl_markers.py) and answers on its own LSL stream (EVALUATOR_STREAM_NAME):
 
     Eval_Verdict_Round_<r>_<correct|incorrect>_...     -> applied like the researcher's y / c key
+    Eval_Battery_Round_<r>_Slot_<k>_<correct|incorrect>_...   -> vest / sound cue for that battery
     Eval_Prediction_Round_<r>_...                      -> live prediction, only recorded (not applied)
 
 LSL finds streams on the local network by itself, so both PCs only need to be on the same
@@ -18,10 +19,12 @@ from PyQt5.QtCore import QThread, pyqtSignal
 from config import EVALUATOR_STREAM_NAME
 
 VERDICT_RE = re.compile(r"^Eval_Verdict_Round_(\d+)_(correct|incorrect)(?:_|$)")
+BATTERY_RE = re.compile(r"^Eval_Battery_Round_(\d+)_Slot_(\d)_(correct|incorrect)(?:_|$)")
 
 
 class EvaluatorLink(QThread):
     verdict_received = pyqtSignal(int, bool)      # round, is_correct
+    battery_received = pyqtSignal(int, int, bool) # round, slot (1-3), is_correct  -> per-battery cue
     message_received = pyqtSignal(str)            # every evaluator message (for logging)
     connection_changed = pyqtSignal(bool)
 
@@ -58,6 +61,10 @@ class EvaluatorLink(QThread):
                         continue
                     msg = str(sample[0])
                     self.message_received.emit(msg)
+                    m = BATTERY_RE.match(msg)
+                    if m:
+                        self.battery_received.emit(int(m.group(1)), int(m.group(2)), m.group(3) == "correct")
+                        continue
                     m = VERDICT_RE.match(msg)
                     if m:
                         self.verdict_received.emit(int(m.group(1)), m.group(2) == "correct")

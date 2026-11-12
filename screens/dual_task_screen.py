@@ -10,6 +10,10 @@ from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from audio import audio_sys
 from config import (
+    BATTERY_CUE_CONDITIONS,
+    CUE_AUDIO_MAX_SECONDS,
+    correct_cue_audio,
+    incorrect_cue_audio,
     DELIVERY_WINDOW_SECONDS,
     LOG_TRAINING_CSV,
     MAX_ROUNDS_PER_CONDITION,
@@ -25,6 +29,7 @@ from config import (
     incorrect_audio
 )
 from game import RadioPanelGame
+from haptics import play_correct_cue, play_incorrect_cue
 from lsl_markers import send_marker
 from sequences import load_condition_sequence
 from state import state
@@ -475,6 +480,20 @@ class DualTaskScreen(QWidget):
             send_marker(f"Remote_Verdict_Ignored_Round_{round_number}_Current_{self.current_round}")
             return
         self.record_evaluation(is_correct, source="camera")
+
+    def remote_battery_cue(self, round_number: int, slot: int, is_correct: bool):
+        """A battery was seen in a slot (live_evaluator.py): confirm or alert with the condition's cue."""
+        if round_number != self.current_round or self.phase not in ("DUAL_ASSEMBLY", "DELIVERY_PAUSE"):
+            return
+        scenario = self.get_scenario_cb()
+        channels = BATTERY_CUE_CONDITIONS.get(scenario, ())
+        result = "correct" if is_correct else "incorrect"
+        if "haptic" in channels:
+            play_correct_cue() if is_correct else play_incorrect_cue()
+        if "audio" in channels:
+            audio_sys.play_participant_clip(correct_cue_audio if is_correct else incorrect_cue_audio,
+                                            CUE_AUDIO_MAX_SECONDS)
+        send_marker(f"Battery_Cue_Round_{round_number}_Slot_{slot}_{result}_{'+'.join(channels) or 'none'}")
 
     def flush_pending_log(self):
         if self.pending_log is not None:
