@@ -809,83 +809,223 @@ def draw_station(img, reading):
     return img
 
 
-CAMERA_FRAME_TIMEOUT_MS = 1000     # no frame this long = one timeout (live_test.py waits 5000)
-CAMERA_REOPEN_AFTER = 3            # timeouts in a row before the camera is closed and opened again
+CAMERA_FRAME_TIMEOUT_MS = 1000     # camera process: wait this long for one frame
+CAMERA_RESTART_SECONDS = 3.0       # no frame this long -> the camera process is killed and started again
+CAMERA_OPEN_SECONDS = 20.0         # time a new camera process gets to deliver its first frame
+CAMERA_BUFFER_BYTES = 64 * 1024 * 1024
 
 
-def make_ximea_thread(preset, fps):
-    """live_test.XimeaCaptureThread with a stronger recovery: a timeout (XIMEA error 10) restarts the
-    acquisition; several in a row, or any other camera error, close and reopen the device. The thread
-    never stops by itself and reports what it is doing in .status ("" = frames are arriving)."""
-    from live_test import XimeaCaptureThread
-    from ximea import xiapi
+def _ximea_worker(preset, fps, sys_path, shm_name, meta, lock, new_frame, status_q):
+    """Runs in its OWN PROCESS: opens the XIMEA camera and copies every frame into shared memory.
 
-    class RobustXimeaThread(XimeaCaptureThread):
-        status = "CAMERA: starting"
-        recoveries = 0
+    The camera driver is only ever called here. If one of its calls hangs (seen after error 10 when the
+    acquisition was restarted), the evaluator simply kills this process and starts a new one - the window,
+    the model and the link to the GUI keep running.
+    """
+    import numpy as np
+    from multiprocessing import shared_memory
+    sys.path[:] = sys_path
+    shm = shared_memory.SharedMemory(name=shm_name)
 
-        def _push(self, frame):
-            if self.frame_queue.full():
+    def say(text):
+        try:
+            status_q.put_nowait(text)
+        except Exception:
+            pass
+
+    try:
+        from ximea import xiapi
+    except Exception as e:
+        say(f"CAMERA: XIMEA API not found ({e})")
+        return
+
+    def open_camera():
+        probe = xiapi.Camera()
+        for i in range(probe.get_number_devices()):
+            cam = xiapi.Camera(dev_id=i)
+            cam.open_device()
+            raw = cam.get_param("device_name")
+            name = raw.decode("utf-8") if isinstance(raw, bytes) else str(raw)
+            if preset["name_match"] not in name:
+                cam.close_device()
+                continue
+            cam.set_imgdataformat("XI_RGB24")
+            try:
+                cam.set_param("buffer_policy", "XI_BP_SAFE")
+                cam.set_param("recent_frame", 1)
+            except Exception:
+                pass
+            if preset.get("binning", False):
                 try:
-                    self.frame_queue.get_nowait()
-                except queue.Empty:
-                    pass
-            self.frame_queue.put(frame)
-
-        def _close(self):
-            cam, self.cam = self.cam, None
-            if cam is not None:
-                for action in (cam.stop_acquisition, cam.close_device):
+                    cam.set_param("downsampling_type", "XI_BINNING")
+                    cam.set_param("downsampling", "XI_DWN_2x2")
+                except Exception:
                     try:
-                        action()
+                        cam.set_param("downsampling", "XI_DWN_2x2")
                     except Exception:
                         pass
+            cam.set_exposure(preset["exposure"])
+            cam.set_gain(preset["gain"])
+            cam.set_gammaY(preset["gammaY"])
+            cam.set_param("wb_kr", preset["wb_kr"])
+            cam.set_param("wb_kb", preset["wb_kb"])
+            try:
+                cam.set_param("acq_timing_mode", "XI_ACQ_TIMING_MODE_FRAME_RATE")
+                cam.set_param("framerate", float(fps))
+            except Exception:
+                pass
+            cam.start_acquisition()
+            return cam, name
+        raise RuntimeError(f"no camera matching '{preset['name_match']}' found")
 
-        def run(self):
-            img, timeouts = None, 0
-            while self.running:
-                if self.cam is None:
+    cam = None
+    while cam is None:
+        try:
+            cam, name = open_camera()
+            say(f"OPENED {name}")
+        except Exception as e:
+            say(f"CAMERA NOT FOUND - check the USB cable ({e})")
+            time.sleep(2.0)
+    img = xiapi.Image()
+    while True:
+        try:
+            cam.get_image(img, timeout=CAMERA_FRAME_TIMEOUT_MS)
+        except xiapi.Xi_error as err:
+            # no restart calls here: just report; the evaluator replaces this process if frames stay away
+            say(f"CAMERA: no frames (XIMEA error {getattr(err, 'status', '?')})")
+            continue
+        frame = np.ascontiguousarray(img.get_image_data_numpy())
+        if frame.ndim == 2:
+            frame = frame[:, :, None]
+        if frame.nbytes > shm.size:
+            say("CAMERA: frame larger than the shared buffer")
+            continue
+        with lock:
+            np.ndarray(frame.shape, np.uint8, buffer=shm.buf)[:] = frame
+            meta[1], meta[2], meta[3] = frame.shape
+            meta[0] += 1
+        new_frame.set()
+
+
+class XimeaProcessCamera:
+    """XIMEA camera in a separate process, restarted automatically when frames stop.
+    Same interface as the capture threads: .frame_queue, .start(), .stop(), plus .status ('' = frames arrive)."""
+
+    def __init__(self, preset, fps):
+        import multiprocessing as mp
+        from multiprocessing import shared_memory
+        self.preset, self.fps = preset, fps
+        self.ctx = mp.get_context("spawn")
+        self.shm = shared_memory.SharedMemory(create=True, size=CAMERA_BUFFER_BYTES)
+        self.frame_queue = queue.Queue(maxsize=2)
+        self.status = "CAMERA: starting"
+        self.restarts = 0
+        self.running = True
+        self.proc = None
+        self.thread = threading.Thread(target=self._supervise, daemon=True)
+
+    def start(self):
+        self.thread.start()
+
+    def _spawn(self):
+        # new lock / counters for every process: a killed process may die while holding the old lock
+        self.meta = self.ctx.Array("q", 4, lock=False)
+        self.lock = self.ctx.Lock()
+        self.new_frame = self.ctx.Event()
+        self.status_q = self.ctx.Queue()
+        self.proc = self.ctx.Process(
+            target=_ximea_worker, daemon=True,
+            args=(self.preset, self.fps, list(sys.path), self.shm.name, self.meta, self.lock,
+                  self.new_frame, self.status_q))
+        self.proc.start()
+        self.seen = 0
+        self.last_frame = None
+        self.opened = None
+        self.spawned = time.monotonic()
+
+    def _kill(self):
+        proc, self.proc = self.proc, None
+        if proc is None:
+            return
+        try:
+            proc.terminate()
+            proc.join(2.0)
+            if proc.is_alive():
+                proc.kill()
+                proc.join(2.0)
+        except Exception:
+            pass
+
+    def _supervise(self):
+        import numpy as np
+        self._spawn()
+        while self.running:
+            got = self.new_frame.wait(0.1)
+            now = time.monotonic()
+            try:                                        # messages from the camera process
+                while True:
+                    msg = self.status_q.get_nowait()
+                    if msg.startswith("OPENED"):
+                        print(f"[CAMERA] {msg[7:]} opened")
+                        self.opened = now
+                    else:
+                        if msg != self.status:
+                            print(f"[CAMERA] {msg}")
+                        self.status = msg
+            except queue.Empty:
+                pass
+            if got:
+                self.new_frame.clear()
+                frame = None
+                if self.lock.acquire(timeout=0.5):
                     try:
-                        self.init_camera()
-                        img, timeouts = xiapi.Image(), 0
-                    except Exception as e:
-                        self._close()
-                        if not self.status.startswith("CAMERA NOT FOUND"):
-                            print(f"[CAMERA] cannot open the camera ({e}) - retrying every 2 s")
-                        self.status = "CAMERA NOT FOUND - check the USB cable, retrying"
-                        time.sleep(2.0)
-                        continue
-                try:
-                    self.cam.get_image(img, timeout=CAMERA_FRAME_TIMEOUT_MS)
-                    frame = img.get_image_data_numpy().copy()
+                        if self.meta[0] != self.seen:
+                            self.seen = self.meta[0]
+                            shape = (self.meta[1], self.meta[2], self.meta[3])
+                            frame = np.ndarray(shape, np.uint8, buffer=self.shm.buf).copy()
+                    finally:
+                        self.lock.release()
+                if frame is not None:
                     if self.status:
-                        print("[CAMERA] frames are arriving again")
-                    self.status, timeouts = "", 0
-                    self._push(frame)
-                except xiapi.Xi_error as err:
-                    code = getattr(err, "status", None)
-                    timeouts += 1 if code == 10 else CAMERA_REOPEN_AFTER
-                    self.recoveries += 1
-                    if timeouts < CAMERA_REOPEN_AFTER:
-                        print(f"[CAMERA] no frame for {CAMERA_FRAME_TIMEOUT_MS} ms (error 10) - restarting acquisition")
-                        self.status = "CAMERA: no frames - restarting acquisition"
+                        print("[CAMERA] frames are arriving")
+                    self.status, self.last_frame = "", now
+                    if frame.shape[2] == 1:
+                        frame = frame[:, :, 0]
+                    if self.frame_queue.full():
                         try:
-                            self.cam.stop_acquisition()
-                            time.sleep(0.05)
-                            self.cam.start_acquisition()
-                        except Exception:
-                            timeouts = CAMERA_REOPEN_AFTER
-                    if timeouts >= CAMERA_REOPEN_AFTER:
-                        print(f"[CAMERA] camera error {code} - closing and reopening the camera")
-                        self.status = "CAMERA LOST - reopening"
-                        self._close()
-                        time.sleep(1.0)
+                            self.frame_queue.get_nowait()
+                        except queue.Empty:
+                            pass
+                    self.frame_queue.put(frame)
+                    continue
+            # no new frame: decide whether the camera process has to be replaced
+            if self.last_frame is not None or self.opened is not None:
+                since = now - (self.last_frame if self.last_frame is not None else self.opened)
+                stalled = since > CAMERA_RESTART_SECONDS
+                if since > 1.0 and not self.status:
+                    self.status = "CAMERA: no frames"
+            else:                                       # still opening the camera
+                stalled = now - self.spawned > CAMERA_OPEN_SECONDS and not self.status.startswith("CAMERA NOT FOUND")
+            if stalled or not self.proc.is_alive():
+                self.restarts += 1
+                why = "stopped" if not self.proc.is_alive() else "delivers no frames"
+                print(f"[CAMERA] camera process {why} - restarting it (restart {self.restarts})")
+                self.status = f"CAMERA LOST - restarting the camera (restart {self.restarts})"
+                self._kill()
+                time.sleep(0.5)
+                if self.running:
+                    self._spawn()
 
-        def stop(self):
-            self.running = False
-            self._close()
-
-    return RobustXimeaThread(preset, fps=fps)
+    def stop(self):
+        self.running = False
+        if self.thread.is_alive():
+            self.thread.join(3.0)
+        self._kill()
+        try:
+            self.shm.close()
+            self.shm.unlink()
+        except Exception:
+            pass
 
 
 class CameraModel:
@@ -902,7 +1042,7 @@ class CameraModel:
         print(f"[INFO] YOLO on {self.device}, classes {self.model.names}")
         if not any(str(n).lower() == STATION_LABEL for n in self.model.names.values()):
             print(f"[WARN] The model has no '{STATION_LABEL}' class - the whole image is used.")
-        self.cam = make_ximea_thread(MC050_PRESET, FPS_XIMEA) if webcam is None else WebcamCaptureThread(webcam)
+        self.cam = XimeaProcessCamera(MC050_PRESET, FPS_XIMEA) if webcam is None else WebcamCaptureThread(webcam)
         self.cam.start()
 
     @property
