@@ -14,6 +14,7 @@ from config import (
     DELIVER_WORDS,
     VOICE_COOLDOWN_SECONDS,
     VOICE_INPUT_KEYWORD,
+    VOICE_KEEP_MIC_OPEN,
     VOSK_MODEL_DIR,
     VOSK_SAMPLE_RATE
 )
@@ -98,20 +99,31 @@ class VoiceDeliverListener(QObject):
                 self.q.queue.clear()
             self._needs_reset = True
 
-            if self.stream is None:
-                try:
-                    self.stream = sd.InputStream(
-                        device=self._find_input_device(),
-                        samplerate=VOSK_SAMPLE_RATE,
-                        channels=1,
-                        dtype="int16",
-                        callback=self._audio_callback,
-                    )
-                    self.stream.start()
-                except Exception as e:
-                    self.stream = None
-                    print(f"Failed to start microphone stream for Vosk: {e}")
-        elif self.stream is not None:
+            self.open_microphone()
+        elif not VOICE_KEEP_MIC_OPEN:
+            self.close_microphone()
+        # with VOICE_KEEP_MIC_OPEN the stream stays open; audio is simply ignored while not listening
+
+    def open_microphone(self):
+        """Open the microphone stream (does nothing if it is already open). Listening is switched
+        separately with set_enabled()."""
+        if not self.vosk_ready or self.stream is not None:
+            return
+        try:
+            self.stream = sd.InputStream(
+                device=self._find_input_device(),
+                samplerate=VOSK_SAMPLE_RATE,
+                channels=1,
+                dtype="int16",
+                callback=self._audio_callback,
+            )
+            self.stream.start()
+        except Exception as e:
+            self.stream = None
+            print(f"Failed to start microphone stream for Vosk: {e}")
+
+    def close_microphone(self):
+        if self.stream is not None:
             try:
                 self.stream.stop()
                 self.stream.close()
@@ -121,7 +133,8 @@ class VoiceDeliverListener(QObject):
 
     def stop(self):
         self._running = False
-        self.set_enabled(False)
+        self.listening_enabled = False
+        self.close_microphone()
         if self.thread is not None and self.thread.is_alive():
             self.thread.join(timeout=1.0)
 

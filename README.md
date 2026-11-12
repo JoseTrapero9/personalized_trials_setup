@@ -108,9 +108,11 @@ Live mode plays no sounds for now.
   only inside a tray whose centre is on the station; batteries dropped around it, trays elsewhere and
   hands away from the station are ignored. The station position is remembered while the tray covers it.
   Without a `Station` detection the whole image is used (shown as STATION NOT FOUND).
-* Evaluated at the first of: the tray is off the station (0.5 s, no hand at the station, `--tray-gone`),
-  "deliver", or the handover. Someone who says deliver after picking the tray up is judged on the tray
-  as it was on the station.
+* The round is evaluated when the tray leaves the station: no tray on it and no hand at it for 10 frames in
+  a row (`--tray-gone`). Not when the third battery is placed, not when the clock runs out and not at
+  "deliver"; batteries can still be changed until the tray is taken away. Safety net in live mode: if the
+  camera never saw the tray leave, the handover ends the round. In test mode "deliver" / D still closes
+  an open row.
 * Correct only if all 3 slots match the log file; a slot not seen counts as wrong
   (fewer than 3 batteries in view = mistake).
 * A reading counts when it is stable for `STABLE_FRAMES` frames with no hand at the station. The previous
@@ -118,7 +120,7 @@ Live mode plays no sounds for now.
 
 **Per-battery cues (predictive):** as soon as a battery is seen in a slot for `CUE_STABLE_FRAMES` frames
 (default 4, `--cue-frames`), the evaluator sends `Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect_...`.
-A hand at the station does not block this. The GUI answers during the assembly with the cue of the condition
+A hand at the station does not block this. A battery that is taken out and put in again (same colour or another) gets a new cue every time; a slot only covered by a hand for a moment (under `RECUE_EMPTY_FRAMES` = 12 frames, `--recue-frames`) does not. The GUI answers during the assembly with the cue of the condition
 (marker `Battery_Cue_Round_<r>_Slot_<k>_<result>_<channels>`):
 
 | condition | correct battery | wrong battery |
