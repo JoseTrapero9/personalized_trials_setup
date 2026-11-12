@@ -668,7 +668,7 @@ def render_panel(tracker, width=700, height=640, now=None):
     return img
 
 
-def compose(camera_img, tracker, link_text=None, link_ok=True, now=None):
+def compose(camera_img, tracker, link_text=None, link_ok=True, now=None, alert=""):
     """Camera image (left, 1024x576) + notes below it + answer table (right)."""
     import cv2
     import numpy as np
@@ -683,6 +683,9 @@ def compose(camera_img, tracker, link_text=None, link_ok=True, now=None):
     if link_text:
         cv2.putText(canvas, link_text, (cam_w - 190, 630), cv2.FONT_HERSHEY_SIMPLEX, 0.55,
                     (0, 200, 0) if link_ok else (0, 0, 255), 2, cv2.LINE_AA)
+    if alert:                                    # camera problem: red banner over the (frozen) image
+        cv2.rectangle(canvas, (0, 250), (cam_w, 326), (0, 0, 200), -1)
+        cv2.putText(canvas, alert[:60], (20, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
     canvas[:, cam_w:] = render_panel(tracker, panel_w, h, now)
     return canvas
 
@@ -804,11 +807,90 @@ def draw_station(img, reading):
     return img
 
 
+CAMERA_FRAME_TIMEOUT_MS = 1000     # no frame this long = one timeout (live_test.py waits 5000)
+CAMERA_REOPEN_AFTER = 3            # timeouts in a row before the camera is closed and opened again
+
+
+def make_ximea_thread(preset, fps):
+    """live_test.XimeaCaptureThread with a stronger recovery: a timeout (XIMEA error 10) restarts the
+    acquisition; several in a row, or any other camera error, close and reopen the device. The thread
+    never stops by itself and reports what it is doing in .status ("" = frames are arriving)."""
+    from live_test import XimeaCaptureThread
+    from ximea import xiapi
+
+    class RobustXimeaThread(XimeaCaptureThread):
+        status = "CAMERA: starting"
+        recoveries = 0
+
+        def _push(self, frame):
+            if self.frame_queue.full():
+                try:
+                    self.frame_queue.get_nowait()
+                except queue.Empty:
+                    pass
+            self.frame_queue.put(frame)
+
+        def _close(self):
+            cam, self.cam = self.cam, None
+            if cam is not None:
+                for action in (cam.stop_acquisition, cam.close_device):
+                    try:
+                        action()
+                    except Exception:
+                        pass
+
+        def run(self):
+            img, timeouts = None, 0
+            while self.running:
+                if self.cam is None:
+                    try:
+                        self.init_camera()
+                        img, timeouts = xiapi.Image(), 0
+                    except Exception as e:
+                        self._close()
+                        if not self.status.startswith("CAMERA NOT FOUND"):
+                            print(f"[CAMERA] cannot open the camera ({e}) - retrying every 2 s")
+                        self.status = "CAMERA NOT FOUND - check the USB cable, retrying"
+                        time.sleep(2.0)
+                        continue
+                try:
+                    self.cam.get_image(img, timeout=CAMERA_FRAME_TIMEOUT_MS)
+                    frame = img.get_image_data_numpy().copy()
+                    if self.status:
+                        print("[CAMERA] frames are arriving again")
+                    self.status, timeouts = "", 0
+                    self._push(frame)
+                except xiapi.Xi_error as err:
+                    code = getattr(err, "status", None)
+                    timeouts += 1 if code == 10 else CAMERA_REOPEN_AFTER
+                    self.recoveries += 1
+                    if timeouts < CAMERA_REOPEN_AFTER:
+                        print(f"[CAMERA] no frame for {CAMERA_FRAME_TIMEOUT_MS} ms (error 10) - restarting acquisition")
+                        self.status = "CAMERA: no frames - restarting acquisition"
+                        try:
+                            self.cam.stop_acquisition()
+                            time.sleep(0.05)
+                            self.cam.start_acquisition()
+                        except Exception:
+                            timeouts = CAMERA_REOPEN_AFTER
+                    if timeouts >= CAMERA_REOPEN_AFTER:
+                        print(f"[CAMERA] camera error {code} - closing and reopening the camera")
+                        self.status = "CAMERA LOST - reopening"
+                        self._close()
+                        time.sleep(1.0)
+
+        def stop(self):
+            self.running = False
+            self._close()
+
+    return RobustXimeaThread(preset, fps=fps)
+
+
 class CameraModel:
     def __init__(self, webcam=None):
         import torch
         from ultralytics import YOLO
-        from live_test import CONFIDENCE, FPS_XIMEA, MC050_PRESET, MODEL_PATH, XimeaCaptureThread
+        from live_test import CONFIDENCE, FPS_XIMEA, MC050_PRESET, MODEL_PATH
         if not os.path.exists(MODEL_PATH):
             raise FileNotFoundError(f"Model not found at: {MODEL_PATH}")
         self.device = 0 if torch.cuda.is_available() else "cpu"
@@ -818,8 +900,13 @@ class CameraModel:
         print(f"[INFO] YOLO on {self.device}, classes {self.model.names}")
         if not any(str(n).lower() == STATION_LABEL for n in self.model.names.values()):
             print(f"[WARN] The model has no '{STATION_LABEL}' class - the whole image is used.")
-        self.cam = XimeaCaptureThread(MC050_PRESET, fps=FPS_XIMEA) if webcam is None else WebcamCaptureThread(webcam)
+        self.cam = make_ximea_thread(MC050_PRESET, FPS_XIMEA) if webcam is None else WebcamCaptureThread(webcam)
         self.cam.start()
+
+    @property
+    def status(self):
+        """'' while frames arrive, otherwise what the camera thread is doing about it."""
+        return getattr(self.cam, "status", "")
 
     def read(self):
         """(annotated image, station reading dict) or None if no new frame."""
@@ -1060,7 +1147,8 @@ def run_test(args):
                 deliver_event.clear()
                 tracker.deliver()
             cv2.imshow("Battery evaluator - TEST",
-                       compose(image, tracker, "voice ON" if voice else "D = deliver", voice is not None))
+                       compose(image, tracker, "voice ON" if voice else "D = deliver", voice is not None,
+                               alert=camera.status))
             key = cv2.waitKey(1) & 0xFF
             if key in (ord("q"), ord("Q"), 27):
                 break
@@ -1116,7 +1204,8 @@ def run_live(args):
                         tracker.update_reading(reading["slots"], reading["hand"], reading["tray_on_station"],
                                                detail=camera_detail(reading))
                     link = "GUI linked" if listener.connected else "GUI NOT FOUND"
-                    cv2.imshow("Battery evaluator", compose(image, tracker, link, listener.connected))
+                    cv2.imshow("Battery evaluator", compose(image, tracker, link, listener.connected,
+                                                            alert=camera.status))
                     if (cv2.waitKey(1) & 0xFF) in (ord("q"), ord("Q"), 27):
                         break
             finally:

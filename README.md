@@ -133,6 +133,10 @@ a sound, change the file name there (any length, it is cut to 1 s when played). 
 bHaptics Player websocket like the pre-study scripts (`websocket-client`). The whole-tray reading for the
 final verdict still waits until no hand is at the station.
 
+**Camera drop-outs:** if the XIMEA delivers no frame for 1 s the acquisition is restarted; after 3 timeouts in
+a row (or any other camera error) the camera is closed and reopened, and it keeps retrying if it is unplugged.
+A red banner on the camera image says what is happening; the round state is kept.
+
 **Live, with the GUI:** both PCs on the same network; LSL finds the streams by itself, no IP setup.
 
 ```
