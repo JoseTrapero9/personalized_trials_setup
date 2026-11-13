@@ -22,8 +22,11 @@ LIVE (with the GUI on the other PC, same network):
 How a row / round is evaluated (both modes)
   * Evaluation is ACTIVE (marks drawn in green) from the start of the round until it is evaluated;
     afterwards the marks are frozen and drawn in black.
-  * Per-battery cue (predictive): as soon as a battery is seen in a slot for CUE_STABLE_FRAMES frames,
-    Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect_... is sent - also while a hand is at the station.
+  * Fast loop: the model runs in its own loop on the area around the station only (MODEL AREA, found on
+    a full frame and refreshed every 2 s); the window is drawn separately at DISPLAY_FPS and cannot slow it.
+  * Per-battery cue: a battery in a slot fires on the FIRST frame when the model is CUE_FAST_CONFIDENCE
+    sure, otherwise after CUE_STABLE_FRAMES frames. Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect_...
+    _CamMs_<ms> is sent (CamMs = camera frame -> message) - also while a hand is at the station.
     The GUI answers with the vest / sound cue of the condition. One cue per placement: a battery that was
     only covered by a hand for a moment does not cue again, but every battery that is taken out and put
     in again (same colour or another one) gets a new cue, as many times as needed.
@@ -78,12 +81,28 @@ from sequences import sequence_path, subject_tag
 # ================= CONFIGURATION =================
 MARKER_STREAM_NAME = "ParadigmMarkers"     # the GUI's marker stream (lsl_markers.py)
 STABLE_FRAMES = 8                          # same tray reading this many frames in a row (~0.27 s at 30 fps)
-CUE_STABLE_FRAMES = 4                      # a battery seen in a slot this many frames in a row -> per-battery cue
-                                           # (hands do NOT block this; lower = faster cue, more false cues)
-RECUE_EMPTY_FRAMES = 12                    # slot empty this many frames while a hand is at the station = the
-                                           # battery was taken out, so the next one cues again (even the same
-                                           # colour). Shorter gaps count as "only covered by the hand".
+
+# Per-battery cue rule (hands do NOT block it). A battery in a slot fires its cue
+#   - on the FIRST frame if the model is at least CUE_FAST_CONFIDENCE sure, otherwise
+#   - after CUE_STABLE_FRAMES frames in a row with the same colour.
+CUE_FAST_CONFIDENCE = 0.75
+CUE_STABLE_FRAMES = 2
+SLOT_EMPTY_SECONDS = 0.15                  # slot empty this long with NO hand at the station = battery taken out
+RECUE_EMPTY_SECONDS = 0.40                 # ... this long WHILE a hand is there (shorter = only covered by the hand)
+                                           # after "taken out" the next battery cues again (even the same colour)
+
+# Model area: after the station has been found on a full frame, the model only looks at the station and
+# its surroundings. Smaller picture = faster model; batteries keep the size they had in training.
+ROI_ENABLED = True                         # --no-roi turns it off (model on the full frame, as before)
+ROI_MARGINS = (0.25, 0.80, 0.25, 0.25)     # left, top, right, bottom around the station, in station sizes
+ROI_REFRESH_SECONDS = 2.0                  # one full frame this often, to re-find the station if anything moved
+BASE_IMGSZ = 640                           # model input size for the full frame
+ROI_SCALE = 1.0                            # >1 = more detail in the model area (slower), <1 = faster
+USE_HALF_PRECISION = True                  # half precision on the GPU
+DISPLAY_FPS = 12                           # the window is drawn this often; the model runs as fast as it can
+
 TRAY_GONE_FRAMES = 10                      # tray off the station (no hand at it) this many frames -> evaluate
+TRAY_GONE_MIN_SECONDS = 0.25               # ... and at least this long (the model now runs faster than 30 fps)
 STATION_CLEAR_SECONDS = 0.3                # no tray on the station this long = cleared (arms "tray left")
 STATION_LABEL = "station"                  # YOLO class of the assembly station (case-insensitive)
 STATION_MARGIN = 0.10                      # tray centre may be this fraction of the station size outside it
@@ -165,6 +184,7 @@ class RoundRecord:
         self.armed = False              # station cleared / tray changed since the round started
         self.slot_candidate = [None] * 3    # per-battery cues: colour currently seen in each slot ...
         self.slot_count = [0] * 3           # ... for this many frames in a row
+        self.slot_since = [start] * 3       # ... since this time
         self.slot_cued = [None] * 3         # colour the last cue of each slot was sent for
         self.cues = []                      # [(seconds since round start, slot 1-3, colour, correct)]
         self.tray_seen = False          # a tray was read on the station after arming
@@ -213,6 +233,7 @@ class ParadigmTracker:
         self.hand = False
         self.tray = False
         self.camera_detail = ""         # e.g. "tray off the station", "STATION NOT FOUND"
+        self.frame_time = None          # time.monotonic() of the frame being processed (for the latency stamp)
         self.on_verdict = None          # optional callback(round_record) after correct / incorrect
         if subject and condition:
             self._load_answer_key_for(subject, condition)
@@ -397,12 +418,14 @@ class ParadigmTracker:
             self.on_verdict(rec)
 
     # ---------------- tray readings ----------------
-    def update_reading(self, slots, hand, tray_seen, ts=None, detail=""):
-        """slots: tray on the station; hand: hand at the station; tray_seen: a tray is ON the station."""
+    def update_reading(self, slots, hand, tray_seen, ts=None, detail="", confs=None, frame_time=None):
+        """slots: tray on the station; hand: hand at the station; tray_seen: a tray is ON the station.
+        confs: model confidence per slot (None = unknown); frame_time: time.monotonic() of the camera frame."""
         ts = self.clock() if ts is None else ts
         self.hand, self.tray, self.camera_detail = hand, tray_seen, detail
+        self.frame_time = frame_time
         if tray_seen:
-            self._battery_cues(tuple(slots), hand, ts)       # per battery, also while a hand is at the station
+            self._battery_cues(tuple(slots), hand, ts, confs)       # per battery, also while a hand is at the station
         if hand:
             # the whole-tray reading used for the final verdict still waits for the hand to leave
             # (a hand covering batteries must not turn a correct tray into a mistake)
@@ -428,8 +451,9 @@ class ParadigmTracker:
         if self._candidate_count == self.stable_frames:
             self._on_stable(slots, ts)
 
-    def _battery_cues(self, slots, hand, ts):
-        """One cue per battery as soon as it is seen in a slot for cue_frames frames (hands do not block)."""
+    def _battery_cues(self, slots, hand, ts, confs=None):
+        """One cue per placement, as early as possible (hands do not block): first frame when the model is
+        sure (CUE_FAST_CONFIDENCE), else after cue_frames frames in a row."""
         rec = self.round
         if rec is None or not rec.active or rec.expected is None:
             return
@@ -441,26 +465,29 @@ class ParadigmTracker:
             if color == rec.slot_candidate[k]:
                 rec.slot_count[k] += 1
             else:
-                rec.slot_candidate[k], rec.slot_count[k] = color, 1
+                rec.slot_candidate[k], rec.slot_count[k], rec.slot_since[k] = color, 1, ts
             if color is None:
-                # taken out: seen empty with no hand, or empty long enough while a hand is there.
+                # taken out: empty for a moment with no hand, or empty for longer while a hand is there.
                 # Then the next battery in this slot gets its own cue again, as often as needed.
-                if rec.slot_count[k] >= (self.cue_frames if not hand else max(self.cue_frames, RECUE_EMPTY_FRAMES)):
-                    if rec.slot_cued[k] is not None and rec.row is not None:
-                        self.table[rec.row]["marks"][k] = None
+                if rec.slot_cued[k] is not None and \
+                        ts - rec.slot_since[k] >= (RECUE_EMPTY_SECONDS if hand else SLOT_EMPTY_SECONDS):
                     rec.slot_cued[k] = None
-                continue
-            if rec.slot_count[k] != self.cue_frames:
+                    if rec.row is not None:
+                        self.table[rec.row]["marks"][k] = None
                 continue
             if color == rec.slot_cued[k]:
-                continue                                 # same battery seen again after being covered
+                continue                                 # this battery already got its cue
+            sure = confs is not None and confs[k] is not None and confs[k] >= CUE_FAST_CONFIDENCE
+            if not sure and rec.slot_count[k] < self.cue_frames:
+                continue
             rec.slot_cued[k] = color
             correct = color == rec.expected[k]
+            cam_ms = -1 if self.frame_time is None else int(round((time.monotonic() - self.frame_time) * 1000))
             rec.cues.append((round(ts - rec.start, 3), k + 1, color, correct))
             if rec.row is not None:
                 self.table[rec.row]["marks"][k] = correct
             self.send(f"Eval_Battery_Round_{rec.number}_Slot_{k + 1}_{'correct' if correct else 'incorrect'}"
-                      f"_Color_{color}_Expected_{rec.expected[k]}")
+                      f"_Color_{color}_Expected_{rec.expected[k]}_CamMs_{cam_ms}")
 
     def _check_station(self, ts):
         rec = self.round
@@ -469,7 +496,7 @@ class ParadigmTracker:
         gone = ts - self._absent_since
         if not rec.armed and gone >= STATION_CLEAR_SECONDS:
             rec.armed = True
-        if rec.armed and rec.tray_seen and self._absent_frames >= TRAY_GONE_FRAMES:
+        if rec.armed and rec.tray_seen and self._absent_frames >= TRAY_GONE_FRAMES and gone >= TRAY_GONE_MIN_SECONDS:
             self.evaluate("tray_left", ts)
 
     def _on_stable(self, slots, ts):
@@ -699,8 +726,9 @@ def compose(camera_img, tracker, link_text=None, link_ok=True, now=None, alert="
         cv2.putText(canvas, note[:120], (12, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (200, 200, 200), 1, cv2.LINE_AA)
         y += 22
     if link_text:
-        cv2.putText(canvas, link_text, (cam_w - 190, 630), cv2.FONT_HERSHEY_SIMPLEX, 0.55,
-                    (0, 200, 0) if link_ok else (0, 0, 255), 2, cv2.LINE_AA)
+        tw = cv2.getTextSize(link_text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)[0][0]
+        cv2.putText(canvas, link_text, (cam_w - tw - 12, 630), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    (0, 200, 0) if link_ok else (0, 0, 255), 1, cv2.LINE_AA)
     if alert:                                    # camera problem: red banner over the (frozen) image
         cv2.rectangle(canvas, (0, 250), (cam_w, 326), (0, 0, 200), -1)
         cv2.putText(canvas, alert[:60], (20, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
@@ -733,7 +761,7 @@ class WebcamCaptureThread(threading.Thread):
                     self.frame_queue.get_nowait()
                 except queue.Empty:
                     pass
-            self.frame_queue.put(frame)
+            self.frame_queue.put((frame, time.monotonic()))
         cap.release()
 
     def stop(self):
@@ -770,13 +798,15 @@ class StationReader:
         ax1, ay1, ax2, ay2 = self._area()
         return box[0] < ax2 and box[2] > ax1 and box[1] < ay2 and box[3] > ay1
 
-    def read(self, detections):
+    def read(self, detections, update_station=True):
+        """update_station=False: keep the remembered station box (used for frames cut to the model area,
+        so the area cannot drift)."""
         dets = [(str(label).strip().lower(), float(conf), tuple(map(float, box))) for label, conf, box in detections]
         stations = [d for d in dets if d[0] == self.station_label]
-        if stations:
+        if stations and (update_station or self.station is None):
             self.station = max(stations, key=lambda d: d[1])[2]
-        out = {"slots": EMPTY, "hand": False, "tray_on_station": False, "tray_elsewhere": False,
-               "station": self.station, "station_live": bool(stations), "tray": None}
+        out = {"slots": EMPTY, "confs": (None, None, None), "hand": False, "tray_on_station": False,
+               "tray_elsewhere": False, "station": self.station, "station_live": bool(stations), "tray": None}
 
         out["hand"] = any(d[0] == "hand" and self._touches_station(d[2]) for d in dets)
         trays = [d for d in dets if d[0] == "tray"]
@@ -801,6 +831,7 @@ class StationReader:
             if best[k] is None or conf > best[k][0]:
                 best[k] = (conf, color)
         out["slots"] = tuple(b[1] if b else None for b in best)
+        out["confs"] = tuple(b[0] if b else None for b in best)
         return out
 
 
@@ -812,16 +843,39 @@ def camera_detail(reading):
     return "" if reading["station_live"] else "station hidden (last position)"
 
 
-def draw_station(img, reading):
-    """Evaluation area on the camera image: green with a tray on it, grey without."""
+BOX_BGR = dict(COLOR_BGR, tray=(80, 80, 230), hand=(200, 120, 200), station=(190, 190, 60))
+
+
+def draw_view(frame, result, width=1024, height=576):
+    """Camera picture for the window, drawn from the latest model result (only at DISPLAY_FPS, never in the
+    model loop): detections, the station = EVALUATION AREA, and the area the model looks at."""
     import cv2
-    if reading["station"] is None:
+    img = cv2.resize(frame, (width, height))
+    if img.ndim == 2:
+        img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    sx, sy = width / frame.shape[1], height / frame.shape[0]
+
+    def box(b):
+        return (int(b[0] * sx), int(b[1] * sy)), (int(b[2] * sx), int(b[3] * sy))
+
+    if result is None:
         return img
-    x1, y1, x2, y2 = (int(v) for v in reading["station"])
-    color = (0, 200, 0) if reading["tray_on_station"] else (170, 170, 170)
-    cv2.rectangle(img, (x1, y1), (x2, y2), color, 4)
-    cv2.putText(img, "EVALUATION AREA", (x1, min(img.shape[0] - 8, y2 + 30)), cv2.FONT_HERSHEY_SIMPLEX,
-                0.9, color, 2, cv2.LINE_AA)
+    if result["roi"] is not None:
+        p1, p2 = box(result["roi"])
+        cv2.rectangle(img, p1, p2, (0, 215, 255), 1)
+        cv2.putText(img, "MODEL AREA", (p1[0] + 4, p1[1] + 16), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 215, 255), 1, cv2.LINE_AA)
+    for label, conf, b in result["detections"]:
+        color = BOX_BGR.get(str(label).capitalize(), BOX_BGR.get(str(label).lower(), (200, 200, 200)))
+        p1, p2 = box(b)
+        cv2.rectangle(img, p1, p2, color, 2)
+        cv2.putText(img, f"{label} {conf:.2f}", (p1[0], max(12, p1[1] - 5)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2, cv2.LINE_AA)
+    reading = result["reading"]
+    if reading["station"] is not None:
+        p1, p2 = box(reading["station"])
+        color = (0, 200, 0) if reading["tray_on_station"] else (170, 170, 170)
+        cv2.rectangle(img, p1, p2, color, 3)
+        cv2.putText(img, "EVALUATION AREA", (p1[0], min(height - 8, p2[1] + 22)), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.6, color, 2, cv2.LINE_AA)
     return img
 
 
@@ -1012,7 +1066,7 @@ class XimeaProcessCamera:
                             self.frame_queue.get_nowait()
                         except queue.Empty:
                             pass
-                    self.frame_queue.put(frame)
+                    self.frame_queue.put((frame, now))
                     continue
             # no new frame: decide whether the camera process has to be replaced
             if self.last_frame is not None or self.opened is not None:
@@ -1045,7 +1099,10 @@ class XimeaProcessCamera:
 
 
 class CameraModel:
-    def __init__(self, webcam=None):
+    """Camera + YOLO. step() runs the model on the newest frame - on the station area only once the station
+    is known - and returns the detections in full-frame coordinates. No drawing here."""
+
+    def __init__(self, webcam=None, exposure=None, fps=None, roi=ROI_ENABLED, roi_scale=ROI_SCALE):
         import torch
         from ultralytics import YOLO
         from live_test import CONFIDENCE, FPS_XIMEA, MC050_PRESET, MODEL_PATH
@@ -1054,32 +1111,172 @@ class CameraModel:
         self.device = 0 if torch.cuda.is_available() else "cpu"
         self.model = YOLO(MODEL_PATH)
         self.conf = CONFIDENCE
+        self.half = USE_HALF_PRECISION and self.device != "cpu"
+        self.roi_enabled, self.roi_scale = roi, roi_scale
+        self.last_full = 0.0
         self.station = StationReader()
         print(f"[INFO] YOLO on {self.device}, classes {self.model.names}")
         if not any(str(n).lower() == STATION_LABEL for n in self.model.names.values()):
             print(f"[WARN] The model has no '{STATION_LABEL}' class - the whole image is used.")
-        self.cam = XimeaProcessCamera(MC050_PRESET, FPS_XIMEA) if webcam is None else WebcamCaptureThread(webcam)
+        preset = dict(MC050_PRESET)
+        if exposure:
+            preset["exposure"] = int(exposure)
+        fps = float(fps or FPS_XIMEA)
+        if webcam is None:
+            print(f"[INFO] Camera: exposure {preset['exposure']} us, {fps:g} fps requested")
+        self.cam = XimeaProcessCamera(preset, fps) if webcam is None else WebcamCaptureThread(webcam)
         self.cam.start()
 
     @property
     def status(self):
-        """'' while frames arrive, otherwise what the camera thread is doing about it."""
+        """'' while frames arrive, otherwise what the camera is doing about it."""
         return getattr(self.cam, "status", "")
 
-    def read(self):
-        """(annotated image, station reading dict) or None if no new frame."""
+    def model_area(self, shape, now):
+        """(x1, y1, x2, y2) the model should look at, or None for the full frame."""
+        st = self.station.station
+        if not self.roi_enabled or st is None:
+            return None
+        if now - self.last_full >= ROI_REFRESH_SECONDS:
+            return None                                  # regular full frame: re-find the station
+        h, w = shape[:2]
+        sw, sh = st[2] - st[0], st[3] - st[1]
+        left, top, right, bottom = ROI_MARGINS
+        x1, y1 = max(0, int(st[0] - left * sw)), max(0, int(st[1] - top * sh))
+        x2, y2 = min(w, int(st[2] + right * sw)), min(h, int(st[3] + bottom * sh))
+        if x2 - x1 < 32 or y2 - y1 < 32:
+            return None
+        return x1, y1, x2, y2
+
+    def _predict(self, image, imgsz):
         try:
-            frame = self.cam.frame_queue.get(timeout=0.2)
+            return self.model.predict(source=image, conf=self.conf, device=self.device, verbose=False,
+                                      imgsz=imgsz, half=self.half)[0]
+        except Exception as e:
+            if not self.half:
+                raise
+            print(f"[INFO] half precision not usable ({e}) - using full precision")
+            self.half = False
+            return self.model.predict(source=image, conf=self.conf, device=self.device, verbose=False, imgsz=imgsz)[0]
+
+    def step(self):
+        """None if no new frame, else dict(frame, frame_time, detections, reading, roi, model_ms)."""
+        import numpy as np
+        try:
+            frame, frame_time = self.cam.frame_queue.get(timeout=0.2)
         except queue.Empty:
             return None
-        results = self.model.predict(source=frame, conf=self.conf, device=self.device, verbose=False)[0]
-        detections = [(self.model.names[int(b.cls[0].item())], b.conf[0].item(), b.xyxy[0].tolist())
-                      for b in results.boxes]
-        reading = self.station.read(detections)
-        return draw_station(results.plot(), reading), reading
+        t0 = time.monotonic()
+        roi = self.model_area(frame.shape, t0)
+        if roi is None:
+            self.last_full = t0
+            image, ox, oy, imgsz = frame, 0, 0, BASE_IMGSZ
+        else:
+            x1, y1, x2, y2 = roi
+            image, ox, oy = np.ascontiguousarray(frame[y1:y2, x1:x2]), x1, y1
+            # same pixels-per-battery as on the full frame (what the model was trained on), times ROI_SCALE
+            scale = BASE_IMGSZ / max(frame.shape[:2]) * self.roi_scale
+            imgsz = max(96, int(-(-max(x2 - x1, y2 - y1) * scale // 32) * 32))
+        result = self._predict(image, imgsz)
+        boxes = result.boxes
+        names = self.model.names
+        detections = [(names[int(c)], float(p), (b[0] + ox, b[1] + oy, b[2] + ox, b[3] + oy))
+                      for c, p, b in zip(boxes.cls.tolist(), boxes.conf.tolist(), boxes.xyxy.tolist())]
+        reading = self.station.read(detections, update_station=roi is None)
+        return {"frame": frame, "frame_time": frame_time, "detections": detections, "reading": reading,
+                "roi": roi, "model_ms": (time.monotonic() - t0) * 1000}
 
     def stop(self):
         self.cam.stop()
+
+
+class Pipeline(threading.Thread):
+    """The fast loop: newest frame -> model -> cue / verdict rules -> message to the GUI. Nothing is drawn
+    here. The window (main thread) only reads `latest` and a snapshot of the tracker."""
+
+    def __init__(self, camera, tracker, lock, before=None):
+        super().__init__(daemon=True)
+        self.camera, self.tracker, self.lock, self.before = camera, tracker, lock, before
+        self.running = True
+        self.latest = None
+        self.fps = 0.0
+        self.model_ms = 0.0
+        self.error = ""
+
+    def run(self):
+        count, t_fps = 0, time.monotonic()
+        while self.running:
+            try:
+                if self.before is not None:
+                    with self.lock:
+                        self.before()                    # GUI markers, "deliver"
+                out = self.camera.step()
+                if out is None:
+                    continue
+                r = out["reading"]
+                with self.lock:
+                    self.tracker.update_reading(r["slots"], r["hand"], r["tray_on_station"], detail=camera_detail(r),
+                                                confs=r["confs"], frame_time=out["frame_time"])
+                self.latest = out
+                self.model_ms = 0.9 * self.model_ms + 0.1 * out["model_ms"] if self.model_ms else out["model_ms"]
+                count += 1
+                now = time.monotonic()
+                if now - t_fps >= 1.0:
+                    self.fps, count, t_fps = count / (now - t_fps), 0, now
+            except Exception as e:                       # keep the loop alive, show the problem in the window
+                if str(e) != self.error:
+                    print(f"[MODEL] error in the model loop: {e!r}")
+                self.error = str(e) or repr(e)
+                time.sleep(0.2)
+
+    def stop(self):
+        self.running = False
+        self.join(2.0)
+
+
+class PanelSnapshot:
+    """Copy of what the window needs from the tracker, taken under the lock, drawn outside it."""
+
+    def __init__(self, tracker):
+        import types
+        self._lines = tracker.status_lines()
+        self.table = [dict(row, marks=list(row["marks"])) for row in tracker.table]
+        rec = tracker.round
+        self.round = None if rec is None else types.SimpleNamespace(row=rec.row, active=rec.active)
+        self.mode = tracker.mode
+        self.notes = list(tracker.notes)
+
+    def status_lines(self, now=None):
+        return self._lines
+
+
+def show_window(title, pipeline, tracker, lock, camera, footer, on_key=None):
+    """Main-thread display loop at DISPLAY_FPS. footer() -> (text, ok). Returns when Q / Esc is pressed."""
+    import cv2
+    import numpy as np
+    cv2.namedWindow(title, cv2.WINDOW_NORMAL)
+    blank = np.full((576, 1024, 3), 30, np.uint8)
+    watch = FreezeWatch()
+    try:
+        while True:
+            watch.kick()
+            with lock:
+                snap = PanelSnapshot(tracker)
+            out = pipeline.latest
+            view = blank if out is None else draw_view(out["frame"], out)
+            text, ok = footer()
+            speed = f"model {pipeline.fps:.0f} fps, {pipeline.model_ms:.0f} ms" if pipeline.fps else "model starting"
+            alert = camera.status or (f"MODEL ERROR: {pipeline.error}" if pipeline.error and pipeline.fps == 0 else "")
+            cv2.imshow(title, compose(view, snap, f"{text}   |   {speed}", ok, alert=alert))
+            key = cv2.waitKey(max(1, int(1000 / DISPLAY_FPS))) & 0xFF
+            if key in (ord("q"), ord("Q"), 27):
+                return
+            if on_key is not None and key != 255:
+                with lock:
+                    on_key(key)
+    finally:
+        watch.stop()
+        cv2.destroyAllWindows()
 
 
 # ---------------------------------------------------------------------------
@@ -1337,8 +1534,11 @@ class FreezeWatch:
 # ---------------------------------------------------------------------------
 # Main loops
 # ---------------------------------------------------------------------------
+def make_camera(args):
+    return CameraModel(args.webcam, exposure=args.exposure, fps=args.fps, roi=not args.no_roi, roi_scale=args.roi_scale)
+
+
 def run_test(args):
-    import cv2
     path = choose_log_file(args.test)
     tracker = ParadigmTracker(time.monotonic, lambda msg: print(f"[TEST] {msg}"),
                               stable_frames=args.stable_frames, cue_frames=args.cue_frames, mode="test")
@@ -1354,7 +1554,8 @@ def run_test(args):
     cv2.namedWindow("Battery evaluator - TEST", cv2.WINDOW_NORMAL)
     image = None
     protect_console()
-    watch = FreezeWatch()
+    pipeline = Pipeline(camera, tracker, lock, before)
+    pipeline.start()
     try:
         while True:
             watch.kick()
@@ -1381,7 +1582,6 @@ def run_test(args):
         watch.stop()
         camera.stop()
         tracker.close()
-        cv2.destroyAllWindows()
         if tracker.csv_path:
             print(f"[INFO] Log: {tracker.csv_path}")
 
@@ -1411,30 +1611,17 @@ def run_live(args):
             except KeyboardInterrupt:
                 pass
         else:
-            import cv2
-            camera = CameraModel(args.webcam)
-            cv2.namedWindow("Battery evaluator", cv2.WINDOW_NORMAL)
-            image = None
+            camera = make_camera(args)
+            lock = threading.RLock()
             protect_console()
-            watch = FreezeWatch()
+            pipeline = Pipeline(camera, tracker, lock, before=lambda: drain(q, tracker))
+            pipeline.start()
             try:
-                while True:
-                    watch.kick()
-                    drain(q, tracker)
-                    got = camera.read()
-                    if got is not None:
-                        image, reading = got
-                        tracker.update_reading(reading["slots"], reading["hand"], reading["tray_on_station"],
-                                               detail=camera_detail(reading))
-                    link = "GUI linked" if listener.connected else "GUI NOT FOUND"
-                    cv2.imshow("Battery evaluator", compose(image, tracker, link, listener.connected,
-                                                            alert=camera.status))
-                    if (cv2.waitKey(1) & 0xFF) in (ord("q"), ord("Q"), 27):
-                        break
+                show_window("Battery evaluator", pipeline, tracker, lock, camera,
+                            lambda: ("GUI linked" if listener.connected else "GUI NOT FOUND", listener.connected))
             finally:
-                watch.stop()
+                pipeline.stop()
                 camera.stop()
-                cv2.destroyAllWindows()
     finally:
         listener.running = False
         tracker.close()
@@ -1444,7 +1631,7 @@ def run_live(args):
 
 
 def main():
-    global SEND_VERDICTS, TRAY_GONE_FRAMES, RECUE_EMPTY_FRAMES
+    global SEND_VERDICTS, TRAY_GONE_FRAMES
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--test", nargs="?", const="pick", metavar="FILE",
                     help="test mode without the GUI; FILE like s03_audio (no FILE = choose in a window)")
@@ -1454,9 +1641,13 @@ def main():
     ap.add_argument("--no-camera", action="store_true", help="live mode: only follow the GUI markers")
     ap.add_argument("--stable-frames", type=int, default=STABLE_FRAMES)
     ap.add_argument("--cue-frames", type=int, default=CUE_STABLE_FRAMES,
-                    help="frames a battery must be seen in a slot before its cue is sent (default 4)")
-    ap.add_argument("--recue-frames", type=int, default=RECUE_EMPTY_FRAMES,
-                    help="frames a slot must be empty under a hand before the next battery cues again (default 12)")
+                    help="frames a battery must be seen before its cue when the model is not sure (default 2); "
+                         "a confident detection cues on the first frame")
+    ap.add_argument("--no-roi", action="store_true", help="run the model on the full frame, not only the station area")
+    ap.add_argument("--roi-scale", type=float, default=ROI_SCALE,
+                    help="detail of the station area for the model: 1 = as trained, <1 faster, >1 finer")
+    ap.add_argument("--exposure", type=int, metavar="US", help="camera exposure in microseconds (default: live_test.py)")
+    ap.add_argument("--fps", type=float, help="camera frame rate (default: live_test.py)")
     ap.add_argument("--tray-gone", type=int, default=TRAY_GONE_FRAMES,
                     help="frames the tray must be off the station before the round is evaluated (default 10)")
     ap.add_argument("--predict-only", action="store_true", help="live mode: never send verdicts to the GUI")
@@ -1468,7 +1659,7 @@ def main():
     args = ap.parse_args()
     SEND_VERDICTS = SEND_VERDICTS and not args.predict_only
     TRAY_GONE_FRAMES = args.tray_gone
-    RECUE_EMPTY_FRAMES = args.recue_frames
+
     if args.test:
         run_test(args)
     else:
