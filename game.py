@@ -137,14 +137,20 @@ class RadioPanelGame(QWidget):
         self.popups = []
 
         now = time.perf_counter()
-        self._new_layout(now)
-        self.next_filler_at = now + 0.5
-        self.next_problem_at = now + 6.0
-        self.next_shuffle_at = now + SHUFFLE_SECONDS
         self.running = True
         self.player.stop()
         send_marker(f"Radio_Game_Start_Mode_{state.game_mode}_Lang_{lang}_Voice_{(self.bank.voice or 'none').replace(' ', '')}"
                     f"_Silent_{int(self.player.silent or not self.bank.ok)}")
+        gap = self.rng.uniform(*PROBLEM_GAP_SECONDS)
+        if gap <= 0:
+            self.next_filler_at = float("inf")
+            self.next_shuffle_at = float("inf")
+            self._start_problem(now)
+        else:
+            self._new_layout(now)
+            self.next_filler_at = now + 0.5
+            self.next_problem_at = now + gap
+            self.next_shuffle_at = now + SHUFFLE_SECONDS
         self.timer.start(30)
         self.update()
 
@@ -164,7 +170,7 @@ class RadioPanelGame(QWidget):
         if self.player is not None:
             self.player.close()
 
-    def set_pause(self, paused, title="", subtitle="", seconds_left=0):
+    def set_pause(self, paused, title="", subtitle="", seconds_left=0, start_problem_now=False):
         self.pause_title, self.pause_subtitle, self.pause_seconds_left = title, subtitle, seconds_left
         now = time.perf_counter()
         if paused and not self.paused:
@@ -178,9 +184,13 @@ class RadioPanelGame(QWidget):
         elif not paused and self.paused:
             if self.problem is not None:
                 self._resume_problem(now)
-            self.next_problem_at = max(self.next_problem_at, now + RESUME_GAP_SECONDS)
-            self.next_filler_at = now + 0.4
-            if self.problem is None:
+                self.next_problem_at = now + RESUME_GAP_SECONDS
+                self.next_filler_at = now + 0.4
+            elif start_problem_now or RESUME_GAP_SECONDS <= 0:
+                self._start_problem(now)
+            else:
+                self.next_problem_at = now + RESUME_GAP_SECONDS
+                self.next_filler_at = now + 0.4
                 self.next_shuffle_at = now          # fresh match round right away
         self.paused = paused
         self.update()
@@ -362,8 +372,9 @@ class RadioPanelGame(QWidget):
             if self.counted >= PROBLEMS_PER_CHECKPOINT:
                 self.counted = 0
                 self.pending_checkpoint = True
-        self.next_problem_at = now + fb_dur + self.rng.uniform(*PROBLEM_GAP_SECONDS)
-        self.next_shuffle_at = now              # hard mode: next match round right away
+        gap = self.rng.uniform(*PROBLEM_GAP_SECONDS)
+        self.next_problem_at = (now + fb_dur + gap) if gap > 0 else now
+        self.next_shuffle_at = now if gap > 0 else float("inf")
         self._log(p, outcome, rt, rt_after)
 
     def _spinning(self):

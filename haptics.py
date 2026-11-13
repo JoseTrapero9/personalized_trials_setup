@@ -63,6 +63,17 @@ async def close_haptics():
 ALL_MOTORS = list(range(20))
 CENTER_MOTORS = [1, 2, 5, 6, 9, 10, 13, 14, 17, 18]
 OUTER_MOTORS = [0, 3, 4, 7, 8, 11, 12, 15, 16, 19]
+
+BACK_ALL = list(range(20))
+BACK_LOWER = [4, 5, 6, 7, 12, 13, 14, 15, 16, 17, 18, 19]
+BACK_UPPER = [0, 1, 2, 3, 8, 9, 10, 11]
+BACK_CENTER = [1, 2, 5, 6, 9, 10, 13, 14, 17, 18]
+BACK_OUTER = [0, 3, 4, 7, 8, 11, 12, 15, 16, 19]
+BACK_RIGHT = [2, 3, 6, 7, 10, 11, 14, 15, 18, 19]
+
+FRONT_ALL = list(range(20))
+FRONT_LEFT = [0, 1, 4, 5, 8, 9, 12, 13, 16, 17]
+FRONT_RIGHT = [2, 3, 6, 7, 10, 11, 14, 15, 18, 19]
 PLAYER_URL = "ws://127.0.0.1:15881/v2/feedbacks?app_id=assembly_x16&app_name=Dual_Task_Paradigm"
 
 
@@ -116,6 +127,25 @@ class _PlayerLink:
 
 player = _PlayerLink()
 
+def _positive_1(position):
+    """1.4 Hz heartbeat-like double pulse (about 0.5 s)."""
+    player.frame("p1_a", position, BACK_ALL, 35, 60)
+    time.sleep(0.05)
+    player.frame("p1_b", position, BACK_ALL, 60, 100)
+    time.sleep(0.18)
+    player.frame("p1_c", position, BACK_ALL, 35, 60)
+    time.sleep(0.05)
+    player.frame("p1_d", position, BACK_ALL, 60, 120)
+
+
+def _positive_2(position):
+    """Upward wave: lower -> whole panel -> upper (about 0.5 s)."""
+    player.frame("p2_low", position, BACK_LOWER, 35, 160)
+    time.sleep(0.15)
+    player.frame("p2_mid", position, BACK_ALL, 50, 160)
+    time.sleep(0.15)
+    player.frame("p2_high", position, BACK_UPPER, 65, 180)
+
 
 def _positive_3(position):
     """Warm swell: centre -> whole panel -> outer ring (about 0.5 s)."""
@@ -126,6 +156,13 @@ def _positive_3(position):
     player.frame("p3_3", position, OUTER_MOTORS, 25, 200)
 
 
+def _negative_1(position):
+    """0.5 Hz heavy double pulse (about 0.5 s)."""
+    player.frame("n1_a", position, FRONT_ALL, 95, 240)
+    time.sleep(0.24)
+    player.frame("n1_b", position, FRONT_ALL, 100, 240)
+
+
 def _negative_2(position):
     """Sharp staccato: three full-strength bursts (about 0.5 s)."""
     for step in range(3):
@@ -134,7 +171,37 @@ def _negative_2(position):
             time.sleep(0.18)
 
 
-CUE_PATTERNS = {"positive_3": _positive_3, "negative_2": _negative_2}
+def _negative_3(position):
+    """Chest jitter: alternating left/right bursts (about 0.5 s)."""
+    for step in range(5):
+        motors = FRONT_LEFT if step % 2 == 0 else FRONT_RIGHT
+        player.frame(f"n3_{step}", position, motors, 100, 90)
+        if step < 4:
+            time.sleep(0.09)
+
+
+CUE_PATTERNS = {
+    "positive_1": _positive_1,
+    "positive_2": _positive_2,
+    "positive_3": _positive_3,
+    "negative_1": _negative_1,
+    "negative_2": _negative_2,
+    "negative_3": _negative_3,
+}
+
+
+def _pickup_right():
+    """Positive-1 double-pulse sequence on both front-right and back-right (containers are on the right)."""
+    for tag, intensity, dur, gap in (
+        ("a", 35, 60, 0.05),
+        ("b", 60, 100, 0.18),
+        ("c", 35, 60, 0.05),
+        ("d", 60, 120, 0.0),
+    ):
+        player.frame(f"pickup_f_{tag}", "VestFront", FRONT_RIGHT, intensity, dur)
+        player.frame(f"pickup_b_{tag}", "VestBack", BACK_RIGHT, intensity, dur)
+        if gap > 0:
+            time.sleep(gap)
 
 
 def play_correct_cue():
@@ -145,6 +212,10 @@ def play_correct_cue():
 def play_incorrect_cue():
     threading.Thread(target=CUE_PATTERNS[HAPTIC_INCORRECT_PATTERN], args=(HAPTIC_INCORRECT_POSITION,),
                      daemon=True).start()
+
+
+def play_pickup_cue():
+    threading.Thread(target=_pickup_right, daemon=True).start()
 
 
 def start_haptic_thread():

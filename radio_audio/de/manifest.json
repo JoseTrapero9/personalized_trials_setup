@@ -3,176 +3,176 @@
  "voice": "Microsoft Hedda Desktop - German",
  "voice_source": "desktop",
  "rate": 0,
- "script_hash": "df5829131393",
- "generated": "2026-11-04 11:50:43",
+ "script_hash": "432ba64a0400",
+ "generated": "2026-11-13 15:36:36",
  "clips": {
   "filler_00": {
    "parts": [
-    "Hallo zusammen, hier ist das Werksradio mit dem aktuellen Bericht aus der Leitwarte."
+    "Leitwarte hier: alles im Normalbereich."
    ],
-   "duration_s": 5.377
+   "duration_s": 2.966
   },
   "filler_01": {
    "parts": [
-    "Alle vier Turbinen laufen einwandfrei, und die Leistung liegt genau im Plan."
+    "Alle vier Turbinen laufen rund."
    ],
-   "duration_s": 4.957
+   "duration_s": 1.905
   },
   "filler_02": {
    "parts": [
-    "Das Wartungsteam hat heute Morgen die Inspektion der Kühltürme abgeschlossen."
+    "Kühlturm-Inspektion ist abgeschlossen."
    ],
-   "duration_s": 4.583
+   "duration_s": 2.366
   },
   "filler_03": {
    "parts": [
-    "Draußen ist es ruhig, mit einer leichten Brise vom Fluss."
+    "Draußen ist das Wetter ruhig."
    ],
-   "duration_s": 3.683
+   "duration_s": 1.679
   },
   "filler_04": {
    "parts": [
-    "Die Energieleistung in dieser Stunde liegt etwas über dem gestrigen Durchschnitt. Gute Arbeit, alle zusammen."
+    "Die Leistung liegt genau im Plan."
    ],
-   "duration_s": 7.395
+   "duration_s": 2.0
   },
   "filler_05": {
    "parts": [
-    "Zur Erinnerung: Die Kantine serviert bis vierzehn Uhr Suppe und frisches Brot."
+    "Die Kantine hat bis vierzehn Uhr offen."
    ],
-   "duration_s": 4.748
+   "duration_s": 2.272
   },
   "filler_06": {
    "parts": [
-    "Die neuen Sensoren im Kesselhaus senden saubere Daten, bisher ohne Überraschungen."
+    "Kesselhaus-Sensoren melden saubere Daten."
    ],
-   "duration_s": 5.364
+   "duration_s": 2.604
   },
   "filler_07": {
    "parts": [
-    "Die Netzlast ist stabil, wir erwarten einen ruhigen Nachmittag."
+    "Die Netzlast ist heute stabil."
    ],
-   "duration_s": 4.226
+   "duration_s": 1.96
   },
   "filler_08": {
    "parts": [
-    "Schichtwechsel ist um sechs. Bitte hinterlasst eure Notizen für das nächste Team."
+    "Schichtwechsel ist um achtzehn Uhr."
    ],
-   "duration_s": 5.52
+   "duration_s": 1.929
   },
   "filler_09": {
    "parts": [
-    "Das Kohlelager hat heute Morgen eine volle Ladung bekommen, der Vorrat sieht gut aus."
+    "Das Kohlelager ist voll."
    ],
-   "duration_s": 5.436
+   "duration_s": 1.56
   },
   "filler_10": {
    "parts": [
-    "Die Wassertemperatur im Kondensator ist stabil und innerhalb der Grenzwerte."
+    "Wassertemperatur im Kondensator normal."
    ],
-   "duration_s": 4.555
+   "duration_s": 2.694
   },
   "filler_11": {
    "parts": [
-    "Der Sicherheitsrundgang in Sektor zwei lief gut. Danke an alle, die dabei waren."
+    "Sicherheitsrundgang in Sektor zwei beendet."
    ],
-   "duration_s": 6.117
+   "duration_s": 2.729
   },
   "filler_12": {
    "parts": [
-    "Unser Solarfeld bringt etwas zusätzlichen Strom, solange die Sonne scheint."
+    "Das Solarfeld erzeugt Zusatzstrom."
    ],
-   "duration_s": 4.921
+   "duration_s": 2.383
   },
   "filler_13": {
    "parts": [
-    "Eine Besuchergruppe von der Universität besichtigt später die Anlage."
+    "Später kommt eine Besuchergruppe."
    ],
-   "duration_s": 4.131
+   "duration_s": 1.972
   },
   "filler_14": {
    "parts": [
-    "Der Brennstoffverbrauch liegt unter Plan, das freut das Budget."
+    "Der Brennstoffverbrauch ist niedrig."
    ],
-   "duration_s": 4.081
+   "duration_s": 1.967
   },
   "filler_15": {
    "parts": [
-    "Denkt daran, etwas Wasser zu trinken und euch kurz zu strecken."
+    "Denkt daran, etwas Wasser zu trinken."
    ],
-   "duration_s": 4.16
+   "duration_s": 2.743
   },
   "filler_16": {
    "parts": [
-    "Die Vibrationen an der Hauptwelle sind niedrig und stabil, genau so, wie wir es mögen."
+    "Vibrationen an der Hauptwelle sind gering."
    ],
-   "duration_s": 5.849
+   "duration_s": 2.402
   },
   "filler_17": {
    "parts": [
-    "Der Parkplatz wird am Wochenende neu markiert, bitte parkt in der Nähe des Tores."
+    "Bitte nahe am Haupttor parken."
    ],
-   "duration_s": 4.975
+   "duration_s": 1.928
   },
   "filler_18": {
    "parts": [
-    "Der Dampfdruck in der gesamten Anlage ist ausgeglichen und hält sich gut."
+    "Der Dampfdruck bleibt stabil."
    ],
-   "duration_s": 4.102
+   "duration_s": 1.794
   },
   "filler_19": {
    "parts": [
-    "Das war es fürs Erste aus der Leitwarte. Eine gute Schicht euch allen."
+    "Leitwarte Ende. Gute Schicht."
    ],
-   "duration_s": 4.8
+   "duration_s": 2.817
   },
   "fb_solved_0": {
    "parts": [
-    "Perfekt, das hat es behoben."
+    "Behoben."
    ],
-   "duration_s": 2.364
+   "duration_s": 0.729
   },
   "fb_solved_1": {
    "parts": [
-    "Sehr gut, alles ist wieder stabil."
+    "Gut, wieder stabil."
    ],
-   "duration_s": 2.496
+   "duration_s": 1.837
   },
   "fb_solved_2": {
    "parts": [
-    "Super, Problem gelöst."
+    "Problem gelöst."
    ],
-   "duration_s": 2.177
+   "duration_s": 1.095
   },
   "fb_wrong_0": {
    "parts": [
-    "Oh nein, das war falsch. Wir haben etwas Leistung verloren."
+    "Falscher Knopf."
    ],
-   "duration_s": 5.03
+   "duration_s": 0.852
   },
   "fb_wrong_1": {
    "parts": [
-    "Das hat nicht geklappt, das System wurde beschädigt."
+    "Nein, Systemschaden."
    ],
-   "duration_s": 3.449
+   "duration_s": 2.005
   },
   "fb_wrong_2": {
    "parts": [
-    "Schade, das war der falsche Schritt."
+    "Falscher Schritt."
    ],
-   "duration_s": 2.35
+   "duration_s": 0.803
   },
   "fb_timeout_0": {
    "parts": [
-    "Zu spät, das System hat kurz abgeschaltet."
+    "Zu spät."
    ],
-   "duration_s": 3.258
+   "duration_s": 0.683
   },
   "fb_timeout_1": {
    "parts": [
-    "Die Zeit ist um, wir haben Leistung verloren."
+    "Zeit abgelaufen."
    ],
-   "duration_s": 3.198
+   "duration_s": 1.121
   },
   "ann_container_1": {
    "parts": [
@@ -188,1788 +188,2553 @@
   },
   "prob_e000": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke den grünen Knopf."
+    "Drücke zuerst den grünen Knopf.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 7.396
+   "duration_s": 15.468
   },
   "prob_e001": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den violetten Knopf."
    ],
-   "duration_s": 8.046
+   "duration_s": 15.62
   },
   "prob_e002": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den gelben Knopf."
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den blauen Knopf.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 7.012
+   "duration_s": 15.51
   },
   "prob_e003": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke den gelben Knopf."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den grünen Knopf.",
+    "Das Sicherheitsventil klemmt.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
    ],
-   "duration_s": 7.217
+   "duration_s": 15.21
   },
   "prob_e004": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke den gelben Knopf."
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Mach das Band schnell frei."
    ],
-   "duration_s": 7.778
+   "duration_s": 16.443
   },
   "prob_e005": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Blau."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den violetten Knopf.",
+    "Senke sofort die Last."
    ],
-   "duration_s": 8.0
+   "duration_s": 15.113
   },
   "prob_e006": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, und dann den Knopf mit der Aufschrift Rot."
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Mach das Band schnell frei.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
    ],
-   "duration_s": 11.377
+   "duration_s": 16.326
   },
   "prob_e007": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, und dann den Knopf mit der Aufschrift Violett."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 11.595
+   "duration_s": 16.218
   },
   "prob_e008": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, und dann den Knopf mit der Aufschrift Blau."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den gelben Knopf.",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Prüfe die Hauptanzeige."
    ],
-   "duration_s": 11.369
+   "duration_s": 15.193
   },
   "prob_e009": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, und dann den Knopf mit der Aufschrift Violett."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Der Druck im Sektor fällt.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
    ],
-   "duration_s": 10.376
+   "duration_s": 15.69
   },
   "prob_e010": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, und dann den Knopf mit der Aufschrift Violett."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Der Druck im Sektor fällt.",
+    "Drücke zuerst den roten Knopf.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den gelben Knopf."
    ],
-   "duration_s": 12.408
+   "duration_s": 14.062
   },
   "prob_e011": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, und dann den gelben Knopf."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den blauen Knopf.",
+    "Das Sicherheitsventil klemmt.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
    ],
-   "duration_s": 10.702
+   "duration_s": 15.195
   },
   "prob_e012": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den Knopf mit der Aufschrift Blau."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den roten Knopf.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
    ],
-   "duration_s": 11.187
+   "duration_s": 15.379
   },
   "prob_e013": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den Knopf mit der Aufschrift Rot, und zuletzt den grünen Knopf."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den roten Knopf.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb."
    ],
-   "duration_s": 13.576
+   "duration_s": 14.9
   },
   "prob_e014": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, dann den gelben Knopf, und zuletzt den violetten Knopf."
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke zuerst den violetten Knopf.",
+    "Mach das Band schnell frei.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
    ],
-   "duration_s": 11.795
+   "duration_s": 15.486
   },
   "prob_e015": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, dann den Knopf mit der Aufschrift Rot, und zuletzt den gelben Knopf."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den blauen Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Drücke außerdem den roten Knopf.",
+    "Sperre den Abschnitt ab."
    ],
-   "duration_s": 13.348
+   "duration_s": 13.988
   },
   "prob_e016": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den violetten Knopf, und zuletzt den gelben Knopf."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Der Druck im Sektor fällt.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den gelben Knopf."
    ],
-   "duration_s": 12.707
+   "duration_s": 14.952
   },
   "prob_e017": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, dann den violetten Knopf, und zuletzt den Knopf mit der Aufschrift Gelb."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den blauen Knopf.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den gelben Knopf.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 14.307
+   "duration_s": 14.548
   },
   "prob_e018": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, dann den violetten Knopf, und zuletzt den Knopf mit der Aufschrift Rot."
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 13.445
+   "duration_s": 16.35
   },
   "prob_e019": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, dann den violetten Knopf, und zuletzt den Knopf mit der Aufschrift Blau."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den gelben Knopf.",
+    "Der Wasserfluss fällt schnell.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 12.557
+   "duration_s": 14.918
   },
   "prob_e020": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Grün."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den grünen Knopf."
    ],
-   "duration_s": 7.772
+   "duration_s": 15.082
   },
   "prob_e021": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke den roten Knopf."
+    "Drücke zuerst den gelben Knopf.",
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Senke sofort die Last."
    ],
-   "duration_s": 7.798
+   "duration_s": 14.973
   },
   "prob_e022": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Rot."
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den grünen Knopf.",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den gelben Knopf.",
+    "Mach das Band schnell frei."
    ],
-   "duration_s": 7.839
+   "duration_s": 14.515
   },
   "prob_e023": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den roten Knopf.",
+    "Der Antriebsmotor ist überlastet.",
+    "Mach das Band schnell frei.",
+    "Drücke außerdem den grünen Knopf."
    ],
-   "duration_s": 7.654
+   "duration_s": 14.498
   },
   "prob_e024": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Grün."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den blauen Knopf."
    ],
-   "duration_s": 7.513
+   "duration_s": 15.46
   },
   "prob_e025": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke den roten Knopf."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den gelben Knopf.",
+    "Das Sicherheitsventil klemmt.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb."
    ],
-   "duration_s": 6.64
+   "duration_s": 15.1
   },
   "prob_e026": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, und dann den Knopf mit der Aufschrift Gelb."
+    "Drücke zuerst den blauen Knopf.",
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Prüfe die Hauptanzeige."
    ],
-   "duration_s": 11.169
+   "duration_s": 15.434
   },
   "prob_e027": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, und dann den blauen Knopf."
+    "Drücke zuerst den roten Knopf.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den violetten Knopf.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 9.799
+   "duration_s": 14.724
   },
   "prob_e028": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, und dann den Knopf mit der Aufschrift Grün."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Der Druck im Sektor fällt.",
+    "Drücke zuerst den grünen Knopf.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den gelben Knopf."
    ],
-   "duration_s": 11.393
+   "duration_s": 14.112
   },
   "prob_e029": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den gelben Knopf."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den blauen Knopf.",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Der Ersatzlauf startet."
    ],
-   "duration_s": 9.7
+   "duration_s": 14.923
   },
   "prob_e030": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, und dann den blauen Knopf."
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den violetten Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 10.412
+   "duration_s": 15.655
   },
   "prob_e031": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, und dann den Knopf mit der Aufschrift Gelb."
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den blauen Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den grünen Knopf.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 10.942
+   "duration_s": 14.631
   },
   "prob_e032": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, und dann den blauen Knopf."
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
    ],
-   "duration_s": 9.737
+   "duration_s": 15.834
   },
   "prob_e033": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den Knopf mit der Aufschrift Grün, und zuletzt den blauen Knopf."
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den gelben Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
    ],
-   "duration_s": 13.501
+   "duration_s": 15.321
   },
   "prob_e034": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den blauen Knopf, und zuletzt den gelben Knopf."
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den grünen Knopf."
    ],
-   "duration_s": 12.722
+   "duration_s": 15.648
   },
   "prob_e035": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, dann den Knopf mit der Aufschrift Rot, und zuletzt den grünen Knopf."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den blauen Knopf.",
+    "Senke sofort die Last."
    ],
-   "duration_s": 12.152
+   "duration_s": 15.063
   },
   "prob_e036": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, dann den Knopf mit der Aufschrift Gelb, und zuletzt den Knopf mit der Aufschrift Blau."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den roten Knopf.",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den blauen Knopf.",
+    "Der Ersatzlauf startet."
    ],
-   "duration_s": 13.909
+   "duration_s": 14.073
   },
   "prob_e037": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, dann den gelben Knopf, und zuletzt den blauen Knopf."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 11.439
+   "duration_s": 16.298
   },
   "prob_e038": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, dann den violetten Knopf, und zuletzt den gelben Knopf."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den roten Knopf."
    ],
-   "duration_s": 11.582
+   "duration_s": 14.949
   },
   "prob_e039": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, dann den Knopf mit der Aufschrift Grün, und zuletzt den gelben Knopf."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den gelben Knopf."
    ],
-   "duration_s": 14.206
+   "duration_s": 15.046
   },
   "prob_e040": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Gelb."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den roten Knopf.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den blauen Knopf."
    ],
-   "duration_s": 7.897
+   "duration_s": 14.391
   },
   "prob_e041": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Grün."
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Der Antriebsmotor ist überlastet.",
+    "Mach das Band schnell frei.",
+    "Drücke außerdem den violetten Knopf."
    ],
-   "duration_s": 8.23
+   "duration_s": 15.556
   },
   "prob_e042": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke den violetten Knopf."
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den blauen Knopf.",
+    "Der Ersatzlauf startet."
    ],
-   "duration_s": 7.543
+   "duration_s": 15.152
   },
   "prob_e043": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Gelb."
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den roten Knopf.",
+    "Stabilisiere das Netz."
    ],
-   "duration_s": 7.506
+   "duration_s": 15.942
   },
   "prob_e044": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke den grünen Knopf."
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 8.209
+   "duration_s": 16.332
   },
   "prob_e045": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den roten Knopf."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den blauen Knopf.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 7.032
+   "duration_s": 15.444
   },
   "prob_e046": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den grünen Knopf."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den blauen Knopf.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den violetten Knopf."
    ],
-   "duration_s": 9.61
+   "duration_s": 14.585
   },
   "prob_e047": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den Knopf mit der Aufschrift Grün."
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke zuerst den violetten Knopf.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
    ],
-   "duration_s": 11.102
+   "duration_s": 15.783
   },
   "prob_e048": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den Knopf mit der Aufschrift Grün."
+    "Drücke zuerst den roten Knopf.",
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den violetten Knopf.",
+    "Der Ersatzlauf startet."
    ],
-   "duration_s": 11.102
+   "duration_s": 14.243
   },
   "prob_e049": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, und dann den Knopf mit der Aufschrift Blau."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 10.048
+   "duration_s": 16.092
   },
   "prob_e050": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den grünen Knopf."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den grünen Knopf.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den blauen Knopf."
    ],
-   "duration_s": 11.56
+   "duration_s": 14.612
   },
   "prob_e051": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den blauen Knopf."
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den grünen Knopf.",
+    "Der Antriebsmotor ist überlastet.",
+    "Mach das Band schnell frei.",
+    "Drücke außerdem den gelben Knopf."
    ],
-   "duration_s": 9.041
+   "duration_s": 14.487
   },
   "prob_e052": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, und dann den violetten Knopf."
+    "Drücke zuerst den violetten Knopf.",
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Der Druck im Sektor fällt.",
+    "Drücke außerdem den grünen Knopf.",
+    "Sperre den Abschnitt ab."
    ],
-   "duration_s": 10.772
+   "duration_s": 14.242
   },
   "prob_e053": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den Knopf mit der Aufschrift Blau, und zuletzt den violetten Knopf."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den grünen Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 14.18
+   "duration_s": 15.003
   },
   "prob_e054": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den Knopf mit der Aufschrift Rot, und zuletzt den gelben Knopf."
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den roten Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 12.542
+   "duration_s": 15.395
   },
   "prob_e055": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, dann den Knopf mit der Aufschrift Rot, und zuletzt den Knopf mit der Aufschrift Blau."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den blauen Knopf.",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Prüfe die Hauptanzeige."
    ],
-   "duration_s": 13.919
+   "duration_s": 15.423
   },
   "prob_e056": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, dann den gelben Knopf, und zuletzt den Knopf mit der Aufschrift Blau."
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den grünen Knopf.",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den roten Knopf.",
+    "Mach das Band schnell frei."
    ],
-   "duration_s": 13.197
+   "duration_s": 14.525
   },
   "prob_e057": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den Knopf mit der Aufschrift Rot, und zuletzt den grünen Knopf."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Senke sofort die Last."
    ],
-   "duration_s": 11.833
+   "duration_s": 15.798
   },
   "prob_e058": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, dann den gelben Knopf, und zuletzt den blauen Knopf."
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 13.369
+   "duration_s": 16.588
   },
   "prob_e059": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den Knopf mit der Aufschrift Blau, und zuletzt den Knopf mit der Aufschrift Grün."
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
    ],
-   "duration_s": 14.288
+   "duration_s": 15.972
   },
   "prob_e060": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke den grünen Knopf."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den grünen Knopf."
    ],
-   "duration_s": 8.209
+   "duration_s": 15.173
   },
   "prob_e061": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke den gelben Knopf."
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den grünen Knopf.",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Stabilisiere das Netz."
    ],
-   "duration_s": 8.145
+   "duration_s": 15.812
   },
   "prob_e062": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke den grünen Knopf."
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den violetten Knopf.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb."
    ],
-   "duration_s": 6.943
+   "duration_s": 15.134
   },
   "prob_e063": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Grün."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den violetten Knopf.",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den roten Knopf.",
+    "Senke sofort die Last."
    ],
-   "duration_s": 8.072
+   "duration_s": 14.344
   },
   "prob_e064": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke den violetten Knopf."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den violetten Knopf.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 7.085
+   "duration_s": 15.647
   },
   "prob_e065": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Blau."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Der Druck im Sektor fällt.",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
    ],
-   "duration_s": 7.832
+   "duration_s": 15.795
   },
   "prob_e066": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, und dann den Knopf mit der Aufschrift Gelb."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den violetten Knopf.",
+    "Das Sicherheitsventil klemmt.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
    ],
-   "duration_s": 11.34
+   "duration_s": 15.4
   },
   "prob_e067": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 9.812
-  },
-  "prob_e068": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, und dann den gelben Knopf."
-   ],
-   "duration_s": 10.702
-  },
-  "prob_e069": {
-   "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den blauen Knopf."
-   ],
-   "duration_s": 9.298
-  },
-  "prob_e070": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 9.881
-  },
-  "prob_e071": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, und dann den roten Knopf."
-   ],
-   "duration_s": 9.629
-  },
-  "prob_e072": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den violetten Knopf."
-   ],
-   "duration_s": 11.691
-  },
-  "prob_e073": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, dann den Knopf mit der Aufschrift Blau, und zuletzt den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 15.141
-  },
-  "prob_e074": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den Knopf mit der Aufschrift Grün, und zuletzt den blauen Knopf."
-   ],
-   "duration_s": 13.501
-  },
-  "prob_e075": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den Knopf mit der Aufschrift Violett, und zuletzt den Knopf mit der Aufschrift Gelb."
-   ],
-   "duration_s": 13.275
-  },
-  "prob_e076": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, dann den Knopf mit der Aufschrift Gelb, und zuletzt den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 14.268
-  },
-  "prob_e077": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, dann den violetten Knopf, und zuletzt den gelben Knopf."
-   ],
-   "duration_s": 11.19
-  },
-  "prob_e078": {
-   "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den grünen Knopf, und zuletzt den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 12.106
-  },
-  "prob_e079": {
-   "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den roten Knopf, und zuletzt den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 13.073
-  },
-  "prob_e080": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke den grünen Knopf."
-   ],
-   "duration_s": 7.283
-  },
-  "prob_e081": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 8.001
-  },
-  "prob_e082": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Blau."
-   ],
-   "duration_s": 7.832
-  },
-  "prob_e083": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke den blauen Knopf."
-   ],
-   "duration_s": 7.272
-  },
-  "prob_e084": {
-   "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke den violetten Knopf."
-   ],
-   "duration_s": 7.085
-  },
-  "prob_e085": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 8.072
-  },
-  "prob_e086": {
-   "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, und dann den grünen Knopf."
-   ],
-   "duration_s": 10.121
-  },
-  "prob_e087": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, und dann den grünen Knopf."
-   ],
-   "duration_s": 11.444
-  },
-  "prob_e088": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den blauen Knopf."
-   ],
-   "duration_s": 10.223
-  },
-  "prob_e089": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 10.816
-  },
-  "prob_e090": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den violetten Knopf."
-   ],
-   "duration_s": 10.545
-  },
-  "prob_e091": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, und dann den roten Knopf."
-   ],
-   "duration_s": 8.984
-  },
-  "prob_e092": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, und dann den violetten Knopf."
-   ],
-   "duration_s": 9.831
-  },
-  "prob_e093": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den blauen Knopf, und zuletzt den roten Knopf."
-   ],
-   "duration_s": 11.802
-  },
-  "prob_e094": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den Knopf mit der Aufschrift Blau, und zuletzt den roten Knopf."
-   ],
-   "duration_s": 12.42
-  },
-  "prob_e095": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, dann den roten Knopf, und zuletzt den Knopf mit der Aufschrift Violett."
-   ],
-   "duration_s": 13.484
-  },
-  "prob_e096": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, dann den Knopf mit der Aufschrift Grün, und zuletzt den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 13.552
-  },
-  "prob_e097": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den grünen Knopf, und zuletzt den Knopf mit der Aufschrift Violett."
-   ],
-   "duration_s": 12.26
-  },
-  "prob_e098": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, dann den gelben Knopf, und zuletzt den roten Knopf."
-   ],
-   "duration_s": 11.561
-  },
-  "prob_e099": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, dann den violetten Knopf, und zuletzt den gelben Knopf."
-   ],
-   "duration_s": 12.36
-  },
-  "prob_e100": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den violetten Knopf."
-   ],
-   "duration_s": 7.222
-  },
-  "prob_e101": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Gelb."
-   ],
-   "duration_s": 7.897
-  },
-  "prob_e102": {
-   "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 8.159
-  },
-  "prob_e103": {
-   "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 8.23
-  },
-  "prob_e104": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Blau."
-   ],
-   "duration_s": 8.603
-  },
-  "prob_e105": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 8.044
-  },
-  "prob_e106": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, und dann den grünen Knopf."
-   ],
-   "duration_s": 9.912
-  },
-  "prob_e107": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 11.307
-  },
-  "prob_e108": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, und dann den Knopf mit der Aufschrift Gelb."
-   ],
-   "duration_s": 12.103
-  },
-  "prob_e109": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, und dann den gelben Knopf."
-   ],
-   "duration_s": 10.177
-  },
-  "prob_e110": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, und dann den violetten Knopf."
-   ],
-   "duration_s": 10.048
-  },
-  "prob_e111": {
-   "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, und dann den Knopf mit der Aufschrift Blau."
-   ],
-   "duration_s": 10.948
-  },
-  "prob_e112": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den gelben Knopf."
-   ],
-   "duration_s": 9.542
-  },
-  "prob_e113": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den gelben Knopf, und zuletzt den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 13.244
-  },
-  "prob_e114": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, dann den violetten Knopf, und zuletzt den gelben Knopf."
-   ],
-   "duration_s": 12.352
-  },
-  "prob_e115": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, dann den Knopf mit der Aufschrift Violett, und zuletzt den Knopf mit der Aufschrift Blau."
-   ],
-   "duration_s": 14.094
-  },
-  "prob_e116": {
-   "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, dann den Knopf mit der Aufschrift Gelb, und zuletzt den Knopf mit der Aufschrift Violett."
-   ],
-   "duration_s": 13.984
-  },
-  "prob_e117": {
-   "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, dann den blauen Knopf, und zuletzt den Knopf mit der Aufschrift Violett."
-   ],
-   "duration_s": 13.661
-  },
-  "prob_e118": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, dann den violetten Knopf, und zuletzt den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 13.288
-  },
-  "prob_e119": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, dann den Knopf mit der Aufschrift Gelb, und zuletzt den Knopf mit der Aufschrift Blau."
-   ],
-   "duration_s": 13.909
-  },
-  "prob_e120": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den blauen Knopf."
-   ],
-   "duration_s": 7.071
-  },
-  "prob_e121": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
-   ],
-   "duration_s": 8.817
-  },
-  "prob_e122": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
-   ],
-   "duration_s": 8.213
-  },
-  "prob_e123": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
-   ],
-   "duration_s": 8.25
-  },
-  "prob_e124": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den blauen Knopf."
-   ],
-   "duration_s": 7.071
-  },
-  "prob_e125": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke den roten Knopf."
-   ],
-   "duration_s": 8.164
-  },
-  "prob_e126": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den roten Knopf."
-   ],
-   "duration_s": 11.515
-  },
-  "prob_e127": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den gelben Knopf."
-   ],
-   "duration_s": 10.168
-  },
-  "prob_e128": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den roten Knopf."
-   ],
-   "duration_s": 10.377
-  },
-  "prob_e129": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, und dann den blauen Knopf."
-   ],
-   "duration_s": 10.28
-  },
-  "prob_e130": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, und dann den grünen Knopf."
-   ],
-   "duration_s": 11.064
-  },
-  "prob_e131": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, und dann den Knopf mit der Aufschrift Gelb."
-   ],
-   "duration_s": 11.293
-  },
-  "prob_e132": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 11.874
-  },
-  "prob_e133": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, dann den violetten Knopf, und zuletzt den Knopf mit der Aufschrift Gelb."
-   ],
-   "duration_s": 12.526
-  },
-  "prob_e134": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, dann den grünen Knopf, und zuletzt den gelben Knopf."
-   ],
-   "duration_s": 11.407
-  },
-  "prob_e135": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, dann den Knopf mit der Aufschrift Blau, und zuletzt den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 12.72
-  },
-  "prob_e136": {
-   "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, dann den Knopf mit der Aufschrift Gelb, und zuletzt den grünen Knopf."
-   ],
-   "duration_s": 12.162
-  },
-  "prob_e137": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den grünen Knopf, und zuletzt den roten Knopf."
-   ],
-   "duration_s": 11.568
-  },
-  "prob_e138": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, dann den violetten Knopf, und zuletzt den Knopf mit der Aufschrift Blau."
-   ],
-   "duration_s": 13.434
-  },
-  "prob_e139": {
-   "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den grünen Knopf, und zuletzt den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 13.652
-  },
-  "prob_e140": {
-   "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke den roten Knopf."
-   ],
-   "duration_s": 6.892
-  },
-  "prob_e141": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 7.513
-  },
-  "prob_e142": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke den gelben Knopf."
-   ],
-   "duration_s": 7.778
-  },
-  "prob_e143": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
-   ],
-   "duration_s": 9.183
-  },
-  "prob_e144": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke den grünen Knopf."
-   ],
-   "duration_s": 7.283
-  },
-  "prob_e145": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den blauen Knopf."
-   ],
-   "duration_s": 7.071
-  },
-  "prob_e146": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den Knopf mit der Aufschrift Blau."
-   ],
-   "duration_s": 11.404
-  },
-  "prob_e147": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, und dann den blauen Knopf."
-   ],
-   "duration_s": 11.021
-  },
-  "prob_e148": {
-   "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, und dann den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 10.34
-  },
-  "prob_e149": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, und dann den Knopf mit der Aufschrift Grün."
-   ],
-   "duration_s": 11.33
-  },
-  "prob_e150": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den grünen Knopf."
-   ],
-   "duration_s": 11.56
-  },
-  "prob_e151": {
-   "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, und dann den blauen Knopf."
-   ],
-   "duration_s": 9.737
-  },
-  "prob_e152": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den roten Knopf."
-   ],
-   "duration_s": 9.985
-  },
-  "prob_e153": {
-   "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den roten Knopf, und zuletzt den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 12.509
-  },
-  "prob_e154": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, dann den Knopf mit der Aufschrift Violett, und zuletzt den grünen Knopf."
-   ],
-   "duration_s": 14.454
-  },
-  "prob_e155": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den Knopf mit der Aufschrift Blau, und zuletzt den Knopf mit der Aufschrift Violett."
-   ],
-   "duration_s": 13.993
-  },
-  "prob_e156": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den Knopf mit der Aufschrift Grün, und zuletzt den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 13.297
-  },
-  "prob_e157": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den roten Knopf, und zuletzt den Knopf mit der Aufschrift Gelb."
-   ],
-   "duration_s": 11.944
-  },
-  "prob_e158": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den roten Knopf, und zuletzt den blauen Knopf."
-   ],
-   "duration_s": 12.604
-  },
-  "prob_e159": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, dann den roten Knopf, und zuletzt den blauen Knopf."
-   ],
-   "duration_s": 11.924
-  },
-  "prob_e160": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Gelb."
-   ],
-   "duration_s": 8.102
-  },
-  "prob_e161": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Blau."
-   ],
-   "duration_s": 8.603
-  },
-  "prob_e162": {
-   "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Blau."
-   ],
-   "duration_s": 8.158
-  },
-  "prob_e163": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den violetten Knopf."
-   ],
-   "duration_s": 7.222
-  },
-  "prob_e164": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den blauen Knopf."
-   ],
-   "duration_s": 7.071
-  },
-  "prob_e165": {
-   "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Gelb."
-   ],
-   "duration_s": 8.552
-  },
-  "prob_e166": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, und dann den gelben Knopf."
-   ],
-   "duration_s": 9.735
-  },
-  "prob_e167": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, und dann den roten Knopf."
-   ],
-   "duration_s": 8.984
-  },
-  "prob_e168": {
-   "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den grünen Knopf."
-   ],
-   "duration_s": 9.647
-  },
-  "prob_e169": {
-   "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 9.812
-  },
-  "prob_e170": {
-   "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, und dann den roten Knopf."
-   ],
-   "duration_s": 9.747
-  },
-  "prob_e171": {
-   "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, und dann den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 10.509
-  },
-  "prob_e172": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, und dann den Knopf mit der Aufschrift Gelb."
-   ],
-   "duration_s": 10.314
-  },
-  "prob_e173": {
-   "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den grünen Knopf, und zuletzt den Knopf mit der Aufschrift Rot."
-   ],
-   "duration_s": 12.406
-  },
-  "prob_e174": {
-   "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den Knopf mit der Aufschrift Rot, und zuletzt den gelben Knopf."
-   ],
-   "duration_s": 13.184
-  },
-  "prob_e175": {
-   "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, dann den Knopf mit der Aufschrift Blau, und zuletzt den Knopf mit der Aufschrift Rot."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den violetten Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Sperre den Abschnitt ab."
    ],
    "duration_s": 15.077
   },
+  "prob_e068": {
+   "parts": [
+    "Drücke zuerst den blauen Knopf.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 15.418
+  },
+  "prob_e069": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Die Einspeisung schwankt stark.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den grünen Knopf."
+   ],
+   "duration_s": 16.013
+  },
+  "prob_e070": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den blauen Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
+   ],
+   "duration_s": 14.911
+  },
+  "prob_e071": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den grünen Knopf."
+   ],
+   "duration_s": 15.107
+  },
+  "prob_e072": {
+   "parts": [
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den blauen Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den roten Knopf."
+   ],
+   "duration_s": 14.561
+  },
+  "prob_e073": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den grünen Knopf.",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Senke sofort die Last."
+   ],
+   "duration_s": 15.193
+  },
+  "prob_e074": {
+   "parts": [
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den roten Knopf.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den violetten Knopf."
+   ],
+   "duration_s": 14.55
+  },
+  "prob_e075": {
+   "parts": [
+    "Drücke zuerst den grünen Knopf.",
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den violetten Knopf.",
+    "Stabilisiere das Netz."
+   ],
+   "duration_s": 15.128
+  },
+  "prob_e076": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den violetten Knopf.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den blauen Knopf."
+   ],
+   "duration_s": 14.797
+  },
+  "prob_e077": {
+   "parts": [
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den blauen Knopf.",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Der Ersatzlauf startet."
+   ],
+   "duration_s": 15.103
+  },
+  "prob_e078": {
+   "parts": [
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den roten Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Kühle die Einheit schnell."
+   ],
+   "duration_s": 15.42
+  },
+  "prob_e079": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Der Druck im Sektor fällt.",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb."
+   ],
+   "duration_s": 15.9
+  },
+  "prob_e080": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den blauen Knopf.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den violetten Knopf.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 14.753
+  },
+  "prob_e081": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 16.482
+  },
+  "prob_e082": {
+   "parts": [
+    "Drücke zuerst den grünen Knopf.",
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau.",
+    "Prüfe die Hauptanzeige."
+   ],
+   "duration_s": 15.189
+  },
+  "prob_e083": {
+   "parts": [
+    "Drücke zuerst den grünen Knopf.",
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den violetten Knopf.",
+    "Der Ersatzlauf startet."
+   ],
+   "duration_s": 14.293
+  },
+  "prob_e084": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den gelben Knopf.",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Stabilisiere das Netz."
+   ],
+   "duration_s": 15.712
+  },
+  "prob_e085": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Mach das Band schnell frei."
+   ],
+   "duration_s": 16.288
+  },
+  "prob_e086": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den roten Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Sperre den Abschnitt ab."
+   ],
+   "duration_s": 14.842
+  },
+  "prob_e087": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Stabilisiere das Netz."
+   ],
+   "duration_s": 16.836
+  },
+  "prob_e088": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den gelben Knopf.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
+   ],
+   "duration_s": 15.007
+  },
+  "prob_e089": {
+   "parts": [
+    "Drücke zuerst den blauen Knopf.",
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den grünen Knopf.",
+    "Mach das Band schnell frei."
+   ],
+   "duration_s": 14.575
+  },
+  "prob_e090": {
+   "parts": [
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den violetten Knopf."
+   ],
+   "duration_s": 15.65
+  },
+  "prob_e091": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 16.222
+  },
+  "prob_e092": {
+   "parts": [
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den violetten Knopf.",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Prüfe die Hauptanzeige."
+   ],
+   "duration_s": 15.443
+  },
+  "prob_e093": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau.",
+    "Prüfe die Hauptanzeige."
+   ],
+   "duration_s": 16.048
+  },
+  "prob_e094": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den gelben Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den blauen Knopf."
+   ],
+   "duration_s": 14.085
+  },
+  "prob_e095": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
+   ],
+   "duration_s": 16.473
+  },
+  "prob_e096": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Der Druck im Sektor fällt.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb."
+   ],
+   "duration_s": 15.64
+  },
+  "prob_e097": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den grünen Knopf.",
+    "Die Einspeisung schwankt stark.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
+   ],
+   "duration_s": 15.745
+  },
+  "prob_e098": {
+   "parts": [
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den gelben Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den grünen Knopf."
+   ],
+   "duration_s": 14.563
+  },
+  "prob_e099": {
+   "parts": [
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den gelben Knopf.",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Mach das Band schnell frei."
+   ],
+   "duration_s": 15.494
+  },
+  "prob_e100": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den roten Knopf.",
+    "Senke sofort die Last."
+   ],
+   "duration_s": 14.998
+  },
+  "prob_e101": {
+   "parts": [
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den violetten Knopf."
+   ],
+   "duration_s": 15.465
+  },
+  "prob_e102": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den violetten Knopf.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 15.528
+  },
+  "prob_e103": {
+   "parts": [
+    "Drücke zuerst den gelben Knopf.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den roten Knopf.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 14.514
+  },
+  "prob_e104": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Kurzschluss auf der Leitung.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den gelben Knopf."
+   ],
+   "duration_s": 15.401
+  },
+  "prob_e105": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den roten Knopf.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den violetten Knopf."
+   ],
+   "duration_s": 14.335
+  },
+  "prob_e106": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den violetten Knopf.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den grünen Knopf."
+   ],
+   "duration_s": 14.427
+  },
+  "prob_e107": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den blauen Knopf.",
+    "Kühle die Einheit schnell."
+   ],
+   "duration_s": 15.65
+  },
+  "prob_e108": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den grünen Knopf.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 15.498
+  },
+  "prob_e109": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Der Druck im Sektor fällt.",
+    "Drücke zuerst den blauen Knopf.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den violetten Knopf."
+   ],
+   "duration_s": 14.3
+  },
+  "prob_e110": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den blauen Knopf.",
+    "Der Ersatzlauf startet."
+   ],
+   "duration_s": 15.152
+  },
+  "prob_e111": {
+   "parts": [
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den grünen Knopf.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den roten Knopf."
+   ],
+   "duration_s": 14.405
+  },
+  "prob_e112": {
+   "parts": [
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den blauen Knopf.",
+    "Kühle die Einheit schnell."
+   ],
+   "duration_s": 15.391
+  },
+  "prob_e113": {
+   "parts": [
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Der Wasserfluss fällt schnell.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den gelben Knopf."
+   ],
+   "duration_s": 14.932
+  },
+  "prob_e114": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den violetten Knopf.",
+    "Die Einspeisung schwankt stark.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den blauen Knopf."
+   ],
+   "duration_s": 15.16
+  },
+  "prob_e115": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den gelben Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Drücke außerdem den roten Knopf.",
+    "Sperre den Abschnitt ab."
+   ],
+   "duration_s": 13.938
+  },
+  "prob_e116": {
+   "parts": [
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den grünen Knopf.",
+    "Der Wasserfluss fällt schnell.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
+   ],
+   "duration_s": 15.123
+  },
+  "prob_e117": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Senke sofort die Last."
+   ],
+   "duration_s": 16.058
+  },
+  "prob_e118": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
+   ],
+   "duration_s": 16.077
+  },
+  "prob_e119": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den violetten Knopf.",
+    "Kurzschluss auf der Leitung.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
+   ],
+   "duration_s": 15.567
+  },
+  "prob_e120": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Der Druck im Sektor fällt.",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den roten Knopf."
+   ],
+   "duration_s": 14.88
+  },
+  "prob_e121": {
+   "parts": [
+    "Drücke zuerst den gelben Knopf.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 15.548
+  },
+  "prob_e122": {
+   "parts": [
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den blauen Knopf.",
+    "Der Antriebsmotor ist überlastet.",
+    "Mach das Band schnell frei.",
+    "Drücke außerdem den violetten Knopf."
+   ],
+   "duration_s": 14.676
+  },
+  "prob_e123": {
+   "parts": [
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
+   ],
+   "duration_s": 16.173
+  },
+  "prob_e124": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den blauen Knopf.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
+   ],
+   "duration_s": 14.985
+  },
+  "prob_e125": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den grünen Knopf.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
+   ],
+   "duration_s": 15.393
+  },
+  "prob_e126": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den gelben Knopf.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den violetten Knopf.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 14.703
+  },
+  "prob_e127": {
+   "parts": [
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Mach das Band schnell frei.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
+   ],
+   "duration_s": 16.181
+  },
+  "prob_e128": {
+   "parts": [
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Mach das Band schnell frei.",
+    "Drücke außerdem den grünen Knopf."
+   ],
+   "duration_s": 15.388
+  },
+  "prob_e129": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den violetten Knopf.",
+    "Kurzschluss auf der Leitung.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
+   ],
+   "duration_s": 15.567
+  },
+  "prob_e130": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 16.447
+  },
+  "prob_e131": {
+   "parts": [
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke zuerst den violetten Knopf.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
+   ],
+   "duration_s": 15.571
+  },
+  "prob_e132": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den blauen Knopf.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 15.632
+  },
+  "prob_e133": {
+   "parts": [
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Mach das Band schnell frei."
+   ],
+   "duration_s": 16.139
+  },
+  "prob_e134": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke zuerst den grünen Knopf.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb."
+   ],
+   "duration_s": 15.7
+  },
+  "prob_e135": {
+   "parts": [
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den violetten Knopf.",
+    "Der Wasserfluss fällt schnell.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den grünen Knopf."
+   ],
+   "duration_s": 14.338
+  },
+  "prob_e136": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den roten Knopf.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den grünen Knopf."
+   ],
+   "duration_s": 14.573
+  },
+  "prob_e137": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den violetten Knopf."
+   ],
+   "duration_s": 15.224
+  },
+  "prob_e138": {
+   "parts": [
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den blauen Knopf.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den violetten Knopf."
+   ],
+   "duration_s": 14.585
+  },
+  "prob_e139": {
+   "parts": [
+    "Drücke zuerst den roten Knopf.",
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den grünen Knopf.",
+    "Stabilisiere das Netz."
+   ],
+   "duration_s": 14.938
+  },
+  "prob_e140": {
+   "parts": [
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den gelben Knopf.",
+    "Der Ersatzlauf startet."
+   ],
+   "duration_s": 14.913
+  },
+  "prob_e141": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke zuerst den grünen Knopf.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den blauen Knopf."
+   ],
+   "duration_s": 14.976
+  },
+  "prob_e142": {
+   "parts": [
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den blauen Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Kühle die Einheit schnell."
+   ],
+   "duration_s": 15.455
+  },
+  "prob_e143": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den gelben Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Drücke außerdem den violetten Knopf.",
+    "Sperre den Abschnitt ab."
+   ],
+   "duration_s": 14.133
+  },
+  "prob_e144": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den grünen Knopf.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
+   ],
+   "duration_s": 15.393
+  },
+  "prob_e145": {
+   "parts": [
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den grünen Knopf.",
+    "Der Antriebsmotor ist überlastet.",
+    "Mach das Band schnell frei.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
+   ],
+   "duration_s": 15.519
+  },
+  "prob_e146": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Der Druck im Sektor fällt.",
+    "Drücke zuerst den blauen Knopf.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den gelben Knopf."
+   ],
+   "duration_s": 14.097
+  },
+  "prob_e147": {
+   "parts": [
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den roten Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Kühle die Einheit schnell."
+   ],
+   "duration_s": 15.395
+  },
+  "prob_e148": {
+   "parts": [
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den roten Knopf.",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den blauen Knopf.",
+    "Der Ersatzlauf startet."
+   ],
+   "duration_s": 14.073
+  },
+  "prob_e149": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den gelben Knopf.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den blauen Knopf."
+   ],
+   "duration_s": 14.16
+  },
+  "prob_e150": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
+   ],
+   "duration_s": 16.848
+  },
+  "prob_e151": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Der Druck im Sektor fällt.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den roten Knopf."
+   ],
+   "duration_s": 14.96
+  },
+  "prob_e152": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den grünen Knopf."
+   ],
+   "duration_s": 15.107
+  },
+  "prob_e153": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 16.187
+  },
+  "prob_e154": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den roten Knopf.",
+    "Die Einspeisung schwankt stark.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
+   ],
+   "duration_s": 15.695
+  },
+  "prob_e155": {
+   "parts": [
+    "Drücke zuerst den violetten Knopf.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den gelben Knopf.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 14.748
+  },
+  "prob_e156": {
+   "parts": [
+    "Drücke zuerst den roten Knopf.",
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Stabilisiere das Netz."
+   ],
+   "duration_s": 15.918
+  },
+  "prob_e157": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den violetten Knopf."
+   ],
+   "duration_s": 16.155
+  },
+  "prob_e158": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den violetten Knopf.",
+    "Mach das Band schnell frei."
+   ],
+   "duration_s": 15.743
+  },
+  "prob_e159": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Der Druck im Sektor fällt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Sperre den Abschnitt ab."
+   ],
+   "duration_s": 15.652
+  },
+  "prob_e160": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Die Einspeisung schwankt stark.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den blauen Knopf."
+   ],
+   "duration_s": 15.815
+  },
+  "prob_e161": {
+   "parts": [
+    "Drücke zuerst den grünen Knopf.",
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau.",
+    "Senke sofort die Last."
+   ],
+   "duration_s": 14.933
+  },
+  "prob_e162": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Der Druck im Sektor fällt.",
+    "Drücke zuerst den roten Knopf.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
+   ],
+   "duration_s": 14.881
+  },
+  "prob_e163": {
+   "parts": [
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke außerdem den roten Knopf.",
+    "Prüfe die Hauptanzeige."
+   ],
+   "duration_s": 15.243
+  },
+  "prob_e164": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den gelben Knopf.",
+    "Senke sofort die Last."
+   ],
+   "duration_s": 15.162
+  },
+  "prob_e165": {
+   "parts": [
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Der Wasserfluss fällt schnell.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb."
+   ],
+   "duration_s": 15.88
+  },
+  "prob_e166": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den grünen Knopf.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den roten Knopf."
+   ],
+   "duration_s": 14.19
+  },
+  "prob_e167": {
+   "parts": [
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den gelben Knopf."
+   ],
+   "duration_s": 15.201
+  },
+  "prob_e168": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den violetten Knopf.",
+    "Stabilisiere das Netz."
+   ],
+   "duration_s": 15.992
+  },
+  "prob_e169": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Mach das Band schnell frei."
+   ],
+   "duration_s": 16.178
+  },
+  "prob_e170": {
+   "parts": [
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Der Druck im Sektor fällt.",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
+   ],
+   "duration_s": 15.95
+  },
+  "prob_e171": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den roten Knopf.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Isoliere sofort den Fehler."
+   ],
+   "duration_s": 15.557
+  },
+  "prob_e172": {
+   "parts": [
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
+   ],
+   "duration_s": 16.803
+  },
+  "prob_e173": {
+   "parts": [
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den grünen Knopf.",
+    "Der Ersatzlauf startet."
+   ],
+   "duration_s": 14.907
+  },
+  "prob_e174": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den gelben Knopf.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
+   ],
+   "duration_s": 15.528
+  },
+  "prob_e175": {
+   "parts": [
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Kurzschluss auf der Leitung.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
+   ],
+   "duration_s": 16.298
+  },
   "prob_e176": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, dann den Knopf mit der Aufschrift Violett, und zuletzt den Knopf mit der Aufschrift Blau."
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Senke sofort die Last."
    ],
-   "duration_s": 14.196
+   "duration_s": 16.067
   },
   "prob_e177": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, dann den roten Knopf, und zuletzt den blauen Knopf."
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 13.026
+   "duration_s": 16.367
   },
   "prob_e178": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den blauen Knopf, und zuletzt den violetten Knopf."
+    "Drücke zuerst den violetten Knopf.",
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Mach das Band schnell frei."
    ],
-   "duration_s": 12.714
+   "duration_s": 15.568
   },
   "prob_e179": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den Knopf mit der Aufschrift Grün, und zuletzt den Knopf mit der Aufschrift Blau."
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den blauen Knopf.",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Mach das Band schnell frei."
    ],
-   "duration_s": 14.299
+   "duration_s": 15.544
   },
   "prob_e180": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Rot."
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den grünen Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
    ],
-   "duration_s": 7.839
+   "duration_s": 15.386
   },
   "prob_e181": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke den grünen Knopf."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den blauen Knopf."
    ],
-   "duration_s": 6.943
+   "duration_s": 14.896
   },
   "prob_e182": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Blau."
+    "Drücke zuerst den violetten Knopf.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den gelben Knopf.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 7.7
+   "duration_s": 14.748
   },
   "prob_e183": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Blau."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Das Sicherheitsventil klemmt.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
    ],
-   "duration_s": 8.158
+   "duration_s": 16.268
   },
   "prob_e184": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Grün."
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den blauen Knopf.",
+    "Stabilisiere das Netz."
    ],
-   "duration_s": 8.072
+   "duration_s": 15.982
   },
   "prob_e185": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke den roten Knopf."
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den gelben Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den violetten Knopf.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 8.164
+   "duration_s": 14.721
   },
   "prob_e186": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den Knopf mit der Aufschrift Blau."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den grünen Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den roten Knopf."
    ],
-   "duration_s": 10.4
+   "duration_s": 14.12
   },
   "prob_e187": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, und dann den violetten Knopf."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Der Wasserfluss fällt schnell.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 10.605
+   "duration_s": 15.823
   },
   "prob_e188": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den violetten Knopf."
+    "Drücke zuerst den blauen Knopf.",
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 9.748
+   "duration_s": 15.471
   },
   "prob_e189": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den gelben Knopf."
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den gelben Knopf.",
+    "Mach das Band schnell frei."
    ],
-   "duration_s": 11.128
+   "duration_s": 15.388
   },
   "prob_e190": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den Knopf mit der Aufschrift Gelb."
+    "Drücke zuerst den gelben Knopf.",
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 12.262
+   "duration_s": 15.411
   },
   "prob_e191": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, und dann den grünen Knopf."
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den violetten Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den blauen Knopf.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 11.082
+   "duration_s": 14.816
   },
   "prob_e192": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den Knopf mit der Aufschrift Violett."
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Prüfe die Hauptanzeige."
    ],
-   "duration_s": 11.991
+   "duration_s": 16.308
   },
   "prob_e193": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, dann den blauen Knopf, und zuletzt den Knopf mit der Aufschrift Violett."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den violetten Knopf.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
    ],
-   "duration_s": 12.347
+   "duration_s": 15.567
   },
   "prob_e194": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, dann den violetten Knopf, und zuletzt den blauen Knopf."
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 12.06
+   "duration_s": 16.23
   },
   "prob_e195": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den grünen Knopf, und zuletzt den Knopf mit der Aufschrift Blau."
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den roten Knopf."
    ],
-   "duration_s": 12.397
+   "duration_s": 15.054
   },
   "prob_e196": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, dann den blauen Knopf, und zuletzt den violetten Knopf."
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den grünen Knopf."
    ],
-   "duration_s": 11.855
+   "duration_s": 15.122
   },
   "prob_e197": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, dann den violetten Knopf, und zuletzt den Knopf mit der Aufschrift Blau."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb."
    ],
-   "duration_s": 12.759
+   "duration_s": 16.175
   },
   "prob_e198": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, dann den grünen Knopf, und zuletzt den Knopf mit der Aufschrift Grün."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Kurzschluss auf der Leitung.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den gelben Knopf."
    ],
-   "duration_s": 12.532
+   "duration_s": 15.401
   },
   "prob_e199": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den Knopf mit der Aufschrift Grün, und zuletzt den grünen Knopf."
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Stabilisiere das Netz."
    ],
-   "duration_s": 12.678
+   "duration_s": 16.717
   },
   "prob_e200": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Der Druck im Sektor fällt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Sperre den Abschnitt ab."
    ],
-   "duration_s": 8.25
+   "duration_s": 15.616
   },
   "prob_e201": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke den violetten Knopf."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den grünen Knopf."
    ],
-   "duration_s": 7.543
+   "duration_s": 15.503
   },
   "prob_e202": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Blau."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den grünen Knopf."
    ],
-   "duration_s": 7.7
+   "duration_s": 15.018
   },
   "prob_e203": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Blau."
+    "Drücke zuerst den gelben Knopf.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 8.037
+   "duration_s": 15.393
   },
   "prob_e204": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den grünen Knopf.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 8.046
+   "duration_s": 15.458
   },
   "prob_e205": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Gelb."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den blauen Knopf.",
+    "Kurzschluss auf der Leitung.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 8.552
+   "duration_s": 15.444
   },
   "prob_e206": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den violetten Knopf."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 10.558
+   "duration_s": 16.092
   },
   "prob_e207": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, und dann den Knopf mit der Aufschrift Rot."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den blauen Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau.",
+    "Sperre den Abschnitt ab."
    ],
-   "duration_s": 10.459
+   "duration_s": 14.762
   },
   "prob_e208": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, und dann den Knopf mit der Aufschrift Blau."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Der Druck im Sektor fällt.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den roten Knopf."
    ],
-   "duration_s": 12.219
+   "duration_s": 14.88
   },
   "prob_e209": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Blau, und dann den violetten Knopf."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Das Sicherheitsventil klemmt.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den violetten Knopf."
    ],
-   "duration_s": 10.567
+   "duration_s": 15.465
   },
   "prob_e210": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den Knopf mit der Aufschrift Rot."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den grünen Knopf.",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den gelben Knopf.",
+    "Der Ersatzlauf startet."
    ],
-   "duration_s": 10.816
+   "duration_s": 14.073
   },
   "prob_e211": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den Knopf mit der Aufschrift Grün."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den blauen Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb."
    ],
-   "duration_s": 11.102
+   "duration_s": 14.865
   },
   "prob_e212": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, und dann den Knopf mit der Aufschrift Violett."
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Stabilisiere das Netz."
    ],
-   "duration_s": 11.474
+   "duration_s": 16.662
   },
   "prob_e213": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, dann den blauen Knopf, und zuletzt den Knopf mit der Aufschrift Gelb."
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 12.209
+   "duration_s": 16.205
   },
   "prob_e214": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den roten Knopf, und zuletzt den Knopf mit der Aufschrift Grün."
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau.",
+    "Stabilisiere das Netz."
    ],
-   "duration_s": 13.62
+   "duration_s": 16.542
   },
   "prob_e215": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den Knopf mit der Aufschrift Grün, und zuletzt den roten Knopf."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den grünen Knopf.",
+    "Das Sicherheitsventil klemmt.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den roten Knopf."
    ],
-   "duration_s": 13.236
+   "duration_s": 14.405
   },
   "prob_e216": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, dann den Knopf mit der Aufschrift Grün, und zuletzt den grünen Knopf."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb."
    ],
-   "duration_s": 13.968
+   "duration_s": 15.725
   },
   "prob_e217": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den blauen Knopf, und zuletzt den roten Knopf."
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den blauen Knopf.",
+    "Der Antriebsmotor ist überlastet.",
+    "Mach das Band schnell frei.",
+    "Drücke außerdem den roten Knopf."
    ],
-   "duration_s": 10.993
+   "duration_s": 14.481
   },
   "prob_e218": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den grünen Knopf, dann den roten Knopf, und zuletzt den Knopf mit der Aufschrift Gelb."
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
    ],
-   "duration_s": 12.338
+   "duration_s": 16.014
   },
   "prob_e219": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, dann den Knopf mit der Aufschrift Blau, und zuletzt den gelben Knopf."
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den grünen Knopf."
    ],
-   "duration_s": 13.199
+   "duration_s": 15.468
   },
   "prob_e220": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke den blauen Knopf."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Der Wasserfluss fällt schnell.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den grünen Knopf."
    ],
-   "duration_s": 7.272
+   "duration_s": 14.993
   },
   "prob_e221": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den gelben Knopf.",
+    "Mach das Band schnell frei."
    ],
-   "duration_s": 7.654
+   "duration_s": 15.388
   },
   "prob_e222": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den blauen Knopf."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den grünen Knopf.",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Senke sofort die Last."
    ],
-   "duration_s": 7.071
+   "duration_s": 15.038
   },
   "prob_e223": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den blauen Knopf.",
+    "Der Wasserfluss fällt schnell.",
+    "Drücke außerdem den roten Knopf.",
+    "Der Ersatzlauf startet."
    ],
-   "duration_s": 8.046
+   "duration_s": 14.068
   },
   "prob_e224": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau.",
+    "Kühle die Einheit schnell."
    ],
-   "duration_s": 8.37
+   "duration_s": 16.23
   },
   "prob_e225": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Violett."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den gelben Knopf.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
    ],
-   "duration_s": 8.37
+   "duration_s": 15.328
   },
   "prob_e226": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, und dann den gelben Knopf."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün."
    ],
-   "duration_s": 9.578
+   "duration_s": 16.173
   },
   "prob_e227": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, und dann den gelben Knopf."
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den blauen Knopf.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 11.367
+   "duration_s": 15.373
   },
   "prob_e228": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, und dann den gelben Knopf."
+    "Drücke zuerst den blauen Knopf.",
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot.",
+    "Mach das Band schnell frei."
    ],
-   "duration_s": 10.559
+   "duration_s": 15.374
   },
   "prob_e229": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, und dann den violetten Knopf."
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Der Antriebsmotor ist überlastet.",
+    "Mach das Band schnell frei.",
+    "Drücke außerdem den violetten Knopf."
    ],
-   "duration_s": 9.889
+   "duration_s": 15.556
   },
   "prob_e230": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den violetten Knopf."
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den blauen Knopf.",
+    "Die Einspeisung schwankt stark.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Stabilisiere das Netz."
    ],
-   "duration_s": 11.516
+   "duration_s": 15.787
   },
   "prob_e231": {
    "parts": [
-    "Oh nein, die Spannung auf Leitung vier fällt ab!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, und dann den Knopf mit der Aufschrift Grün."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den grünen Knopf.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
    ],
-   "duration_s": 10.478
+   "duration_s": 15.593
   },
   "prob_e232": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den Knopf mit der Aufschrift Grün."
+    "Drücke zuerst den grünen Knopf.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 12.241
+   "duration_s": 15.458
   },
   "prob_e233": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, dann den gelben Knopf, und zuletzt den violetten Knopf."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den roten Knopf.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den grünen Knopf.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 13.214
+   "duration_s": 14.578
   },
   "prob_e234": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den Knopf mit der Aufschrift Blau, und zuletzt den grünen Knopf."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Der Druck im Sektor fällt.",
+    "Sperre den Abschnitt ab.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
    ],
-   "duration_s": 12.251
+   "duration_s": 15.765
   },
   "prob_e235": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, dann den Knopf mit der Aufschrift Gelb, und zuletzt den Knopf mit der Aufschrift Grün."
+    "Warnung, der Generator überhitzt!",
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Die Abgastemperatur ist zu hoch.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
    ],
-   "duration_s": 14.29
+   "duration_s": 16.26
   },
   "prob_e236": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, dann den Knopf mit der Aufschrift Gelb, und zuletzt den Knopf mit der Aufschrift Violett."
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Die Einspeisung schwankt stark.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den gelben Knopf."
    ],
-   "duration_s": 14.094
+   "duration_s": 15.796
   },
   "prob_e237": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, dann den Knopf mit der Aufschrift Violett, und zuletzt den roten Knopf."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den violetten Knopf."
    ],
-   "duration_s": 13.062
+   "duration_s": 15.404
   },
   "prob_e238": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, dann den Knopf mit der Aufschrift Violett, und zuletzt den roten Knopf."
+    "Drücke zuerst den violetten Knopf.",
+    "Achtung, das Kohleband klemmt!",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Gelb.",
+    "Mach das Band schnell frei."
    ],
-   "duration_s": 12.864
+   "duration_s": 15.603
   },
   "prob_e239": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, dann den blauen Knopf, und zuletzt den gelben Knopf."
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 13.438
+   "duration_s": 16.477
   },
   "prob_t00": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Grün."
+    "Alarm, Trafo drei ist überlastet!",
+    "Drücke zuerst den gelben Knopf.",
+    "Die Spulen werden heiß.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
    ],
-   "duration_s": 7.904
+   "duration_s": 14.93
   },
   "prob_t01": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Gelb."
+    "Warnung, Dampfleck in der Nordleitung!",
+    "Drücke zuerst den violetten Knopf.",
+    "Der Druck im Sektor fällt.",
+    "Drücke außerdem den Knopf mit der Aufschrift Grün.",
+    "Sperre den Abschnitt ab."
    ],
-   "duration_s": 8.552
+   "duration_s": 15.067
   },
   "prob_t02": {
    "parts": [
-    "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Grün."
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke zuerst den Knopf mit der Aufschrift Rot.",
+    "Senke sofort die Last.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
    ],
-   "duration_s": 8.681
+   "duration_s": 16.052
   },
   "prob_t03": {
    "parts": [
-    "Achtung, der Generator überhitzt!",
-    "Um das zu beheben, drücke den Knopf mit der Aufschrift Rot."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den grünen Knopf.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den gelben Knopf.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 7.447
+   "duration_s": 14.563
   },
   "prob_t04": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Rot, und dann den Knopf mit der Aufschrift Grün."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke zuerst den blauen Knopf.",
+    "Prüfe die Hauptanzeige.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau."
    ],
-   "duration_s": 11.27
+   "duration_s": 15.195
   },
   "prob_t05": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, und dann den Knopf mit der Aufschrift Violett."
+    "Achtung, das Kohleband klemmt!",
+    "Drücke zuerst den Knopf mit der Aufschrift Violett.",
+    "Der Antriebsmotor ist überlastet.",
+    "Drücke außerdem den gelben Knopf.",
+    "Mach das Band schnell frei."
    ],
-   "duration_s": 11.148
+   "duration_s": 15.535
   },
   "prob_t06": {
    "parts": [
-    "Oh nein, Kurzschluss in der Turbinenhalle!",
-    "Um das zu beheben, drücke zuerst den blauen Knopf, und dann den Knopf mit der Aufschrift Grün."
+    "Warnung, die Hauptkühlpumpe steht!",
+    "Drücke zuerst den Knopf mit der Aufschrift Gelb.",
+    "Der Wasserfluss fällt schnell.",
+    "Der Ersatzlauf startet.",
+    "Drücke außerdem den Knopf mit der Aufschrift Rot."
    ],
-   "duration_s": 10.309
+   "duration_s": 15.791
   },
   "prob_t07": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Violett, und dann den Knopf mit der Aufschrift Gelb."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den roten Knopf.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 11.45
+   "duration_s": 15.332
   },
   "prob_t08": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, und dann den Knopf mit der Aufschrift Rot."
+    "Warnung, der Generator überhitzt!",
+    "Die Abgastemperatur ist zu hoch.",
+    "Drücke zuerst den violetten Knopf.",
+    "Kühle die Einheit schnell.",
+    "Drücke außerdem den gelben Knopf."
    ],
-   "duration_s": 10.732
+   "duration_s": 14.752
   },
   "prob_t09": {
    "parts": [
-    "Oh nein, der Transformator in Sektor drei ist überlastet!",
-    "Um das zu beheben, drücke zuerst den roten Knopf, dann den gelben Knopf, und zuletzt den Knopf mit der Aufschrift Rot."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Kurzschluss auf der Leitung.",
+    "Drücke zuerst den grünen Knopf.",
+    "Isoliere sofort den Fehler.",
+    "Drücke außerdem den gelben Knopf."
    ],
-   "duration_s": 13.328
+   "duration_s": 14.561
   },
   "prob_t10": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den Knopf mit der Aufschrift Rot, und zuletzt den Knopf mit der Aufschrift Gelb."
+    "Alarm, Spannungsabfall auf Leitung vier!",
+    "Die Einspeisung schwankt stark.",
+    "Drücke zuerst den blauen Knopf.",
+    "Stabilisiere das Netz.",
+    "Drücke außerdem den Knopf mit der Aufschrift Violett."
    ],
-   "duration_s": 13.096
+   "duration_s": 15.949
   },
   "prob_t11": {
    "parts": [
-    "Achtung, der Druck in Kessel zwei steigt schnell!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Grün, dann den grünen Knopf, und zuletzt den blauen Knopf."
+    "Drücke zuerst den Knopf mit der Aufschrift Grün.",
+    "Alarm, Trafo drei ist überlastet!",
+    "Die Spulen werden heiß.",
+    "Drücke außerdem den Knopf mit der Aufschrift Blau.",
+    "Senke sofort die Last."
    ],
-   "duration_s": 12.537
+   "duration_s": 15.797
   },
   "prob_t12": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den gelben Knopf, dann den Knopf mit der Aufschrift Grün, und zuletzt den grünen Knopf."
+    "Alarm, Problem in der Turbinenhalle!",
+    "Drücke zuerst den violetten Knopf.",
+    "Kurzschluss auf der Leitung.",
+    "Drücke außerdem den roten Knopf.",
+    "Isoliere sofort den Fehler."
    ],
-   "duration_s": 12.611
+   "duration_s": 14.758
   },
   "prob_t13": {
    "parts": [
-    "Alarm, Dampfleck in der Nordleitung!",
-    "Um das zu beheben, drücke zuerst den Knopf mit der Aufschrift Gelb, dann den Knopf mit der Aufschrift Blau, und zuletzt den grünen Knopf."
+    "Drücke zuerst den grünen Knopf.",
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke außerdem den roten Knopf.",
+    "Prüfe die Hauptanzeige."
    ],
-   "duration_s": 13.017
+   "duration_s": 14.415
   },
   "prob_t14": {
    "parts": [
-    "Vorsicht, das Förderband im Kohlelager klemmt!",
-    "Um das zu beheben, drücke zuerst den violetten Knopf, dann den blauen Knopf, und zuletzt den Knopf mit der Aufschrift Gelb."
+    "Achtung, Druckanstieg in Kessel zwei!",
+    "Drücke zuerst den Knopf mit der Aufschrift Blau.",
+    "Das Sicherheitsventil klemmt.",
+    "Drücke außerdem den grünen Knopf.",
+    "Prüfe die Hauptanzeige."
    ],
-   "duration_s": 12.684
+   "duration_s": 15.218
   }
  }
 }

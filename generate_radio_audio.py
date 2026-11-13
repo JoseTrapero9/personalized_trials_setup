@@ -221,6 +221,32 @@ def generate(engine, lang, voice_hint, rate, force):
     return missing == 0
 
 
+def generate_voice_cues(engine, force):
+    """Ensure audios/voice_input_correct.wav and audios/voice_input_incorrect.wav exist."""
+    voice = engine.pick_voice("en")
+    if voice is None:
+        return
+    _, _, _, token = voice
+    audios_dir = os.path.join(BASE_DIR, "audios")
+    os.makedirs(audios_dir, exist_ok=True)
+    tmp_dir = tempfile.mkdtemp(prefix="voice_cue_")
+    cues = {
+        "voice_input_correct.wav": ["Input correct"],
+        "voice_input_incorrect.wav": ["Input incorrect"],
+    }
+    for filename, parts in cues.items():
+        out_path = os.path.join(audios_dir, filename)
+        if os.path.exists(out_path) and not force:
+            continue
+        tmp_path = os.path.join(tmp_dir, filename)
+        try:
+            engine.synth(token, 1, parts, tmp_path)
+            postprocess(tmp_path, out_path)
+            print(f"[voice-cue] generated {out_path}")
+        except Exception as e:
+            print(f"[voice-cue] failed {filename}: {e}")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--lang", default="all", choices=list(LANGUAGES) + ["all"])
@@ -244,6 +270,7 @@ def main():
     langs = list(LANGUAGES) if args.lang == "all" else [args.lang]
     if args.voice and len(langs) > 1:
         sys.exit("--voice needs a single --lang")
+    generate_voice_cues(engine, args.force)
     ok = all([generate(engine, l, args.voice, args.rate, args.force) for l in langs])
     sys.exit(0 if ok else 1)
 

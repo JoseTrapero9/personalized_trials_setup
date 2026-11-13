@@ -14,16 +14,17 @@ from radio_script import COLOR_KEYS
 
 POS_KEYS = ["left", "up", "right"]
 
-# Exact composition of every block of 20 experiment problems
-BLOCK_COMPOSITION = {"single": 6, "seq2": 7, "seq3": 7}
+# Exact composition of every block of 20 experiment problems (all 2-step sequences)
+BLOCK_COMPOSITION = {"seq2": 20}
 EXPERIMENT_CONDITIONS = [c for c in ALL_CONDITIONS if c != "training"]
-BLOCKS_PER_CONDITION = 2              # 40 problems per condition (a block of 8 rounds uses ~30-40)
-EXPERIMENT_BLOCKS = BLOCKS_PER_CONDITION * len(EXPERIMENT_CONDITIONS)   # 6 x 2 x 20 = 240 problems
+BLOCKS_PER_CONDITION = 3              # 60 problems per condition (4 conditions x 3 blocks = 12 blocks)
+EXPERIMENT_BLOCKS = 12                # 12 x 20 = 240 problems (matches pre-generated radio_audio clips)
 POOL_SEED = 20261104
 N_INCIDENTS = 8
+N_POSITIONS = 4                       # 4 interleaved layouts for placing step 1 and step 2 inside the announcement
 
-# Training: easy -> hard (singles first, then pairs, then triples)
-TRAINING_SCHEDULE = ["single"] * 4 + ["seq2"] * 5 + ["seq3"] * 6
+# Training: 15 two-step problems
+TRAINING_SCHEDULE = ["seq2"] * 15
 
 
 # ---------------------------------------------------------------------------
@@ -103,7 +104,7 @@ def _draw_steps(rng, ptype):
 
 def _make_problem(pid, ptype, rng):
     return {"id": pid, "type": ptype, "steps": _draw_steps(rng, ptype),
-            "incident": rng.randrange(N_INCIDENTS)}
+            "incident": rng.randrange(N_INCIDENTS), "pos": rng.randrange(N_POSITIONS)}
 
 
 def build_pool():

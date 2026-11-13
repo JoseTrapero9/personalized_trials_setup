@@ -10,15 +10,9 @@ T = {
     "status_answer": {"en": "ANSWER NOW!", "es": "¡RESPONDE AHORA!", "de": "JETZT ANTWORTEN!"},
     "mode_hard": {"en": "HARD", "es": "DIFÍCIL", "de": "SCHWER"},
     "start_hard_line": {
-        "en": "<br><b>HARD MODE:</b> between instructions, press the one button whose color matches its word "
-              "(<b>+{p}</b>, one try per change, missing costs nothing). Instructions count <b>double</b>, "
-              "mistakes cost <b>double</b>.",
-        "es": "<br><b>MODO DIFÍCIL:</b> entre instrucciones, presiona el único botón cuyo color coincide con su palabra "
-              "(<b>+{p}</b>, un intento por cambio, fallar no quita puntos). Las instrucciones valen <b>el doble</b> "
-              "y los errores cuestan <b>el doble</b>.",
-        "de": "<br><b>SCHWERER MODUS:</b> zwischen den Anweisungen drücke den einen Knopf, dessen Farbe zu seinem Wort "
-              "passt (<b>+{p}</b>, ein Versuch pro Wechsel, Verpassen kostet nichts). Anweisungen zählen "
-              "<b>doppelt</b>, Fehler kosten <b>doppelt</b>.",
+        "en": "<br><b>HARD MODE</b>",
+        "es": "<br><b>MODO DIFÍCIL</b>",
+        "de": "<br><b>SCHWERER MODUS</b>",
     },
     "radio_title": {"en": "PLANT RADIO", "es": "RADIO DE LA PLANTA", "de": "WERKSRADIO"},
     "score": {"en": "SCORE", "es": "PUNTOS", "de": "PUNKTE"},
@@ -49,9 +43,9 @@ T = {
                 "de": "Reagiere auf das Radio, um den nächsten Kontrollpunkt zu erreichen."},
     "solve_header": {"en": "SOLVE THE BATTERY & KEEP LISTENING", "es": "RESUELVE LA BATERÍA Y SIGUE ESCUCHANDO",
                      "de": "LÖSE DIE BATTERIE & HÖR WEITER ZU"},
-    "deliver_hint": {"en": 'Say <b>"DELIVER"</b> (or press <b>D</b>) for a {s}s pause, then place at <b>{pt}</b> & press <b>{key}</b>.',
-                     "es": 'Di <b>"DELIVER"</b> (o presiona <b>D</b>) para una pausa de {s}s, luego coloca en <b>{pt}</b> y presiona <b>{key}</b>.',
-                     "de": 'Sag <b>"DELIVER"</b> (oder drücke <b>D</b>) für {s}s Pause, dann auf <b>{pt}</b> legen & <b>{key}</b> drücken.'},
+    "deliver_hint": {"en": 'Press <b>D</b> for a {s}s pause, then place at <b>{pt}</b> & press <b>{key}</b>.',
+                     "es": 'Presiona <b>D</b> para una pausa de {s}s, luego coloca en <b>{pt}</b> y presiona <b>{key}</b>.',
+                     "de": 'Drücke <b>D</b> für {s}s Pause, dann auf <b>{pt}</b> legen & <b>{key}</b> drücken.'},
     "delivery_active": {"en": "<b>DELIVERY WINDOW ({s}s)</b><br>Place the workpiece at <b>{pt}</b> and press <b>{key}</b>!",
                         "es": "<b>VENTANA DE ENTREGA ({s}s)</b><br>¡Coloca la pieza en <b>{pt}</b> y presiona <b>{key}</b>!",
                         "de": "<b>ÜBERGABEFENSTER ({s}s)</b><br>Lege das Werkstück auf <b>{pt}</b> und drücke <b>{key}</b>!"},
@@ -65,21 +59,21 @@ T = {
     "start_body": {
         "en": "1. Listen to the <b>plant radio</b>. When something breaks, it tells you which buttons to press.<br>"
               "2. Find those buttons on the screen and press them with <b>← ↑ →</b> (left, middle, right).<br>"
-              "3. After <b>{n} problems</b> the radio pauses for <b>{r}s</b>: take parts from Container I or II.<br>"
+              "3. After some problems the radio pauses for <b>{r}s</b>: take parts from Container I or II.<br>"
               "4. The screen splits: build the battery while you keep answering the radio.<br>"
-              "5. Say <b>\"DELIVER\"</b> for a <b>{d}s</b> pause, place the piece and press the Point button.<br><br>"
+              "5. Press <b>\"D: DELIVER\"</b> for a <b>{d}s</b> pause, place the piece and press the Point button.<br><br>"
               "Rounds: <b>{rounds}</b>",
         "es": "1. Escucha la <b>radio de la planta</b>. Cuando algo falla, te dice qué botones presionar.<br>"
               "2. Busca esos botones en la pantalla y presiónalos con <b>← ↑ →</b> (izquierda, centro, derecha).<br>"
-              "3. Después de <b>{n} problemas</b> la radio hace una pausa de <b>{r}s</b>: toma piezas del Contenedor I o II.<br>"
+              "3. Después de unos problemas la radio hace una pausa de <b>{r}s</b>: toma piezas del Contenedor I o II.<br>"
               "4. La pantalla se divide: arma la batería mientras sigues respondiendo a la radio.<br>"
-              "5. Di <b>\"DELIVER\"</b> para una pausa de <b>{d}s</b>, coloca la pieza y presiona el botón del Punto.<br><br>"
+              "5. Presiona <b>\"D: DELIVER\"</b> para una pausa de <b>{d}s</b>, coloca la pieza y presiona el botón del Punto.<br><br>"
               "Rondas: <b>{rounds}</b>",
         "de": "1. Hör dem <b>Werksradio</b> zu. Wenn etwas kaputtgeht, sagt es dir, welche Knöpfe du drücken musst.<br>"
               "2. Finde diese Knöpfe auf dem Bildschirm und drücke sie mit <b>← ↑ →</b> (links, Mitte, rechts).<br>"
-              "3. Nach <b>{n} Problemen</b> pausiert das Radio <b>{r}s</b>: nimm Teile aus Behälter I oder II.<br>"
+              "3. Nach einige Problemen pausiert das Radio <b>{r}s</b>: nimm Teile aus Behälter I oder II.<br>"
               "4. Der Bildschirm teilt sich: baue die Batterie und reagiere weiter auf das Radio.<br>"
-              "5. Sag <b>\"DELIVER\"</b> für <b>{d}s</b> Pause, lege das Teil ab und drücke den Punkt-Knopf.<br><br>"
+              "5. Drück <b>\"D: DELIVER\"</b> für <b>{d}s</b> Pause, lege das Teil ab und drücke den Punkt-Knopf.<br><br>"
               "Runden: <b>{rounds}</b>",
     },
     "start_button": {"en": "Start", "es": "Comenzar", "de": "Start"},
@@ -142,9 +136,9 @@ TUTORIAL = {
          "After <b>{n} problems</b> the radio pauses for <b>{r} seconds</b>: bring back the empty piece "
          "and take parts from <b>Container I or II</b>.<br><br>"
          "Problems during the battery task do <b>not</b> count toward the next checkpoint."),
-        ("5 · Battery and \"DELIVER\"",
+        ("5 · Battery and \"D: DELIVER\"",
          "The screen splits: solve the battery on the right <b>while you keep answering the radio</b>.<br><br>"
-         "When your piece is finished, say <b>\"DELIVER\"</b>: you get a <b>{d}-second pause</b> to place it "
+         "When your piece is finished, press <b>\"D\"</b>: you get a <b>{d}-second pause</b> to place it "
          "and press the <b>Point 1</b> or <b>Point 2</b> button.<br>"
          "If the timer reaches 0, <b>SYSTEM FAILED</b> flashes until you deliver."),
     ],
@@ -169,9 +163,9 @@ TUTORIAL = {
          "Después de <b>{n} problemas</b> la radio hace una pausa de <b>{r} segundos</b>: regresa la pieza vacía "
          "y toma piezas del <b>Contenedor I o II</b>.<br><br>"
          "Los problemas durante la tarea de la batería <b>no</b> cuentan para el siguiente punto de control."),
-        ("5 · Batería y \"DELIVER\"",
+        ("5 · Batería y \"D: DELIVER\"",
          "La pantalla se divide: resuelve la batería a la derecha <b>mientras sigues respondiendo a la radio</b>.<br><br>"
-         "Cuando tu pieza esté terminada, di <b>\"DELIVER\"</b>: tienes una <b>pausa de {d} segundos</b> para colocarla "
+         "Cuando tu pieza esté terminada, presiona <b>\"D\"</b>: tienes una <b>pausa de {d} segundos</b> para colocarla "
          "y presionar el botón <b>Punto 1</b> o <b>Punto 2</b>.<br>"
          "Si el tiempo llega a 0, <b>FALLA DEL SISTEMA</b> parpadea hasta que entregues."),
     ],
@@ -196,9 +190,9 @@ TUTORIAL = {
          "Nach <b>{n} Problemen</b> pausiert das Radio <b>{r} Sekunden</b>: bring das leere Teil zurück "
          "und nimm Teile aus <b>Behälter I oder II</b>.<br><br>"
          "Probleme während der Batterie-Aufgabe zählen <b>nicht</b> für den nächsten Kontrollpunkt."),
-        ("5 · Batterie und \"DELIVER\"",
+        ("5 · Batterie und \"D: DELIVER\"",
          "Der Bildschirm teilt sich: löse rechts die Batterie <b>und reagiere weiter auf das Radio</b>.<br><br>"
-         "Wenn dein Teil fertig ist, sag <b>\"DELIVER\"</b>: du bekommst <b>{d} Sekunden Pause</b>, um es abzulegen "
+         "Wenn dein Teil fertig ist, drücke <b>\"D\"</b>: du bekommst <b>{d} Sekunden Pause</b>, um es abzulegen "
          "und den Knopf <b>Punkt 1</b> oder <b>Punkt 2</b> zu drücken.<br>"
          "Wenn die Zeit 0 erreicht, blinkt <b>SYSTEMAUSFALL</b>, bis du übergibst."),
     ],

@@ -7,7 +7,15 @@ from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QVBoxLayout, QWidget
 import json
 import os
 
-from config import ALL_CONDITIONS, GAME_MODES, MAX_ROUNDS_PER_CONDITION, PROBLEMS_PER_CHECKPOINT, RADIO_AUDIO_DIR
+from config import (
+    ALL_CONDITIONS,
+    AUDIO_CUE_MODES,
+    DEFAULT_AUDIO_CUE_MODE,
+    GAME_MODES,
+    MAX_ROUNDS_PER_CONDITION,
+    PROBLEMS_PER_CHECKPOINT,
+    RADIO_AUDIO_DIR,
+)
 from lsl_markers import send_marker
 from questionnaires import SUS_MENU_ITEM
 from radio_script import LANGUAGES
@@ -68,6 +76,21 @@ class setupscreen(QWidget):
             self.mode_combo.addItem(mode.capitalize(), mode)
         layout.addWidget(self.mode_combo, alignment=Qt.AlignCenter)
 
+        self.audio_cue_label = QLabel("Audio Feedback Mode (audio / audio_haptic):")
+        self.audio_cue_label.setFont(main_font)
+        layout.addWidget(self.audio_cue_label, alignment=Qt.AlignCenter)
+
+        self.audio_cue_combo = QComboBox()
+        self.audio_cue_combo.setFont(main_font)
+        self.audio_cue_combo.setFixedWidth(320)
+        cue_labels = {"voice": "Voice mode (input correct/incorrect)", "tone": "Tone mode (sound effects)"}
+        for cue_mode in AUDIO_CUE_MODES:
+            self.audio_cue_combo.addItem(cue_labels.get(cue_mode, cue_mode.capitalize()), cue_mode)
+        default_idx = self.audio_cue_combo.findData(DEFAULT_AUDIO_CUE_MODE)
+        if default_idx >= 0:
+            self.audio_cue_combo.setCurrentIndex(default_idx)
+        layout.addWidget(self.audio_cue_combo, alignment=Qt.AlignCenter)
+
         self.lang_label = QLabel("Participant Language (radio + screens):")
         self.lang_label.setFont(main_font)
         layout.addWidget(self.lang_label, alignment=Qt.AlignCenter)
@@ -88,7 +111,7 @@ class setupscreen(QWidget):
         info_lbl = QLabel(
             f"Each condition runs for {MAX_ROUNDS_PER_CONDITION} battery rounds.\n"
             f"A checkpoint (5s retrieval pause) follows every {PROBLEMS_PER_CHECKPOINT} radio problems.\n"
-            f"Say 'DELIVER' (or press D) for a 5s delivery pause."
+            f"Press D for a 5s delivery pause."
         )
         info_lbl.setFont(QFont("Helvetica", 16))
         info_lbl.setStyleSheet("color: #555;")
@@ -133,11 +156,15 @@ class setupscreen(QWidget):
         state.training_active = (state.current_condition == "training")
         state.language = self.lang_combo.currentData()
         state.game_mode = self.mode_combo.currentData()
+        state.audio_cue_mode = self.audio_cue_combo.currentData()
 
         if state.current_condition in ["training", "baseline"]:
             state.difficulty = "easy"
         else:
             state.difficulty = "hard"
 
-        send_marker(f"Setup_Complete_Subj_{state.subject_number}_Cond_{state.current_condition}_Lang_{state.language}_Mode_{state.game_mode}")
+        send_marker(
+            f"Setup_Complete_Subj_{state.subject_number}_Cond_{state.current_condition}"
+            f"_Lang_{state.language}_Mode_{state.game_mode}_AudioCue_{state.audio_cue_mode}"
+        )
         self.switch_callback()

@@ -12,31 +12,28 @@ from audio import audio_sys
 from config import (
     BATTERY_CUE_CONDITIONS,
     CUE_AUDIO_MAX_SECONDS,
-    correct_cue_audio,
-    incorrect_cue_audio,
     DELIVERY_WINDOW_SECONDS,
     LOG_TRAINING_CSV,
     MAX_ROUNDS_PER_CONDITION,
     RETRIEVAL_SECONDS,
     TASK_SECONDS_DEFAULT,
     USE_RADIO_CONTAINER_CUES,
-    VOICE_KEEP_MIC_OPEN,
     WARNING_SECONDS,
     alarm_audio,
     assembly_seconds,
     base_dir,
     container1_audio,
     container2_audio,
+    get_cue_audio_paths,
     incorrect_audio
 )
 from game import RadioPanelGame
-from haptics import play_correct_cue, play_incorrect_cue
+from haptics import play_correct_cue, play_incorrect_cue, play_pickup_cue
 from lsl_markers import send_marker
 from sequences import load_condition_sequence
 from state import state
 from texts import t
 from ui_helpers import auto_fit_label, make_training_tag
-from voice import VoiceDeliverListener
 
 
 class DualTaskScreen(QWidget):
@@ -72,9 +69,6 @@ class DualTaskScreen(QWidget):
 
         self.blink_timer = QTimer(self)
         self.blink_timer.timeout.connect(self._on_blink_tick)
-
-        self.voice_listener = VoiceDeliverListener()
-        self.voice_listener.deliver_detected.connect(self.trigger_voice_deliver)
 
         self.init_ui()
 
@@ -191,9 +185,6 @@ class DualTaskScreen(QWidget):
 
     def start_condition_session(self, max_rounds: int):
         self.flush_pending_log()
-        if VOICE_KEEP_MIC_OPEN:
-            # before the radio starts: a Bluetooth headset changes volume when its microphone opens
-            self.voice_listener.open_microphone()
         self.max_rounds = max_rounds
         self.current_round = 0
         self.container_toggle = True
@@ -219,7 +210,6 @@ class DualTaskScreen(QWidget):
 
     def _enter_play_to_checkpoint(self):
         self.phase = "PLAY_TO_CHECKPOINT"
-        self.voice_listener.set_enabled(False)
         self.phase_timer.stop()
         self.blink_timer.stop()
         self.system_failed_label.hide()
@@ -253,13 +243,14 @@ class DualTaskScreen(QWidget):
         cue = "container_1" if self.container_toggle else "container_2"
         if not (USE_RADIO_CONTAINER_CUES and self.game_widget.announce(cue)):
             audio_sys.play_participant(container1_audio if self.container_toggle else container2_audio)
+        if "haptic" in BATTERY_CUE_CONDITIONS.get(self.get_scenario_cb(), ()):
+            play_pickup_cue()
         self.container_toggle = not self.container_toggle
         self.phase_timer.start(1000)
 
     def _start_dual_assembly_phase(self):
         """Splits the screen: battery task on the right while the radio game keeps going."""
         self.phase = "DUAL_ASSEMBLY"
-        self.game_widget.set_pause(False)
         self.right_container.show()
 
         self.assembly_ticks_left = assembly_seconds(self.get_scenario_cb())
@@ -308,18 +299,17 @@ class DualTaskScreen(QWidget):
         self.warning_label.setText("")
         self.blink_timer.stop()
 
-        self.voice_listener.set_enabled(True)
         send_marker(f"Dual_Workpiece_Task_Started_Round_{self.current_round}_Type_{self.current_task_info}")
+        self.game_widget.set_pause(False, start_problem_now=True)
         self.phase_timer.start(1000)
 
     def trigger_voice_deliver(self):
-        """Called when 'deliver' is spoken (or 'D' is pressed) during assembly."""
+        """Called when 'D' is pressed during assembly."""
         if self.phase != "DUAL_ASSEMBLY":
             return
 
         self.phase = "DELIVERY_PAUSE"
         self.pause_ticks_left = DELIVERY_WINDOW_SECONDS
-        self.voice_listener.set_enabled(False)
 
         pt_name, key_hint = self._point_names()
 
@@ -354,11 +344,10 @@ class DualTaskScreen(QWidget):
                 self._update_assembly_countdown()
 
             if self.pause_ticks_left <= 0:
-                # If participant didn't press the button within 5s, resume traffic and let them say "deliver" again
+                # If participant didn't press the button within 5s, resume traffic and let them press "D" again
                 send_marker("Delivery_Window_Expired_Resuming_Traffic")
                 self.phase = "DUAL_ASSEMBLY"
                 self.game_widget.set_pause(False)
-                self.voice_listener.set_enabled(True)
                 self.handover_label.setText(self._deliver_hint())
             else:
                 self.game_widget.set_pause_seconds(self.pause_ticks_left)
@@ -413,7 +402,6 @@ class DualTaskScreen(QWidget):
 
         self.phase_timer.stop()
         self.blink_timer.stop()
-        self.voice_listener.set_enabled(False)
         self.warning_label.setText("")
         self.system_failed_label.hide()
         self.game_widget.set_system_failed(False)
@@ -496,12 +484,13 @@ class DualTaskScreen(QWidget):
         if "haptic" in channels:
             play_correct_cue() if is_correct else play_incorrect_cue()
         if "audio" in channels:
-            path = correct_cue_audio if is_correct else incorrect_cue_audio
-            # fast path: mixed into the radio stream that is already open; otherwise a new stream
-            if not self.game_widget.play_cue(path, CUE_AUDIO_MAX_SECONDS):
-                audio_sys.play_participant_clip(path, CUE_AUDIO_MAX_SECONDS)
-        send_marker(f"Battery_Cue_Round_{round_number}_Slot_{slot}_{result}_{'+'.join(channels) or 'none'}"
-                    f"_CamMs_{cam_ms}_LinkMs_{link_ms}")
+            pos_wav, neg_wav = get_cue_audio_paths(state.audio_cue_mode)
+            audio_sys.play_participant_clip(pos_wav if is_correct else neg_wav,
+                                            CUE_AUDIO_MAX_SECONDS)
+        send_marker(
+            f"Battery_Cue_Round_{round_number}_Slot_{slot}_{result}"
+            f"_{'+'.join(channels) or 'none'}_{state.audio_cue_mode}"
+        )
 
     def flush_pending_log(self):
         if self.pending_log is not None:
@@ -566,7 +555,6 @@ class DualTaskScreen(QWidget):
         elif event.key() == Qt.Key_Right:
             self.game_widget.press(2)
         elif event.key() == Qt.Key_D:
-            # Keyboard fallback for voice recognition "deliver"
             self.trigger_voice_deliver()
         else:
             super().keyPressEvent(event)

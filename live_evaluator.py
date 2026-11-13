@@ -7,7 +7,7 @@ TEST (no GUI needed, run it right now):
     python live_evaluator.py --test s03_audio          # or name it (log_files/s03_audio.txt)
     python live_evaluator.py --test s03_audio --webcam 0   # test with a normal webcam instead of the XIMEA
   Row 1 of the file is active right away. Build the tray: every battery gets a check or a cross
-  in the table as soon as the camera sees it. Say "deliver" (or press D) to evaluate the row and
+  in the table as soon as the camera sees it. Press D to evaluate the row and
   move on to the next one. R = redo the current row, Q / Esc = quit.
   Feedback: a random audios/positive_sound*.wav for a correct row, buzzer.wav or incorrect_answer.wav
   for a mistake, played on the subject's output (Trekz, --audio-out NAME), each cut to 1 s (--no-sounds = off).
@@ -64,12 +64,13 @@ import threading
 import time
 
 from config import (
+    AUDIO_CUE_MODES,
+    DEFAULT_AUDIO_CUE_MODE,
     DELIVERY_WINDOW_SECONDS,
     EVALUATOR_STREAM_NAME,
     MAX_ROUNDS_PER_CONDITION,
     RETRIEVAL_SECONDS,
     TRAINING_MARKER_PREFIX,
-    VOICE_COOLDOWN_SECONDS,
     WARNING_SECONDS,
     assembly_seconds,
     audio_dir,
@@ -109,9 +110,14 @@ SEND_VERDICTS = True                       # False = only predict / log (--predi
 
 # Feedback sounds (TEST MODE ONLY for now), played on the subject's audio output
 FEEDBACK_SOUNDS = True                     # --no-sounds turns them off
-CORRECT_SOUNDS = ["positive_sound*.wav"]   # audios/positive_sound1-3.wav, one picked at random for a correct row
-MISTAKE_SOUNDS = ["buzzer.wav", "incorrect_answer.wav"]   # one picked at random for a mistake
-FEEDBACK_MAX_SECONDS = 1.0                 # every clip is cut to this length (short fade-out, files untouched)
+AUDIO_CUE_MODE = DEFAULT_AUDIO_CUE_MODE    # "voice" ("input correct"/"input incorrect") or "tone"
+VOICE_CORRECT_SOUNDS = ["voice_input_correct.wav"]
+VOICE_MISTAKE_SOUNDS = ["voice_input_incorrect.wav"]
+TONE_CORRECT_SOUNDS = ["positive_sound*.wav"]   # audios/positive_sound1-3.wav, one picked at random for a correct row
+TONE_MISTAKE_SOUNDS = ["buzzer.wav", "incorrect_answer.wav"]   # one picked at random for a mistake
+CORRECT_SOUNDS = VOICE_CORRECT_SOUNDS if AUDIO_CUE_MODE == "voice" else TONE_CORRECT_SOUNDS
+MISTAKE_SOUNDS = VOICE_MISTAKE_SOUNDS if AUDIO_CUE_MODE == "voice" else TONE_MISTAKE_SOUNDS
+FEEDBACK_MAX_SECONDS = 1.5                 # every clip is cut to this length (short fade-out, files untouched)
 PARTICIPANT_AUDIO_KEYWORD = "Trekz"        # subject audio output (same device as the GUI); --audio-out to change
 # =================================================
 
@@ -605,7 +611,7 @@ class ParadigmTracker:
         elif rec and rec.active:
             lines.append((f"EVALUATION ACTIVE - prediction: {rec.prediction.upper()}", (0, 150, 0)))
         elif rec and rec.verdict:
-            nxt = "  - say DELIVER for the next row" if self.mode == "test" else ""
+            nxt = "  - press D for the next row" if self.mode == "test" else ""
             lines.append((f"Evaluated: {rec.verdict.upper()} ({rec.trigger.replace('_', ' ')}){nxt}", (0, 0, 0)))
         else:
             lines.append(("Evaluation inactive", (0, 0, 0)))
@@ -1342,15 +1348,30 @@ def drain(q, tracker):
 class FeedbackSounds:
     """Random correct / mistake clip on the subject's audio output, each cut to FEEDBACK_MAX_SECONDS."""
 
-    def __init__(self, out_keyword=PARTICIPANT_AUDIO_KEYWORD, max_seconds=FEEDBACK_MAX_SECONDS):
+    def __init__(self, out_keyword=PARTICIPANT_AUDIO_KEYWORD, max_seconds=FEEDBACK_MAX_SECONDS,
+                 cue_mode=AUDIO_CUE_MODE):
         import glob
         import numpy as np
         import sounddevice as sd
         import soundfile as sf
         self.np, self.sd, self.sf = np, sd, sf
         self.max_seconds = max_seconds
-        self.correct = self._load_all([p for pat in CORRECT_SOUNDS for p in sorted(glob.glob(os.path.join(audio_dir, pat)))])
-        self.mistake = self._load_all([p for pat in MISTAKE_SOUNDS for p in sorted(glob.glob(os.path.join(audio_dir, pat)))])
+        self.cue_mode = cue_mode if cue_mode in AUDIO_CUE_MODES else DEFAULT_AUDIO_CUE_MODE
+        self._sets = {
+            "voice": (
+                self._load_all([p for pat in VOICE_CORRECT_SOUNDS
+                                for p in sorted(glob.glob(os.path.join(audio_dir, pat)))]),
+                self._load_all([p for pat in VOICE_MISTAKE_SOUNDS
+                                for p in sorted(glob.glob(os.path.join(audio_dir, pat)))]),
+            ),
+            "tone": (
+                self._load_all([p for pat in TONE_CORRECT_SOUNDS
+                                for p in sorted(glob.glob(os.path.join(audio_dir, pat)))]),
+                self._load_all([p for pat in TONE_MISTAKE_SOUNDS
+                                for p in sorted(glob.glob(os.path.join(audio_dir, pat)))]),
+            ),
+        }
+        self.correct, self.mistake = self._sets[self.cue_mode]
 
         self.device, self.device_name = None, "default output"
         for i, d in enumerate(sd.query_devices()):
@@ -1360,10 +1381,19 @@ class FeedbackSounds:
         else:
             if out_keyword:
                 print(f"[SOUND] No output device matching '{out_keyword}' - using the default output.")
-        self.status = (f"sounds: {len(self.correct)} correct / {len(self.mistake)} mistake "
+        self._update_status()
+
+    def _update_status(self):
+        self.correct, self.mistake = self._sets[self.cue_mode]
+        self.status = (f"sounds ({self.cue_mode}): {len(self.correct)} correct / {len(self.mistake)} mistake "
                        f"-> {self.device_name}")
         print(f"[SOUND] {self.status}: correct {[c[0] for c in self.correct]}, "
               f"mistake {[m[0] for m in self.mistake]}")
+
+    def toggle_mode(self):
+        self.cue_mode = "tone" if self.cue_mode == "voice" else "voice"
+        self._update_status()
+        return self.cue_mode
 
     def _load_all(self, paths):
         clips = []
@@ -1407,7 +1437,7 @@ def start_sounds(args):
     if args.no_sounds:
         return None
     try:
-        return FeedbackSounds(args.audio_out)
+        return FeedbackSounds(args.audio_out, cue_mode=args.cue_mode)
     except Exception as e:
         print(f"[SOUND] Feedback sounds off ({e}).")
         return None
@@ -1438,30 +1468,6 @@ def choose_log_file(arg):
     print("Log files:", ", ".join(os.path.splitext(f)[0] for f in files))
     name = input("File to test (e.g. s03_audio): ").strip()
     return choose_log_file(name)
-
-
-def start_voice(on_deliver):
-    """Vosk 'deliver' listener from voice.py (same words / microphone as the GUI). None if unavailable."""
-    try:
-        from voice import VoiceDeliverListener
-        listener = VoiceDeliverListener()
-    except Exception as e:
-        print(f"[INFO] Voice not available ({e}) - press D for deliver.")
-        return None
-    if not listener.vosk_ready:
-        print("[INFO] Voice not available - press D for deliver.")
-        return None
-    last = [0.0]
-
-    def emit():   # replaces the Qt signal: no Qt event loop in this script
-        now = time.monotonic()
-        if now - last[0] >= VOICE_COOLDOWN_SECONDS:
-            last[0] = now
-            on_deliver()
-    listener._emit_deliver = emit
-    listener.set_enabled(True)
-    print("[INFO] Say 'deliver' (or press D).")
-    return listener
 
 
 # ---------------------------------------------------------------------------
@@ -1544,32 +1550,36 @@ def run_test(args):
             if name:
                 tracker._note(f"Row {rec.number}: played {name}")
         tracker.on_verdict = feedback
-    camera = make_camera(args)
-    deliver_event = threading.Event()
-    voice = start_voice(deliver_event.set)
-    lock = threading.RLock()
-
-    def before():                                        # in the fast loop, under the lock
-        if deliver_event.is_set():
-            deliver_event.clear()
-            tracker.deliver()
-
-    def on_key(key):
-        if key in (ord("d"), ord("D")):
-            tracker.deliver()
-        elif key in (ord("r"), ord("R")):
-            tracker.redo_row()
-
+    camera = CameraModel(args.webcam)
+    cv2.namedWindow("Battery evaluator - TEST", cv2.WINDOW_NORMAL)
+    image = None
     protect_console()
     pipeline = Pipeline(camera, tracker, lock, before)
     pipeline.start()
     try:
-        show_window("Battery evaluator - TEST", pipeline, tracker, lock, camera,
-                    lambda: ("voice ON" if voice else "D = deliver", voice is not None), on_key)
+        while True:
+            watch.kick()
+            got = camera.read()
+            if got is not None:
+                image, reading = got
+                tracker.update_reading(reading["slots"], reading["hand"], reading["tray_on_station"],
+                                       detail=camera_detail(reading))
+            mode_hint = f"D = deliver | M = {sounds.cue_mode}" if sounds else "D = deliver"
+            cv2.imshow("Battery evaluator - TEST",
+                       compose(image, tracker, mode_hint, True,
+                               alert=camera.status))
+            key = cv2.waitKey(1) & 0xFF
+            if key in (ord("q"), ord("Q"), 27):
+                break
+            if key in (ord("d"), ord("D")):
+                tracker.deliver()
+            elif key in (ord("r"), ord("R")):
+                tracker.redo_row()
+            elif key in (ord("m"), ord("M")) and sounds is not None:
+                new_mode = sounds.toggle_mode()
+                tracker._note(f"Audio feedback switched to {new_mode} mode")
     finally:
-        pipeline.stop()
-        if voice is not None:
-            voice.stop()
+        watch.stop()
         camera.stop()
         tracker.close()
         if tracker.csv_path:
@@ -1643,6 +1653,8 @@ def main():
     ap.add_argument("--predict-only", action="store_true", help="live mode: never send verdicts to the GUI")
     ap.add_argument("--audio-out", default=PARTICIPANT_AUDIO_KEYWORD, metavar="NAME",
                     help="test mode: output device for the feedback sounds (part of its name, default Trekz)")
+    ap.add_argument("--cue-mode", default=AUDIO_CUE_MODE, choices=AUDIO_CUE_MODES,
+                    help="test mode: 'voice' ('input correct'/'input incorrect') or 'tone' (default: %(default)s)")
     ap.add_argument("--no-sounds", action="store_true", help="test mode: no correct / mistake sounds")
     args = ap.parse_args()
     SEND_VERDICTS = SEND_VERDICTS and not args.predict_only
