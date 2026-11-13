@@ -125,6 +125,26 @@ class _PlayerLink:
 
 player = _PlayerLink()
 
+def _positive_1(position):
+    """1.4 Hz heartbeat-like double pulse (about 0.5 s)."""
+    player.frame("p1_a", position, BACK_ALL, 35, 60)
+    time.sleep(0.05)
+    player.frame("p1_b", position, BACK_ALL, 60, 100)
+    time.sleep(0.18)
+    player.frame("p1_c", position, BACK_ALL, 35, 60)
+    time.sleep(0.05)
+    player.frame("p1_d", position, BACK_ALL, 60, 120)
+
+
+def _positive_2(position):
+    """Upward wave: lower -> whole panel -> upper (about 0.5 s)."""
+    player.frame("p2_low", position, BACK_LOWER, 35, 160)
+    time.sleep(0.15)
+    player.frame("p2_mid", position, BACK_ALL, 50, 160)
+    time.sleep(0.15)
+    player.frame("p2_high", position, BACK_UPPER, 65, 180)
+
+
 def _positive_3(position):
     """Warm swell: centre -> whole panel -> outer ring (about 0.5 s)."""
     player.frame("p3_1", position, CENTER_MOTORS, 25, 150)
@@ -132,6 +152,13 @@ def _positive_3(position):
     player.frame("p3_2", position, ALL_MOTORS, 55, 200)
     time.sleep(0.14)
     player.frame("p3_3", position, OUTER_MOTORS, 25, 200)
+
+
+def _negative_1(position):
+    """0.5 Hz heavy double pulse (about 0.5 s)."""
+    player.frame("n1_a", position, FRONT_ALL, 95, 240)
+    time.sleep(0.24)
+    player.frame("n1_b", position, FRONT_ALL, 100, 240)
 
 
 def _negative_2(position):
@@ -142,7 +169,23 @@ def _negative_2(position):
             time.sleep(0.18)
 
 
-CUE_PATTERNS = {"positive_3": _positive_3, "negative_2": _negative_2}
+def _negative_3(position):
+    """Chest jitter: alternating left/right bursts (about 0.5 s)."""
+    for step in range(5):
+        motors = FRONT_LEFT if step % 2 == 0 else FRONT_RIGHT
+        player.frame(f"n3_{step}", position, motors, 100, 90)
+        if step < 4:
+            time.sleep(0.09)
+
+
+CUE_PATTERNS = {
+    "positive_1": _positive_1,
+    "positive_2": _positive_2,
+    "positive_3": _positive_3,
+    "negative_1": _negative_1,
+    "negative_2": _negative_2,
+    "negative_3": _negative_3,
+}
 
 
 def play_correct_cue():

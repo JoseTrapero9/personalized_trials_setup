@@ -259,7 +259,6 @@ class DualTaskScreen(QWidget):
     def _start_dual_assembly_phase(self):
         """Splits the screen: battery task on the right while the radio game keeps going."""
         self.phase = "DUAL_ASSEMBLY"
-        self.game_widget.set_pause(False)
         self.right_container.show()
 
         self.assembly_ticks_left = assembly_seconds(self.get_scenario_cb())
@@ -310,6 +309,7 @@ class DualTaskScreen(QWidget):
 
         self.voice_listener.set_enabled(True)
         send_marker(f"Dual_Workpiece_Task_Started_Round_{self.current_round}_Type_{self.current_task_info}")
+        self.game_widget.set_pause(False, start_problem_now=True)
         self.phase_timer.start(1000)
 
     def trigger_voice_deliver(self):

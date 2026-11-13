@@ -16,8 +16,6 @@ if not os.path.exists(alarm_audio):
 mode_audio_haptic = os.path.join(audio_dir, "AUDIO_HAPTIC_MODE.wav")
 mode_audio_only = os.path.join(audio_dir, "AUDIOHELP_mode.wav")
 mode_haptic_only = os.path.join(audio_dir, "HapticVest_Mode.wav")
-mode_robot_fast = os.path.join(audio_dir, "ROBOT_FAST_MODE.wav")
-mode_robot_slow = os.path.join(audio_dir, "ROBOT_SLOW_MODE.wav")
 mode_baseline = os.path.join(audio_dir, "BASELINE_MODE.wav")
 
 container1_audio = os.path.join(audio_dir, "CONTAINER1_ALERT.wav")
@@ -35,9 +33,7 @@ MAX_ROUNDS_PER_CONDITION = 8    # Fixed 8 battery rounds per condition for equal
 TRAINING_ROUNDS = 3             # Practice rounds in training mode
 RETRIEVAL_SECONDS = 5           # 5-second safe pause at checkpoint to pick up a piece
 DELIVERY_WINDOW_SECONDS = 5     # 5-second safe pause after saying "deliver"
-TASK_SECONDS_DEFAULT = 20       # Assembly time in baseline / audio / haptic scenarios
-ROBOT_FAST_SECONDS = 15         # Assembly time in robot_fast
-ROBOT_SLOW_SECONDS = 25         # Assembly time in robot_slow
+TASK_SECONDS_DEFAULT = 25       # Assembly time in baseline / audio / haptic scenarios
 WARNING_SECONDS = 10            # Red timer + blinking warning threshold
 
 # Voice ("deliver") recognition – offline Vosk
@@ -64,10 +60,10 @@ RADIO_AUDIO_DIR = os.path.join(base_dir, "radio_audio")   # made by generate_rad
 PROBLEMS_PER_CHECKPOINT = 3        # radio problems (solved or not) before a checkpoint;
                                    # problems during the battery task do not count
 RESPONSE_SECONDS = 6.0             # time to finish the presses after the instruction ends
-SHUFFLE_SECONDS = 2.5              # idle buttons change color/word this often (frozen during a problem)
-PROBLEM_GAP_SECONDS = (4.0, 9.0)   # random chatter time between two problems
+SHUFFLE_SECONDS = 4.0              # idle buttons change color/word this often (frozen during a problem)
+PROBLEM_GAP_SECONDS = (0.0, 0.0)   # random chatter time between two problems (0 = back-to-back problems)
 FILLER_GAP_SECONDS = (0.3, 0.9)    # silence between two radio lines
-RESUME_GAP_SECONDS = 3.0           # earliest next problem after a pause ends
+RESUME_GAP_SECONDS = 0.0           # earliest next problem after a pause ends
 POINTS_PER_STEP = 30               # solved: +30 per button in the sequence
 FAIL_PENALTY = 40                  # wrong key or timeout (score never below 0)
 SHOW_RESPONSE_BAR = True           # shrinking time bar once the instruction has ended
@@ -89,7 +85,7 @@ PRESS_GRACE_SECONDS = 0.5          # presses this soon after an instruction star
 LATE_PRESS_SECONDS = 0.25
 ROULETTE_DURING_INSTRUCTION = ("hard",)   # modes where the buttons spin + arrows lock while the radio
                                           # speaks; the real buttons appear at ANSWER NOW. Add "normal" to use it there too.
-ROULETTE_FRAME_SECONDS = 0.09             # spin speed          # a press this soon after a button change still counts for the previous one
+ROULETTE_FRAME_SECONDS = 0.5             # spin speed          # a press this soon after a button change still counts for the previous one
 
 # Remote camera evaluator (live_evaluator.py on the camera PC, same network).
 # It reads the ParadigmMarkers LSL stream and answers on its own LSL stream; its verdict is applied
@@ -113,10 +109,6 @@ HAPTIC_INCORRECT_POSITION = "VestFront"    # incorrect on the front
 
 def assembly_seconds(scenario):
     """Assembly time per scenario (shared by the GUI and live_evaluator.py)."""
-    if scenario == "robot_fast":
-        return ROBOT_FAST_SECONDS
-    if scenario == "robot_slow":
-        return ROBOT_SLOW_SECONDS
     return TASK_SECONDS_DEFAULT
 
 
@@ -129,6 +121,4 @@ ALL_CONDITIONS = [
     "audio",
     "haptic",
     "audio_haptic",
-    "robot_fast",
-    "robot_slow"
 ]

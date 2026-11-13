@@ -1,3 +1,0 @@
-subject,condition,difficulty,round,task_info,time_taken_s,handover_point,overtime_alarm,assembly_status,game_score,game_mode
-1,audio_haptic,hard,1,sum_22_Use 1 Yellow and 2 Green,38.072,1,True,incorrect,480,hard
-1,audio_haptic,hard,2,sum_20_Use 1 Red and 2 Green,33.379,2,True,incorrect,680,hard

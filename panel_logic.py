@@ -17,8 +17,8 @@ POS_KEYS = ["left", "up", "right"]
 # Exact composition of every block of 20 experiment problems
 BLOCK_COMPOSITION = {"single": 6, "seq2": 7, "seq3": 7}
 EXPERIMENT_CONDITIONS = [c for c in ALL_CONDITIONS if c != "training"]
-BLOCKS_PER_CONDITION = 2              # 40 problems per condition (a block of 8 rounds uses ~30-40)
-EXPERIMENT_BLOCKS = BLOCKS_PER_CONDITION * len(EXPERIMENT_CONDITIONS)   # 6 x 2 x 20 = 240 problems
+BLOCKS_PER_CONDITION = 3              # 60 problems per condition (4 conditions x 3 blocks = 12 blocks)
+EXPERIMENT_BLOCKS = 12                # 12 x 20 = 240 problems (matches pre-generated radio_audio clips)
 POOL_SEED = 20261104
 N_INCIDENTS = 8
 

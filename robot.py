@@ -13,10 +13,6 @@ _robot_process = None
 
 def set_robot_speed(scenario_name):
     level = 1
-    if scenario_name == "robot_slow":
-        level = 0
-    elif scenario_name == "robot_fast":
-        level = 2
 
     def send_level():
         try:

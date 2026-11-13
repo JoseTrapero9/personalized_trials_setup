@@ -14,8 +14,6 @@ from config import (
     mode_audio_only,
     mode_baseline,
     mode_haptic_only,
-    mode_robot_fast,
-    mode_robot_slow
 )
 from evaluator_link import EvaluatorLink
 from haptics import activate_haptic_vest
@@ -134,10 +132,6 @@ class paradigmcontroller(QWidget):
             audio_sys.play_researcher(mode_haptic_only)
         elif mode == "audio_haptic":
             audio_sys.play_researcher(mode_audio_haptic)
-        elif mode == "robot_fast":
-            audio_sys.play_researcher(mode_robot_fast)
-        elif mode == "robot_slow":
-            audio_sys.play_researcher(mode_robot_slow)
         elif mode == "baseline":
             audio_sys.play_researcher(mode_baseline)
 

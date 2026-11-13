@@ -79,8 +79,6 @@ CONDITION_FILE_NAMES = {
     "audio": "audio",
     "haptic": "haptics",
     "audio_haptic": "audio_haptics",
-    "robot_fast": "fast",
-    "robot_slow": "slow",
 }
 
 
