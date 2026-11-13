@@ -16,6 +16,7 @@ from config import (
     HAPTIC_CORRECT_POSITION,
     HAPTIC_INCORRECT_PATTERN,
     HAPTIC_INCORRECT_POSITION,
+    HAPTIC_POSITIVE_3_ONSET,
 )
 
 try:
@@ -118,7 +119,7 @@ player = _PlayerLink()
 
 def _positive_3(position):
     """Warm swell: centre -> whole panel -> outer ring (about 0.5 s)."""
-    player.frame("p3_1", position, CENTER_MOTORS, 25, 150)
+    player.frame("p3_1", position, CENTER_MOTORS, HAPTIC_POSITIVE_3_ONSET, 150)
     time.sleep(0.14)
     player.frame("p3_2", position, ALL_MOTORS, 55, 200)
     time.sleep(0.14)

@@ -107,6 +107,9 @@ incorrect_cue_audio = mistake_audio                                  # the mista
 CUE_AUDIO_MAX_SECONDS = 1.0        # every cue sound is cut to this length when played (files untouched)
 HAPTIC_CORRECT_PATTERN = "positive_3"      # warm swell (pre-study)
 HAPTIC_INCORRECT_PATTERN = "negative_2"    # sharp staccato (pre-study)
+HAPTIC_POSITIVE_3_ONSET = 45               # strength of the first pulse of positive_3 (pre-study: 25).
+                                           # Stronger start = the cue is felt sooner. Set 25 for the exact
+                                           # pre-study pattern.
 HAPTIC_CORRECT_POSITION = "VestBack"       # pre-study mapping "correct_back": correct on the back,
 HAPTIC_INCORRECT_POSITION = "VestFront"    # incorrect on the front
 

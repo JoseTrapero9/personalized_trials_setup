@@ -201,6 +201,10 @@ class RadioPanelGame(QWidget):
         self.counted = 0
         self.pending_checkpoint = False
 
+    def play_cue(self, path, max_seconds=1.0):
+        """Battery cue sound through the radio's open stream (fast). False if the radio has no stream."""
+        return self.player is not None and self.player.play_cue(path, max_seconds)
+
     def announce(self, key):
         """Play an announcement clip (e.g. 'container_1') in the chosen language. False if missing."""
         cid = f"ann_{key}"
