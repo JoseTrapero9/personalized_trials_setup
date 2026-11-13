@@ -32,28 +32,9 @@ DIFFICULTY_PORT = 50001
 MAX_ROUNDS_PER_CONDITION = 8    # Fixed 8 battery rounds per condition for equal data
 TRAINING_ROUNDS = 3             # Practice rounds in training mode
 RETRIEVAL_SECONDS = 5           # 5-second safe pause at checkpoint to pick up a piece
-DELIVERY_WINDOW_SECONDS = 5     # 5-second safe pause after saying "deliver"
+DELIVERY_WINDOW_SECONDS = 5     # 5-second safe pause after pressing "D" (deliver)
 TASK_SECONDS_DEFAULT = 25       # Assembly time in baseline / audio / haptic scenarios
 WARNING_SECONDS = 10            # Red timer + blinking warning threshold
-
-# Voice ("deliver") recognition – offline Vosk
-VOSK_MODEL_DIR = os.path.join(base_dir, "model")   # downloaded Vosk model, renamed to "model"
-if os.path.isdir(VOSK_MODEL_DIR) and not os.path.isdir(os.path.join(VOSK_MODEL_DIR, "am")):
-    # model unzipped one level deeper (model/vosk-model-small-en-us-0.15/...): use that folder
-    for _name in sorted(os.listdir(VOSK_MODEL_DIR)):
-        if os.path.isdir(os.path.join(VOSK_MODEL_DIR, _name, "am")):
-            VOSK_MODEL_DIR = os.path.join(VOSK_MODEL_DIR, _name)
-            break
-VOSK_SAMPLE_RATE = 16000                           # 16 kHz mono int16 is what Vosk expects
-DELIVER_WORDS = ("deliver", "delivery", "ready")   # grammar-locked trigger words
-VOICE_INPUT_KEYWORD = "Trekz"                         # e.g. "Realtek" to force a specific mic; None = system default
-VOICE_COOLDOWN_SECONDS = 1.0                       # ignore repeat triggers from the same utterance
-VOICE_KEEP_MIC_OPEN = True                         # open the microphone when a condition starts and keep it open.
-                                                   # A Bluetooth headset (Trekz) switches to its hands-free mode while
-                                                   # its microphone is in use, which changes the playback volume and
-                                                   # quality. Opening the mic only for the battery task made the radio
-                                                   # jump in volume at every dual-task phase; open all the time, the
-                                                   # level stays the same. False = old behaviour.
 
 # Radio game (radio_script.py / panel_logic.py / game.py)
 RADIO_AUDIO_DIR = os.path.join(base_dir, "radio_audio")   # made by generate_radio_audio.py
@@ -98,9 +79,30 @@ EVALUATOR_STREAM_NAME = "BatteryEvaluator"
 # (Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect). What the participant gets depends on the condition:
 #   audio -> sound, haptic -> vest, audio_haptic -> both, baseline / training / robot_* -> nothing.
 BATTERY_CUE_CONDITIONS = {"audio": ("audio",), "haptic": ("haptic",), "audio_haptic": ("audio", "haptic")}
-correct_cue_audio = os.path.join(audio_dir, "positive_sound2.wav")   # swap the file name to change the sound
-incorrect_cue_audio = mistake_audio                                  # the mistake sound used so far
-CUE_AUDIO_MAX_SECONDS = 1.0        # every cue sound is cut to this length when played (files untouched)
+
+# Audio cue mode: "voice" ("input correct" / "input incorrect") or "tone" (positive / negative sounds).
+# Can be toggled here (DEFAULT_AUDIO_CUE_MODE) or on the Researcher Setup screen.
+AUDIO_CUE_MODES = ["voice", "tone"]
+DEFAULT_AUDIO_CUE_MODE = "voice"
+
+voice_correct_cue_audio = os.path.join(audio_dir, "voice_input_correct.wav")
+voice_incorrect_cue_audio = os.path.join(audio_dir, "voice_input_incorrect.wav")
+tone_correct_cue_audio = os.path.join(audio_dir, "positive_sound2.wav")
+tone_incorrect_cue_audio = mistake_audio
+
+correct_cue_audio = voice_correct_cue_audio if DEFAULT_AUDIO_CUE_MODE == "voice" else tone_correct_cue_audio
+incorrect_cue_audio = voice_incorrect_cue_audio if DEFAULT_AUDIO_CUE_MODE == "voice" else tone_incorrect_cue_audio
+CUE_AUDIO_MAX_SECONDS = 1.5        # max length when played (1.5s allows full "input incorrect" voice clip)
+
+
+def get_cue_audio_paths(audio_cue_mode=None):
+    """Returns (correct_wav_path, incorrect_wav_path) for 'voice' or 'tone' mode."""
+    mode = (audio_cue_mode or DEFAULT_AUDIO_CUE_MODE).lower()
+    if mode == "tone":
+        return tone_correct_cue_audio, tone_incorrect_cue_audio
+    return voice_correct_cue_audio, voice_incorrect_cue_audio
+
+
 HAPTIC_CORRECT_PATTERN = "positive_3"      # warm swell (pre-study)
 HAPTIC_INCORRECT_PATTERN = "negative_2"    # sharp staccato (pre-study)
 HAPTIC_CORRECT_POSITION = "VestBack"       # pre-study mapping "correct_back": correct on the back,

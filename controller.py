@@ -9,7 +9,7 @@ from config import (
     MAX_ROUNDS_PER_CONDITION,
     TRAINING_ROUNDS,
     USE_REMOTE_EVALUATOR,
-    mistake_audio,
+    get_cue_audio_paths,
     mode_audio_haptic,
     mode_audio_only,
     mode_baseline,
@@ -145,7 +145,8 @@ class paradigmcontroller(QWidget):
         if mode in ["haptic", "audio_haptic"]:
             activate_haptic_vest()
         if mode in ["audio", "audio_haptic"]:
-            audio_sys.play_both(mistake_audio)
+            _, neg_wav = get_cue_audio_paths(state.audio_cue_mode)
+            audio_sys.play_both(neg_wav)
 
         self.mistake_on_cooldown = True
         QTimer.singleShot(2000, self.reset_mistake_cooldown)

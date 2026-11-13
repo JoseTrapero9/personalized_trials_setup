@@ -68,6 +68,7 @@ BACK_LOWER = [4, 5, 6, 7, 12, 13, 14, 15, 16, 17, 18, 19]
 BACK_UPPER = [0, 1, 2, 3, 8, 9, 10, 11]
 BACK_CENTER = [1, 2, 5, 6, 9, 10, 13, 14, 17, 18]
 BACK_OUTER = [0, 3, 4, 7, 8, 11, 12, 15, 16, 19]
+BACK_RIGHT = [2, 3, 6, 7, 10, 11, 14, 15, 18, 19]
 
 FRONT_ALL = list(range(20))
 FRONT_LEFT = [0, 1, 4, 5, 8, 9, 12, 13, 16, 17]
@@ -188,6 +189,20 @@ CUE_PATTERNS = {
 }
 
 
+def _pickup_right():
+    """Positive-1 double-pulse sequence on both front-right and back-right (containers are on the right)."""
+    for tag, intensity, dur, gap in (
+        ("a", 35, 60, 0.05),
+        ("b", 60, 100, 0.18),
+        ("c", 35, 60, 0.05),
+        ("d", 60, 120, 0.0),
+    ):
+        player.frame(f"pickup_f_{tag}", "VestFront", FRONT_RIGHT, intensity, dur)
+        player.frame(f"pickup_b_{tag}", "VestBack", BACK_RIGHT, intensity, dur)
+        if gap > 0:
+            time.sleep(gap)
+
+
 def play_correct_cue():
     threading.Thread(target=CUE_PATTERNS[HAPTIC_CORRECT_PATTERN], args=(HAPTIC_CORRECT_POSITION,),
                      daemon=True).start()
@@ -196,6 +211,10 @@ def play_correct_cue():
 def play_incorrect_cue():
     threading.Thread(target=CUE_PATTERNS[HAPTIC_INCORRECT_PATTERN], args=(HAPTIC_INCORRECT_POSITION,),
                      daemon=True).start()
+
+
+def play_pickup_cue():
+    threading.Thread(target=_pickup_right, daemon=True).start()
 
 
 def start_haptic_thread():

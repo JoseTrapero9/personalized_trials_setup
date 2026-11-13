@@ -14,7 +14,7 @@ import hashlib
 import json
 import re
 
-SCRIPT_VERSION = 1
+SCRIPT_VERSION = 3
 
 LANGUAGES = {
     "en": "English",
@@ -64,166 +64,182 @@ def step_phrase(lang, kind, color):
     raise ValueError(lang)
 
 
+def first_step_text(lang, step):
+    """Spoken command for the FIRST button in an announcement."""
+    s = step_phrase(lang, *step)
+    if lang == "en":
+        return f"Press first {s}."
+    if lang == "es":
+        return f"Presiona primero {s}."
+    if lang == "de":
+        return f"Drücke zuerst {s}."
+    raise ValueError(lang)
+
+
+def second_step_text(lang, step):
+    """Spoken command for the SECOND button in an announcement."""
+    s = step_phrase(lang, *step)
+    if lang == "en":
+        return f"Also press {s}."
+    if lang == "es":
+        return f"También presiona {s}."
+    if lang == "de":
+        return f"Drücke außerdem {s}."
+    raise ValueError(lang)
+
+
 def command_text(lang, steps):
     """steps: list of (kind, color). Returns the spoken command."""
     p = [step_phrase(lang, k, c) for k, c in steps]
     n = len(p)
     if lang == "en":
-        lead = "To fix it, press"
         if n == 1:
-            return f"{lead} {p[0]}."
+            return f"Press {p[0]}."
         if n == 2:
-            return f"{lead} {p[0]}, and then {p[1]}."
-        return f"{lead} {p[0]}, then {p[1]}, and finally {p[2]}."
+            return f"{first_step_text(lang, steps[0])} {second_step_text(lang, steps[1])}"
+        return f"Press {p[0]}, then {p[1]}, and finally {p[2]}."
     if lang == "es":
-        lead = "Para arreglarlo, presiona"
         if n == 1:
-            return f"{lead} {p[0]}."
+            return f"Presiona {p[0]}."
         if n == 2:
-            return f"{lead} {p[0]}, y después {p[1]}."
-        return f"{lead} {p[0]}, luego {p[1]}, y al final {p[2]}."
+            return f"{first_step_text(lang, steps[0])} {second_step_text(lang, steps[1])}"
+        return f"Presiona {p[0]}, luego {p[1]}, y al final {p[2]}."
     if lang == "de":
-        lead = "Um das zu beheben, drücke"
         if n == 1:
-            return f"{lead} {p[0]}."
+            return f"Drücke {p[0]}."
         if n == 2:
-            return f"{lead} zuerst {p[0]}, und dann {p[1]}."
-        return f"{lead} zuerst {p[0]}, dann {p[1]}, und zuletzt {p[2]}."
+            return f"{first_step_text(lang, steps[0])} {second_step_text(lang, steps[1])}"
+        return f"Drücke zuerst {p[0]}, dann {p[1]}, und zuletzt {p[2]}."
     raise ValueError(lang)
 
 
 # ---------------------------------------------------------------------------
-# Background chatter (the radio talks continuously)
+# Background chatter (short control-room updates)
 # ---------------------------------------------------------------------------
 FILLER = {
     "en": [
-        "Hello everyone, this is plant radio with your regular update from the control room.",
-        "All four turbines are running smoothly, and output is right on target today.",
-        "The maintenance team finished the inspection of the cooling towers this morning.",
-        "The weather outside is calm, with a light breeze coming from the river.",
-        "Energy output this hour is slightly above yesterday's average. Nice work, everyone.",
-        "A reminder that the cafeteria serves soup and fresh bread until two o'clock.",
-        "The new sensors in the boiler room are sending clean data, with no surprises so far.",
-        "Grid demand is stable, so we expect a quiet afternoon on the network.",
-        "Shift change is at six. Please leave your notes for the next team.",
-        "The coal yard received a full shipment this morning, and storage is looking good.",
-        "Water temperature in the condenser is steady and well within limits.",
-        "The safety walk in sector two went well. Thanks to everyone who joined.",
-        "Our solar field is adding a little extra power while the sun is out.",
-        "A group of visitors from the university will tour the plant later today.",
-        "Fuel consumption is lower than planned, which keeps the budget happy.",
-        "Remember to drink some water and take a short stretch when you can.",
-        "Vibration on the main shaft is low and steady, just how we like it.",
-        "The parking lot will be repainted on the weekend, so please park near the gate.",
-        "Steam pressure across the plant is balanced and holding nicely.",
-        "That is all for now from the control room. Enjoy your shift.",
+        "Control room update: all systems normal.",
+        "All four turbines are running smoothly.",
+        "Cooling tower inspection is complete.",
+        "Weather outside is calm and clear.",
+        "Energy output is right on target.",
+        "Cafeteria is open until two o'clock.",
+        "Boiler room sensors show clean data.",
+        "Grid demand is steady this afternoon.",
+        "Shift change is at six o'clock.",
+        "Coal yard storage is full.",
+        "Condenser water temperature is normal.",
+        "Sector two safety walk is finished.",
+        "Solar field is adding extra power.",
+        "University visitors arrive later today.",
+        "Fuel use is below plan today.",
+        "Remember to drink some water.",
+        "Main shaft vibration is low.",
+        "Please park near the main gate.",
+        "Steam pressure is holding steady.",
+        "Control room out. Enjoy your shift.",
     ],
     "es": [
-        "Hola a todos, aquí la radio de la planta con su actualización desde la sala de control.",
-        "Las cuatro turbinas funcionan sin problemas, y la producción va justo según lo planeado.",
-        "El equipo de mantenimiento terminó hoy la inspección de las torres de enfriamiento.",
-        "El clima afuera está tranquilo, con una brisa ligera que viene del río.",
-        "La producción de energía de esta hora está un poco arriba del promedio de ayer. Buen trabajo a todos.",
-        "Les recordamos que el comedor sirve sopa y pan recién hecho hasta las dos de la tarde.",
-        "Los sensores nuevos de la sala de calderas envían datos limpios, sin sorpresas hasta ahora.",
-        "La demanda de la red está estable, así que esperamos una tarde tranquila.",
-        "El cambio de turno es a las seis. Por favor dejen sus notas para el siguiente equipo.",
-        "El patio de carbón recibió un cargamento completo esta mañana, y el almacén se ve bien.",
-        "La temperatura del agua en el condensador está estable y dentro de los límites.",
-        "El recorrido de seguridad en el sector dos salió muy bien. Gracias a todos los que participaron.",
-        "El campo solar está aportando un poco de energía extra mientras hay sol.",
-        "Un grupo de visitantes de la universidad va a recorrer la planta más tarde.",
-        "El consumo de combustible está por debajo de lo planeado, y eso ayuda al presupuesto.",
-        "Recuerden tomar agua y estirarse un poco cuando puedan.",
-        "La vibración del eje principal está baja y estable, justo como nos gusta.",
-        "El estacionamiento se va a repintar el fin de semana, así que estaciónense cerca de la entrada.",
-        "La presión de vapor en toda la planta está equilibrada y se mantiene bien.",
-        "Eso es todo por ahora desde la sala de control. Que tengan un buen turno.",
+        "Sala de control: todo normal.",
+        "Las cuatro turbinas funcionan bien.",
+        "Inspección de torres terminada.",
+        "El clima afuera está tranquilo.",
+        "La producción va según lo planeado.",
+        "El comedor cierra a las dos.",
+        "Sensores de calderas sin novedades.",
+        "La demanda de la red está estable.",
+        "El cambio de turno es a las seis.",
+        "El almacén de carbón está lleno.",
+        "Temperatura del condensador normal.",
+        "Recorrido de seguridad terminado.",
+        "El campo solar aporta energía extra.",
+        "Hoy vienen visitantes de la universidad.",
+        "El consumo de combustible es bajo.",
+        "Recuerden tomar un poco de agua.",
+        "Vibración del eje baja y estable.",
+        "Estaciónense cerca de la entrada.",
+        "La presión de vapor se mantiene bien.",
+        "Eso es todo. Buen turno a todos.",
     ],
     "de": [
-        "Hallo zusammen, hier ist das Werksradio mit dem aktuellen Bericht aus der Leitwarte.",
-        "Alle vier Turbinen laufen einwandfrei, und die Leistung liegt genau im Plan.",
-        "Das Wartungsteam hat heute Morgen die Inspektion der Kühltürme abgeschlossen.",
-        "Draußen ist es ruhig, mit einer leichten Brise vom Fluss.",
-        "Die Energieleistung in dieser Stunde liegt etwas über dem gestrigen Durchschnitt. Gute Arbeit, alle zusammen.",
-        "Zur Erinnerung: Die Kantine serviert bis vierzehn Uhr Suppe und frisches Brot.",
-        "Die neuen Sensoren im Kesselhaus senden saubere Daten, bisher ohne Überraschungen.",
-        "Die Netzlast ist stabil, wir erwarten einen ruhigen Nachmittag.",
-        "Schichtwechsel ist um sechs. Bitte hinterlasst eure Notizen für das nächste Team.",
-        "Das Kohlelager hat heute Morgen eine volle Ladung bekommen, der Vorrat sieht gut aus.",
-        "Die Wassertemperatur im Kondensator ist stabil und innerhalb der Grenzwerte.",
-        "Der Sicherheitsrundgang in Sektor zwei lief gut. Danke an alle, die dabei waren.",
-        "Unser Solarfeld bringt etwas zusätzlichen Strom, solange die Sonne scheint.",
-        "Eine Besuchergruppe von der Universität besichtigt später die Anlage.",
-        "Der Brennstoffverbrauch liegt unter Plan, das freut das Budget.",
-        "Denkt daran, etwas Wasser zu trinken und euch kurz zu strecken.",
-        "Die Vibrationen an der Hauptwelle sind niedrig und stabil, genau so, wie wir es mögen.",
-        "Der Parkplatz wird am Wochenende neu markiert, bitte parkt in der Nähe des Tores.",
-        "Der Dampfdruck in der gesamten Anlage ist ausgeglichen und hält sich gut.",
-        "Das war es fürs Erste aus der Leitwarte. Eine gute Schicht euch allen.",
+        "Leitwarte hier: alles im Normalbereich.",
+        "Alle vier Turbinen laufen rund.",
+        "Kühlturm-Inspektion ist abgeschlossen.",
+        "Draußen ist das Wetter ruhig.",
+        "Die Leistung liegt genau im Plan.",
+        "Die Kantine hat bis vierzehn Uhr offen.",
+        "Kesselhaus-Sensoren melden saubere Daten.",
+        "Die Netzlast ist heute stabil.",
+        "Schichtwechsel ist um achtzehn Uhr.",
+        "Das Kohlelager ist voll.",
+        "Wassertemperatur im Kondensator normal.",
+        "Sicherheitsrundgang in Sektor zwei beendet.",
+        "Das Solarfeld erzeugt Zusatzstrom.",
+        "Später kommt eine Besuchergruppe.",
+        "Der Brennstoffverbrauch ist niedrig.",
+        "Denkt daran, etwas Wasser zu trinken.",
+        "Vibrationen an der Hauptwelle sind gering.",
+        "Bitte nahe am Haupttor parken.",
+        "Der Dampfdruck bleibt stabil.",
+        "Leitwarte Ende. Gute Schicht.",
     ],
 }
 
 # ---------------------------------------------------------------------------
-# Incidents (the sudden "oh no" before each instruction)
+# Incidents: 3 short clauses (alert, issue_detail, status_tail) so the two button
+# commands are split up and woven into different places of the announcement.
 # ---------------------------------------------------------------------------
 INCIDENTS = {
     "en": [
-        "Oh no, there's a short circuit in the turbine hall!",
-        "Attention, the pressure in boiler two is rising fast!",
-        "Warning, the main cooling pump just stopped!",
-        "Oh no, the transformer in sector three is overloaded!",
-        "Alert, there's a steam leak in the north pipeline!",
-        "Careful, the conveyor belt in the coal yard is jammed!",
-        "Oh no, the voltage is dropping on line four!",
-        "Attention, the generator is overheating!",
+        ("Alert, problem in the turbine hall!", "There is a short circuit on the line.", "Isolate the fault now."),
+        ("Attention, boiler two pressure is rising!", "The relief valve is stuck.", "Watch the main gauge."),
+        ("Warning, the main cooling pump stopped!", "Water flow is dropping fast.", "Backup flow is starting."),
+        ("Alert, transformer three is overloaded!", "The coils are heating up.", "Shed the extra load now."),
+        ("Warning, steam leak in the north pipe!", "Pressure is falling in that sector.", "Seal that section now."),
+        ("Attention, the coal conveyor is jammed!", "The drive motor is straining.", "Clear the belt quickly."),
+        ("Alert, voltage is dropping on line four!", "The feeder is unstable.", "Balance the network now."),
+        ("Warning, the main generator is overheating!", "Exhaust temperature is high.", "Cool the unit down fast."),
     ],
     "es": [
-        "¡Ay no, hay un cortocircuito en la sala de turbinas!",
-        "¡Atención, la presión de la caldera dos está subiendo rápido!",
-        "¡Cuidado, la bomba principal de enfriamiento se acaba de detener!",
-        "¡Ay no, el transformador del sector tres está sobrecargado!",
-        "¡Alerta, hay una fuga de vapor en la tubería norte!",
-        "¡Cuidado, la banda transportadora del patio de carbón se atoró!",
-        "¡Ay no, el voltaje está bajando en la línea cuatro!",
-        "¡Atención, el generador se está sobrecalentando!",
+        ("¡Alerta, problema en las turbinas!", "Hay un cortocircuito en la línea.", "Aísla la falla ahora."),
+        ("¡Atención, sube la presión en caldera dos!", "La válvula de alivio se trabó.", "Vigila el medidor."),
+        ("¡Cuidado, se detuvo la bomba de enfriamiento!", "El flujo de agua cae rápido.", "Ya entra el respaldo."),
+        ("¡Alerta, sobrecarga en el transformador tres!", "Las bobinas se calientan.", "Baja la carga ahora."),
+        ("¡Cuidado, fuga de vapor en tubería norte!", "Cae la presión en ese sector.", "Cierra esa sección ya."),
+        ("¡Atención, se atoró la banda de carbón!", "El motor principal se esfuerza.", "Libera la banda rápido."),
+        ("¡Alerta, cae el voltaje en la línea cuatro!", "El alimentador está inestable.", "Equilibra la red ya."),
+        ("¡Cuidado, el generador se sobrecalienta!", "La temperatura de escape es alta.", "Enfría la unidad rápido."),
     ],
     "de": [
-        "Oh nein, Kurzschluss in der Turbinenhalle!",
-        "Achtung, der Druck in Kessel zwei steigt schnell!",
-        "Warnung, die Hauptkühlpumpe ist gerade ausgefallen!",
-        "Oh nein, der Transformator in Sektor drei ist überlastet!",
-        "Alarm, Dampfleck in der Nordleitung!",
-        "Vorsicht, das Förderband im Kohlelager klemmt!",
-        "Oh nein, die Spannung auf Leitung vier fällt ab!",
-        "Achtung, der Generator überhitzt!",
+        ("Alarm, Problem in der Turbinenhalle!", "Kurzschluss auf der Leitung.", "Isoliere sofort den Fehler."),
+        ("Achtung, Druckanstieg in Kessel zwei!", "Das Sicherheitsventil klemmt.", "Prüfe die Hauptanzeige."),
+        ("Warnung, die Hauptkühlpumpe steht!", "Der Wasserfluss fällt schnell.", "Der Ersatzlauf startet."),
+        ("Alarm, Trafo drei ist überlastet!", "Die Spulen werden heiß.", "Senke sofort die Last."),
+        ("Warnung, Dampfleck in der Nordleitung!", "Der Druck im Sektor fällt.", "Sperre den Abschnitt ab."),
+        ("Achtung, das Kohleband klemmt!", "Der Antriebsmotor ist überlastet.", "Mach das Band schnell frei."),
+        ("Alarm, Spannungsabfall auf Leitung vier!", "Die Einspeisung schwankt stark.", "Stabilisiere das Netz."),
+        ("Warnung, der Generator überhitzt!", "Die Abgastemperatur ist zu hoch.", "Kühle die Einheit schnell."),
     ],
 }
 
 # ---------------------------------------------------------------------------
-# Reactions after a problem
+# Reactions after a problem (short)
 # ---------------------------------------------------------------------------
 FEEDBACK = {
     "en": {
-        "solved": ["Perfect, that fixed it.", "Great job, everything is stable again.", "Nice, problem solved."],
-        "wrong": ["Oh no, that was not right. We lost some power.",
-                  "That didn't work, the system took some damage.",
-                  "Too bad, that was the wrong move."],
-        "timeout": ["Too late, the system shut down for a moment.", "Time is up, we lost some power."],
+        "solved": ["Fixed.", "Nice, stable again.", "Good, problem solved."],
+        "wrong": ["Wrong button, power lost.", "No, system damaged.", "Wrong move."],
+        "timeout": ["Too late, power lost.", "Time's up."],
     },
     "es": {
-        "solved": ["Perfecto, eso lo arregló.", "Excelente, todo está estable otra vez.", "Muy bien, problema resuelto."],
-        "wrong": ["Ay no, eso no era. Perdimos algo de energía.",
-                  "Eso no funcionó, el sistema sufrió daños.",
-                  "Qué mal, ese no era el movimiento correcto."],
-        "timeout": ["Muy tarde, el sistema se apagó por un momento.", "Se acabó el tiempo, perdimos energía."],
+        "solved": ["Listo, arreglado.", "Bien, estable otra vez.", "Problema resuelto."],
+        "wrong": ["Botón incorrecto.", "No, hubo daños.", "Movimiento equivocado."],
+        "timeout": ["Muy tarde.", "Se acabó el tiempo."],
     },
     "de": {
-        "solved": ["Perfekt, das hat es behoben.", "Sehr gut, alles ist wieder stabil.", "Super, Problem gelöst."],
-        "wrong": ["Oh nein, das war falsch. Wir haben etwas Leistung verloren.",
-                  "Das hat nicht geklappt, das System wurde beschädigt.",
-                  "Schade, das war der falsche Schritt."],
-        "timeout": ["Zu spät, das System hat kurz abgeschaltet.", "Die Zeit ist um, wir haben Leistung verloren."],
+        "solved": ["Behoben.", "Gut, wieder stabil.", "Problem gelöst."],
+        "wrong": ["Falscher Knopf.", "Nein, Systemschaden.", "Falscher Schritt."],
+        "timeout": ["Zu spät.", "Zeit abgelaufen."],
     },
 }
 
@@ -250,9 +266,23 @@ ANNOUNCEMENTS = {
 # Clip catalogue
 # ---------------------------------------------------------------------------
 def problem_clip_parts(lang, problem):
-    """(incident, command) for one problem from panel_logic.build_pool()."""
-    incident = INCIDENTS[lang][problem["incident"] % len(INCIDENTS[lang])]
-    return incident, command_text(lang, problem["steps"])
+    """Spoken parts for one problem from panel_logic.build_pool().
+    Splits the two button steps and interleaves them at random positions inside the incident clauses.
+    """
+    a, b, c = INCIDENTS[lang][problem["incident"] % len(INCIDENTS[lang])]
+    steps = problem["steps"]
+    if len(steps) != 2:
+        return a, b, command_text(lang, steps)
+    cmd1 = first_step_text(lang, steps[0])
+    cmd2 = second_step_text(lang, steps[1])
+    pos = problem.get("pos", 0) % 4
+    if pos == 0:
+        return a, cmd1, b, cmd2, c
+    if pos == 1:
+        return cmd1, a, b, cmd2, c
+    if pos == 2:
+        return a, cmd1, b, c, cmd2
+    return a, b, cmd1, c, cmd2
 
 
 def all_clips(lang, problems):
@@ -282,9 +312,11 @@ def validate():
     """Return a list of problems with the script (empty list = OK)."""
     issues = []
     for lang in LANGUAGES:
+        incident_texts = [part for pair in INCIDENTS[lang]
+                          for part in (pair if isinstance(pair, (tuple, list)) else (pair,))]
         pools = {
             "filler": FILLER[lang],
-            "incident": INCIDENTS[lang],
+            "incident": incident_texts,
             "feedback": [t for v in FEEDBACK[lang].values() for t in v],
             "announcement": list(ANNOUNCEMENTS[lang].values()),
             "command": [command_text(lang, [("C", c), ("L", c2)]) for c in COLOR_KEYS for c2 in COLOR_KEYS],
@@ -296,7 +328,7 @@ def validate():
         color_words = set()
         for table in (LABELS, COLOR_ADJ, LABEL_SPOKEN):
             color_words |= {w.lower() for w in table[lang].values()}
-        for t in FILLER[lang] + INCIDENTS[lang]:
+        for t in FILLER[lang] + incident_texts:
             words = set(re.findall(r"\w+", t.lower()))
             hit = words & color_words
             if hit:
