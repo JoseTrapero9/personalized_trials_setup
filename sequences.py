@@ -97,6 +97,22 @@ def sequence_path(subject_number, condition):
     return os.path.join(base_dir, "log_files", f"{subject_tag(subject_number)}_{suffix}.txt")
 
 
+def training_sequence_path(condition):
+    """log_files/training_<condition>.txt (shared by all subjects), or None for an unknown condition."""
+    suffix = CONDITION_FILE_NAMES.get(condition)
+    return None if suffix is None else os.path.join(base_dir, "log_files", f"training_{suffix}.txt")
+
+
+def load_training_sequence(condition):
+    """(sequence, file name) of a training block, or (None, None) if its file is missing."""
+    path = training_sequence_path(condition)
+    if path and os.path.exists(path):
+        seq = load_synch_sequence(path)
+        if seq:
+            return seq, os.path.basename(path)
+    return None, None
+
+
 def load_condition_sequence(subject_number, condition):
     """Returns (sequence, file name). Falls back to WORKPIECE_SEQUENCE if the file is missing."""
     path = sequence_path(subject_number, condition)

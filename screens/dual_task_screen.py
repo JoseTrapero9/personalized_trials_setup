@@ -189,7 +189,8 @@ class DualTaskScreen(QWidget):
         self.container_toggle = True
         self.session_csv_path = None
         if state.training_active and state.training_sequence:
-            self.sequence, self.sequence_file = state.training_sequence, "training"
+            # log_files/training_<condition>.txt: the camera PC loads the same file and sends the battery cues
+            self.sequence, self.sequence_file = state.training_sequence, state.training_sequence_file or "training"
         else:
             self.sequence, self.sequence_file = load_condition_sequence(state.subject_number, state.current_condition)
         send_marker(f"Sequence_File_{self.sequence_file}")
@@ -469,6 +470,9 @@ class DualTaskScreen(QWidget):
         """Verdict from live_evaluator.py (camera PC). Only used for the round it belongs to."""
         if round_number != self.current_round:
             send_marker(f"Remote_Verdict_Ignored_Round_{round_number}_Current_{self.current_round}")
+            return
+        if state.training_active:                       # training is practice: cues only, never evaluated
+            send_marker(f"Remote_Verdict_Ignored_Training_Round_{round_number}")
             return
         self.record_evaluation(is_correct, source="camera")
 

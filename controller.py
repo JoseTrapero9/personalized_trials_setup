@@ -29,7 +29,7 @@ from screens.scoreboard_screen import ArcadeScoreboardScreen
 from screens.setup_screen import setupscreen
 from screens.start_screen import startscreen
 from screens.tutorial_screen import tutorialscreen
-from sequences import build_training_sequence
+from sequences import build_training_sequence, load_training_sequence
 from state import state
 
 
@@ -126,9 +126,14 @@ class paradigmcontroller(QWidget):
         """Cue slide of training block `index`, then its start screen. Blocks: TRAINING_CONDITIONS, in order."""
         state.training_block = index
         state.training_condition = TRAINING_CONDITIONS[index]
-        tasks = self._training_tasks
-        start = index * TRAINING_ROUNDS                  # every block gets its own battery tasks
-        state.training_sequence = [tasks[(start + k) % len(tasks)] for k in range(TRAINING_ROUNDS)]
+        seq, name = load_training_sequence(state.training_condition)   # log_files/training_<condition>.txt
+        if seq:
+            state.training_sequence, state.training_sequence_file = seq, name
+        else:                                            # file missing: generated tasks, as before
+            tasks = self._training_tasks
+            start = index * TRAINING_ROUNDS              # every block gets its own battery tasks
+            state.training_sequence = [tasks[(start + k) % len(tasks)] for k in range(TRAINING_ROUNDS)]
+            state.training_sequence_file = ""
         self.tutorial_screen.show_cue_slide(state.training_condition, index, len(TRAINING_CONDITIONS),
                                             finish_cb=self._training_block_ready)
         self.stacked_widget.setCurrentIndex(1)

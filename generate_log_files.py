@@ -38,6 +38,9 @@ CONDITION_FILES = ["audio", "audio_haptics", "baseline", "haptics"]
 DRAW_ORDER = ["audio", "audio_haptics", "baseline", "fast", "haptics", "slow"]
 PIECES_PER_FILE = 17
 HEADER = ["piece", "sum", "instruction", "answer"]
+# Training: one file per condition, shared by all subjects (log_files/training_<condition>.txt). They give the
+# camera PC the answers so it can send the per-battery cues; training rounds are not evaluated.
+TRAINING_PIECES = 5               # = config.TRAINING_ROUNDS
 
 
 def slot_sum(order):
@@ -94,6 +97,22 @@ def write_files(n_subjects, seed):
     return data
 
 
+def write_training_files(seed):
+    """log_files/training_<condition>.txt, 5 pieces each. Own random stream: the subject files do not change."""
+    rng = random.Random(f"training-{seed}")
+    answers = all_answers()
+    data = {}
+    for cond in CONDITION_FILES:
+        rows = make_sequence(rng, answers, TRAINING_PIECES)
+        data[("training", cond)] = rows
+        with open(os.path.join(LOG_DIR, f"training_{cond}.txt"), "w", encoding="utf-8", newline="\n") as f:
+            f.write("\t".join(HEADER) + "\n")
+            for row in rows:
+                f.write("\t".join(str(v) for v in row) + "\n")
+    print(f"Wrote {len(data)} training files to {LOG_DIR}")
+    return data
+
+
 def write_pdf(data, path):
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4, landscape
@@ -118,15 +137,20 @@ def write_pdf(data, path):
             "Subjects s01 to s%02d, one page per subject. Values: Blue = 1, Red = 2, Yellow = 3, Green = 4. "
             "Sum = slot 1 x1 + slot 2 x2 + slot 3 x3. Answer is the order from slot 1 (left) to slot 3 (right). "
             "The GUI uses the first %d pieces of each file (one per round)."
-            % (max(int(s[1:]) for s, _ in data), 8),
+            % (max(int(s[1:]) for s, _ in data if s != "training"), 8),
             styles["BodyText"]),
         PageBreak(),
     ]
-    subjects = sorted({s for s, _ in data})
+    subjects = sorted({s for s, _ in data if s != "training"})
+    if any(s == "training" for s, _ in data):
+        subjects = ["training"] + subjects             # training page first
     width = (doc.width - 4 * mm) / 2
     col_w = [8 * mm, 9 * mm, 37 * mm, width - 54 * mm]
     for i, subj in enumerate(subjects):
-        page_items = [Paragraph(f"Subject {subj.upper()}", styles["Heading2"])]
+        training = subj == "training"
+        heading = ("Training (all subjects) - practice only, cues are given but rounds are not evaluated"
+                   if training else f"Subject {subj.upper()}")
+        page_items = [Paragraph(heading, styles["Heading2"])]
         blocks = []
         for cond in CONDITION_FILES:
             rows = data[(subj, cond)]
@@ -134,19 +158,20 @@ def write_pdf(data, path):
             for piece, total, instr, ans in rows:
                 table_rows.append([str(piece), str(total), Paragraph(instr, small), Paragraph(colored(ans), small)])
             t = Table(table_rows, colWidths=col_w, repeatRows=1)
+            extra = ([("ROWBACKGROUNDS", (0, 9), (-1, -1), [colors.white, colors.HexColor("#F7F9FA")])]
+                     if len(rows) > 8 else [])
             t.setStyle(TableStyle([
                 ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2F4F4F")),
                 ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
                 ("FONTSIZE", (0, 0), (-1, -1), 7.5),
-                ("BACKGROUND", (0, 1), (-1, 8), colors.HexColor("#E3EDFF")),   # pieces used by the GUI
-                ("ROWBACKGROUNDS", (0, 9), (-1, -1), [colors.white, colors.HexColor("#F7F9FA")]),
+                ("BACKGROUND", (0, 1), (-1, min(8, len(rows))), colors.HexColor("#E3EDFF")),   # pieces used
                 ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#CBD5E1")),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("TOPPADDING", (0, 0), (-1, -1), 1),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 1.5),
                 ("LEFTPADDING", (0, 0), (-1, -1), 3),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 2),
-            ]))
+            ] + extra))
             title = Paragraph(f"<b>{cond.replace('_', ' ').title()}</b> &nbsp;<font size=7 color='#64748B'>"
                               f"{subj}_{cond}.txt</font>", styles["BodyText"])
             blocks.append([title, t])
@@ -157,8 +182,10 @@ def write_pdf(data, path):
                                ("LEFTPADDING", (0, 0), (-1, -1), 0),
                                ("BOTTOMPADDING", (0, 0), (-1, -1), 4)]))
         page_items.append(g)
-        page_items.append(Paragraph("<font size=7 color='#64748B'>Blue rows (pieces 1-8) are the ones shown in the "
-                               "8 rounds of a condition (round N = piece N).</font>", styles["BodyText"]))
+        note = ("Each training block uses its file: 5 rounds, round N = piece N. Blocks run in the order baseline, "
+                "audio, audio_haptic, haptic." if training else
+                "Blue rows (pieces 1-8) are the ones shown in the 8 rounds of a condition (round N = piece N).")
+        page_items.append(Paragraph(f"<font size=7 color='#64748B'>{note}</font>", styles["BodyText"]))
         story.append(KeepInFrame(doc.width, doc.height, page_items, mode="shrink"))  # one page per subject
         if i < len(subjects) - 1:
             story.append(PageBreak())
@@ -181,6 +208,7 @@ def main():
     ap.add_argument("--no-pdf", action="store_true")
     args = ap.parse_args()
     data = write_files(args.subjects, args.seed)
+    data.update(write_training_files(args.seed))
     if not args.no_pdf:
         write_pdf(data, os.path.join(LOG_DIR, f"Answer_Key_s01-s{args.subjects:02d}.pdf"))
 

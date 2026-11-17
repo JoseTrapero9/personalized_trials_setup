@@ -1,0 +1,6 @@
+piece	sum	instruction	answer
+1	21	Use 2 Yellow and 1 Green	Yellow, Yellow, Green
+2	18	Use 1 Blue and 2 Green	Green, Blue, Green
+3	10	Use 2 Blue and 1 Yellow	Blue, Yellow, Blue
+4	14	Use 2 Red and 1 Green	Green, Red, Red
+5	10	Use 1 Blue and 2 Red	Red, Blue, Red
