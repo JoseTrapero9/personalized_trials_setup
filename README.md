@@ -15,7 +15,7 @@ Missing a voice: Windows Settings > Time & language > Speech > Add voices
 After editing `radio_script.py`, re-run the generator; it only redoes changed clips.
 
 Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `workpieces/`,
-`model/` (Vosk), `radio_audio/` (generated) and `robot_sequence.py`.
+`radio_audio/` (generated) and `robot_sequence.py`. Delivery is always the **D** key (no speech recognition).
 
 ## The game
 
@@ -60,7 +60,8 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 | `radio.py` | radio playback on the participant headphones |
 | `game.py` | the radio button game (left panel) |
 | `texts.py` | participant screen text in EN / ES / DE |
-| `screens/` | setup (incl. language), tutorial, start, dual task, scoreboard |
+| `screens/` | setup (incl. language), tutorial + cue slides, start, dual task, scoreboard, questionnaires, pre-train |
+| `feedback_cues.py` | the feedback cues (sound / vest), used by the battery cues, the training slides and the pre-train |
 | `sequences.py` | loads `log_files/sXX_<condition>.txt` |
 | `questionnaires.py` | NASA-TLX + experience questionnaire: text (EN/ES/DE), saving, subject summary files |
 | `generate_log_files.py` | makes `log_files/` + answer-key PDF |
@@ -70,8 +71,9 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 ## Battery sequences (`log_files/`)
 
 * `log_files/sXX_<condition>.txt` (s01-s25): 17 pieces each, tab separated `piece sum instruction answer`.
-  File names: `audio`, `audio_haptics`, `baseline`, `fast`, `haptics`, `slow`
-  (GUI conditions `audio`, `audio_haptic`, `baseline`, `robot_fast`, `haptic`, `robot_slow`).
+  File names: `audio`, `audio_haptics`, `baseline`, `haptics`
+  (GUI conditions `audio`, `audio_haptic`, `baseline`, `haptic`). The robot fast / slow conditions were removed;
+  the generator still draws their sequences and throws them away, so all other files stay exactly the same.
 * The GUI loads the file of the chosen subject + condition (round N = piece N, first 8 pieces used) and
   sends the marker `Sequence_File_<name>`. Missing file -> fallback `s06_haptics.txt` (`Sequence_File_fallback`).
 * `log_files/Answer_Key_s01-s25.pdf`: every subject and condition with the answers (one page per subject).
@@ -95,7 +97,7 @@ python live_evaluator.py --test s03_audio         # or name it
 python live_evaluator.py --test s03_audio --webcam 0   # normal webcam instead of the XIMEA
 ```
 
-Row 1 starts right away. Say "deliver" (Vosk, same as the GUI) or press D: the row is evaluated and
+Row 1 starts right away. Press D (deliver): the row is evaluated and
 the next one starts. R = redo the row, Q = quit. Log: `logs/evaluator_test_<file>_<time>.csv`.
 Test mode plays feedback on the subject's audio output (Trekz; `--audio-out NAME` for another device,
 `--no-sounds` to turn it off): a random `audios/positive_sound1-3.wav` for a correct row, `buzzer.wav` or
@@ -139,7 +141,9 @@ and sent -> received on the GUI PC):
 | `audio` | `correct_cue_audio` (positive_sound2.wav) | `incorrect_cue_audio` (the mistake sound) |
 | `haptic` | vest `positive_3` (warm swell, back) | vest `negative_2` (sharp staccato, front) |
 | `audio_haptic` | both | both |
-| baseline, training, robot_* | nothing (marker only) | nothing (marker only) |
+| baseline | nothing (marker only) | nothing (marker only) |
+
+In training every block uses the cues of its condition (see Training).
 
 Sounds, their 1 s limit (`CUE_AUDIO_MAX_SECONDS`), vest patterns and positions are set in `config.py`; to change
 a sound, change the file name there (any length, it is cut to 1 s when played). The vest cues go through the
@@ -173,14 +177,32 @@ python live_evaluator.py --subject 3 --condition audio   # started after the GUI
 ```
 
 The camera PC needs this repo (for `log_files/`, `config.py`, `sequences.py`), `pylsl`, and the
-`live_test.py` packages (ultralytics, torch, opencv, XIMEA API); for voice in test mode also `vosk`,
-`sounddevice`, `PyQt5` and the `model/` folder. Allow Python through the Windows firewall on both PCs
+`live_test.py` packages (ultralytics, torch, opencv, XIMEA API). Allow Python through the Windows firewall on both PCs
 (private network) or LSL cannot see the other PC.
+
+## Pre-train and training
+
+Order for a participant: **pre-train** -> **training** -> the four conditions -> **sus**.
+
+* **pre-train** (condition menu): learn the feedback cues, adapted from `pre_study/validating_cues.py`.
+  A cue is played; the participant presses **←** if it means *right* and **→** if it means *wrong*
+  (SPACE plays it again). Three blocks of 40 s: sound, sound + vest, vest (`PRETRAIN_BLOCKS`,
+  `PRETRAIN_BLOCK_SECONDS`). The cues are exactly the ones of the paradigm: vest `positive_3` / `negative_2`
+  and the audio cue mode chosen on the setup screen (voice or tone); nothing to choose as in the pre-study.
+  Saves `logs/pretrain/sXX_pretrain.csv`, one row per cue (block, cue, sound file, vest pattern and side,
+  answer, right or wrong, reaction time, replays). A repeated pre-train overwrites the file; ESC stops early
+  and saves what was answered. Markers `Pretrain_*`.
+* **training**: task slides (radio task, checkpoints, battery sum, delivering with D, how the practice works),
+  then four blocks of `TRAINING_ROUNDS` = 5 rounds, always in the order baseline -> audio -> audio_haptic -> haptic
+  (`TRAINING_CONDITIONS`). Before each block a slide explains its cues; keys **1** / **2** play a sample right /
+  wrong cue. Each block uses the cues of its condition and its own battery tasks. Scoreboard after the last block.
+  Markers `TRAIN_Training_Block_Start|Complete_<i>_<condition>`, `TRAIN_Cue_Slide_Shown_...`, `TRAIN_Cue_Demo_...`.
+* Delivery is always the **D** key; the Vosk speech recognition and its `model/` folder were removed.
 
 ## Questionnaires
 
-* **NASA-TLX after every condition** (baseline, audio, haptic, audio_haptic; not after training,
-  robot_fast or robot_slow): scoreboard -> NASA-TLX -> main menu. Six scales, 21 gradations, raw TLX
+* **NASA-TLX after every condition** (baseline, audio, haptic, audio_haptic; not after training):
+  scoreboard -> NASA-TLX -> main menu. Six scales, 21 gradations, raw TLX
   (no pairwise weighting). Saved as `logs/questionnaires/sXX_<condition>_nasatlx.csv` (scores 0-100 plus
   `raw_tlx`); running the condition again overwrites the file.
 * **`sus` in the condition menu** (once per subject, after all conditions): experience questionnaire with

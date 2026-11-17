@@ -10,12 +10,13 @@ from config import (
     MAX_ROUNDS_PER_CONDITION,
     PROBLEMS_PER_CHECKPOINT,
     RETRIEVAL_SECONDS,
+    TRAINING_CONDITIONS,
     TRAINING_ROUNDS
 )
 from lsl_markers import send_marker
 from robot import start_robot_process
 from state import state
-from texts import t
+from texts import block_name, t
 
 
 class startscreen(QWidget):
@@ -59,7 +60,11 @@ class startscreen(QWidget):
 
     def configure_for_condition(self, cond_name):
         rounds = TRAINING_ROUNDS if cond_name == "training" else MAX_ROUNDS_PER_CONDITION
-        title = t("start_title_training") if cond_name == "training" else t("start_title_cond", c=cond_name.upper())
+        if cond_name == "training":
+            title = t("start_title_block", i=state.training_block + 1, n=len(TRAINING_CONDITIONS),
+                      name=block_name(state.training_condition))
+        else:
+            title = t("start_title_cond", c=cond_name.upper())
         self.message_label.setText(
             f"<b>{title}</b><br><br>"
             + t("start_body", n=PROBLEMS_PER_CHECKPOINT, r=RETRIEVAL_SECONDS,

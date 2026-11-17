@@ -208,7 +208,7 @@ class ParadigmTracker:
                  log_dir=None, mode="live", cue_frames=CUE_STABLE_FRAMES):
         self.clock = clock
         self.send = send
-        self.mode = mode                # "live" (follows the GUI) | "test" (keys / voice)
+        self.mode = mode                # "live" (follows the GUI) | "test" (D key)
         self.subject = subject
         self.condition = condition
         self.stable_frames = stable_frames
@@ -319,7 +319,7 @@ class ParadigmTracker:
             self.round = None
             self.phase, self.phase_deadline = "IDLE", None
 
-    # ---------------- test mode (keys / voice) ----------------
+    # ---------------- test mode (D key) ----------------
     def start_test(self, path):
         self.mode = "test"
         self.subject = "test"
@@ -369,8 +369,16 @@ class ParadigmTracker:
             return
 
         from_marker = answer_from_instruction(target_sum, instruction)
-        row = self.table[(number - 1) % len(self.table)] if self.table else None
-        if row and row["sum"] == target_sum and row["instruction"].lower() == instruction.lower() \
+        if self.answer_file:
+            row = self.table[(number - 1) % len(self.table)] if self.table else None
+        else:
+            # no answer file (training): the table is built from what the GUI shows, one row per round
+            row = next((r for r in self.table if r["piece"] == number), None)
+            if row is not None:
+                row.update(sum=target_sum, instruction=instruction, answer=from_marker or ("?", "?", "?"))
+        if row and not self.answer_file:
+            rec.expected, rec.expected_source = from_marker, "GUI marker"
+        elif row and row["sum"] == target_sum and row["instruction"].lower() == instruction.lower() \
                 and slot_sum(row["answer"]) == target_sum:
             rec.expected, rec.expected_source = row["answer"], f"{self.answer_file} piece {row['piece']}"
         else:

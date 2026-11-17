@@ -7,7 +7,6 @@ sounddevice
 soundfile
 pylsl
 PyQt5
-vosk               # "deliver" voice trigger (voice.py)
 openpyxl           # Excel summary files of the questionnaires
 
 # Tools and pre-study scripts

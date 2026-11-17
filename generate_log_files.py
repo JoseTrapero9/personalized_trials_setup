@@ -32,7 +32,10 @@ COLOR_VALUES = {"Blue": 1, "Red": 2, "Yellow": 3, "Green": 4}
 SLOT_MULTIPLIERS = (1, 2, 3)
 
 # file-name suffix used by the original logs (s06_haptics.txt, s01_audio_haptics.txt, ...)
-CONDITION_FILES = ["audio", "audio_haptics", "baseline", "fast", "haptics", "slow"]
+CONDITION_FILES = ["audio", "audio_haptics", "baseline", "haptics"]
+# The robot "fast" / "slow" conditions were removed. Their sequences are still drawn (and thrown away) so the
+# random generator stays in step and every remaining file is exactly the same as before.
+DRAW_ORDER = ["audio", "audio_haptics", "baseline", "fast", "haptics", "slow"]
 PIECES_PER_FILE = 17
 HEADER = ["piece", "sum", "instruction", "answer"]
 
@@ -77,8 +80,10 @@ def write_files(n_subjects, seed):
     data = {}
     for s in range(1, n_subjects + 1):
         subj = f"s{s:02d}"
-        for cond in CONDITION_FILES:
+        for cond in DRAW_ORDER:
             rows = make_sequence(rng, answers)
+            if cond not in CONDITION_FILES:
+                continue
             data[(subj, cond)] = rows
             path = os.path.join(LOG_DIR, f"{subj}_{cond}.txt")
             with open(path, "w", encoding="utf-8", newline="\n") as f:
@@ -118,7 +123,7 @@ def write_pdf(data, path):
         PageBreak(),
     ]
     subjects = sorted({s for s, _ in data})
-    width = (doc.width - 8 * mm) / 3
+    width = (doc.width - 4 * mm) / 2
     col_w = [8 * mm, 9 * mm, 37 * mm, width - 54 * mm]
     for i, subj in enumerate(subjects):
         page_items = [Paragraph(f"Subject {subj.upper()}", styles["Heading2"])]
@@ -145,9 +150,9 @@ def write_pdf(data, path):
             title = Paragraph(f"<b>{cond.replace('_', ' ').title()}</b> &nbsp;<font size=7 color='#64748B'>"
                               f"{subj}_{cond}.txt</font>", styles["BodyText"])
             blocks.append([title, t])
-        # three tables side by side, two rows of tables: one page per subject
-        grid = [blocks[0:3], blocks[3:6]]
-        g = Table(grid, colWidths=[width + 4 * mm] * 3)
+        # two tables side by side, two rows of tables: one page per subject
+        grid = [blocks[0:2], blocks[2:4]]
+        g = Table(grid, colWidths=[width + 2 * mm] * 2)
         g.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"),
                                ("LEFTPADDING", (0, 0), (-1, -1), 0),
                                ("BOTTOMPADDING", (0, 0), (-1, -1), 4)]))
