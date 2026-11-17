@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QApplication, QMessageBox, QShortcut, QStackedWidget
 from audio import audio_sys
 from config import (
     MAX_ROUNDS_PER_CONDITION,
+    TRAINING_CONDITIONS,
     TRAINING_ROUNDS,
     USE_REMOTE_EVALUATOR,
     get_cue_audio_paths,
@@ -16,11 +17,13 @@ from config import (
     mode_haptic_only,
 )
 from evaluator_link import EvaluatorLink
+from feedback_cues import channels_for, play_feedback
 from haptics import activate_haptic_vest
 from lsl_markers import send_marker
 from questionnaires import QUESTIONNAIRE_CONDITIONS, missing_conditions
 from robot import send_point_to_robot, set_robot_speed
 from screens.dual_task_screen import DualTaskScreen
+from screens.pretrain_screen import PretrainScreen
 from screens.questionnaire_screen import QuestionnaireScreen
 from screens.scoreboard_screen import ArcadeScoreboardScreen
 from screens.setup_screen import setupscreen
@@ -35,10 +38,12 @@ class paradigmcontroller(QWidget):
         super().__init__()
         self.setWindowTitle("Dual-Task Assembly and Collaboration Paradigm")
         self.mistake_on_cooldown = False
+        self._training_tasks = []
 
         self.stacked_widget = QStackedWidget()
-        self.setup_screen = setupscreen(self.setup_finished_callback, self.start_sus_questionnaire)
-        self.tutorial_screen = tutorialscreen(self.tutorial_finished_callback)
+        self.setup_screen = setupscreen(self.setup_finished_callback, self.start_sus_questionnaire,
+                                        self.start_pretrain)
+        self.tutorial_screen = tutorialscreen(self.tutorial_finished_callback, demo_callback=self.play_demo_cue)
         self.start_screen = startscreen(self.start_experiment_tracking)
         self.dual_task_screen = DualTaskScreen(
             round_complete_cb=self.on_handover_complete,
@@ -47,6 +52,7 @@ class paradigmcontroller(QWidget):
         )
         self.scoreboard_screen = ArcadeScoreboardScreen(self.after_scoreboard)
         self.questionnaire_screen = QuestionnaireScreen()
+        self.pretrain_screen = PretrainScreen()
 
         self.stacked_widget.addWidget(self.setup_screen)       # 0
         self.stacked_widget.addWidget(self.tutorial_screen)    # 1
@@ -54,6 +60,7 @@ class paradigmcontroller(QWidget):
         self.stacked_widget.addWidget(self.dual_task_screen)   # 3
         self.stacked_widget.addWidget(self.scoreboard_screen)  # 4
         self.stacked_widget.addWidget(self.questionnaire_screen)  # 5
+        self.stacked_widget.addWidget(self.pretrain_screen)       # 6
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -93,13 +100,16 @@ class paradigmcontroller(QWidget):
         send_marker("Screen_Setup")
 
     def get_current_scenario(self):
+        """Condition whose cues are used: in training, the condition of the current training block."""
         if state.current_condition == "training":
-            return "baseline"
+            return state.training_condition
         return state.current_condition
 
     def setup_finished_callback(self):
         if state.current_condition == "training":
-            state.training_sequence = build_training_sequence()
+            self._training_tasks = build_training_sequence(len(TRAINING_CONDITIONS) * TRAINING_ROUNDS)
+            state.training_block = 0
+            state.training_condition = TRAINING_CONDITIONS[0]
             self.tutorial_screen.reset()
             self.stacked_widget.setCurrentIndex(1)
             self.tutorial_screen.setFocus()
@@ -108,13 +118,35 @@ class paradigmcontroller(QWidget):
             self.stacked_widget.setCurrentIndex(2)
 
     def tutorial_finished_callback(self):
+        """Task tutorial done: first training block."""
+        self.show_training_block(0)
+
+    # ------------------------------------------------------------------ training blocks
+    def show_training_block(self, index):
+        """Cue slide of training block `index`, then its start screen. Blocks: TRAINING_CONDITIONS, in order."""
+        state.training_block = index
+        state.training_condition = TRAINING_CONDITIONS[index]
+        tasks = self._training_tasks
+        start = index * TRAINING_ROUNDS                  # every block gets its own battery tasks
+        state.training_sequence = [tasks[(start + k) % len(tasks)] for k in range(TRAINING_ROUNDS)]
+        self.tutorial_screen.show_cue_slide(state.training_condition, index, len(TRAINING_CONDITIONS),
+                                            finish_cb=self._training_block_ready)
+        self.stacked_widget.setCurrentIndex(1)
+        self.tutorial_screen.setFocus()
+
+    def _training_block_ready(self):
         self.start_screen.configure_for_condition("training")
         self.stacked_widget.setCurrentIndex(2)
 
+    def play_demo_cue(self, condition, is_correct):
+        """Sample cue on a training slide (keys 1 / 2): exactly the cue of that condition."""
+        play_feedback(channels_for(condition), is_correct)
+
     def start_experiment_tracking(self):
         send_marker(f"Condition_Start_{state.current_condition}")
-        if state.current_condition != "training":
-            self.announce_scenario()
+        if state.current_condition == "training":
+            send_marker(f"Training_Block_Start_{state.training_block + 1}_{state.training_condition}")
+        self.announce_scenario()
 
         rounds = TRAINING_ROUNDS if state.current_condition == "training" else MAX_ROUNDS_PER_CONDITION
         self.stacked_widget.setCurrentIndex(3)
@@ -167,19 +199,31 @@ class paradigmcontroller(QWidget):
     def on_condition_complete(self, final_score: int):
         audio_sys.stop_looping_alarm()
         send_marker(f"Condition_Complete_{state.current_condition}_FinalScore_{final_score}")
+        if state.current_condition == "training":
+            send_marker(f"Training_Block_Complete_{state.training_block + 1}_{state.training_condition}"
+                        f"_Score_{final_score}")
+            if state.training_block + 1 < len(TRAINING_CONDITIONS):
+                self.show_training_block(state.training_block + 1)      # next block, scoreboard at the end
+                return
         self.stacked_widget.setCurrentIndex(4)
         self.scoreboard_screen.start_scoreboard(state.current_condition, final_score)
         self.scoreboard_screen.setFocus()
 
     def after_scoreboard(self):
         """Scoreboard closed: NASA-TLX for the condition that just ended, then the main menu."""
-        if state.current_condition not in QUESTIONNAIRE_CONDITIONS:      # training, robot_fast, robot_slow
+        if state.current_condition not in QUESTIONNAIRE_CONDITIONS:      # training
             self.return_to_setup()
             return
         self.stacked_widget.setCurrentIndex(5)
         self.questionnaire_screen.start_nasatlx(
             state.subject_number, state.current_condition, state.language, state.game_mode,
             finish_cb=self.return_to_setup)
+
+    def start_pretrain(self):
+        """'pre-train' chosen in the condition menu: learn the cues, then back to the main menu."""
+        self.stacked_widget.setCurrentIndex(6)
+        self.pretrain_screen.start(state.subject_number, state.language, state.audio_cue_mode,
+                                   finish_cb=self.return_to_setup)
 
     def start_sus_questionnaire(self):
         """'sus' chosen in the condition menu: experience questionnaire for all conditions + summary files."""

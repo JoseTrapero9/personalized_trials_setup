@@ -4,8 +4,6 @@ Pure Python (no Qt, no audio), so it can be edited and checked on its own.
 After editing ANY text here, re-run:   python generate_radio_audio.py --lang all
 
 Rules the text must follow (checked by validate()):
-  * Never use "deliver", "delivery", "ready" (or German "liefer..."): the Vosk listener could
-    hear the radio leaking out of the bone-conduction headphones and trigger a delivery.
   * Filler chatter never mentions colors, buttons, keys or alarm words, so the only colors the
     participant hears are inside real instructions.
 """
@@ -305,7 +303,6 @@ def clips_hash(clips):
     return hashlib.sha1(blob).hexdigest()[:12]
 
 
-_FORBIDDEN = re.compile(r"\b(deliver\w*|delivery|ready|already)\b|liefer\w*", re.IGNORECASE)
 
 
 def validate():
@@ -321,10 +318,6 @@ def validate():
             "announcement": list(ANNOUNCEMENTS[lang].values()),
             "command": [command_text(lang, [("C", c), ("L", c2)]) for c in COLOR_KEYS for c2 in COLOR_KEYS],
         }
-        for name, texts in pools.items():
-            for t in texts:
-                if _FORBIDDEN.search(t):
-                    issues.append(f"[{lang}] {name} uses a voice-trigger word: {t!r}")
         color_words = set()
         for table in (LABELS, COLOR_ADJ, LABEL_SPOKEN):
             color_words |= {w.lower() for w in table[lang].values()}

@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 from audio import audio_sys
 from config import (
     BATTERY_CUE_CONDITIONS,
-    CUE_AUDIO_MAX_SECONDS,
     DELIVERY_WINDOW_SECONDS,
     LOG_TRAINING_CSV,
     MAX_ROUNDS_PER_CONDITION,
@@ -24,11 +23,11 @@ from config import (
     base_dir,
     container1_audio,
     container2_audio,
-    get_cue_audio_paths,
     incorrect_audio
 )
 from game import RadioPanelGame
-from haptics import play_correct_cue, play_incorrect_cue, play_pickup_cue
+from feedback_cues import channels_for, play_feedback
+from haptics import play_pickup_cue
 from lsl_markers import send_marker
 from sequences import load_condition_sequence
 from state import state
@@ -303,7 +302,7 @@ class DualTaskScreen(QWidget):
         self.game_widget.set_pause(False, start_problem_now=True)
         self.phase_timer.start(1000)
 
-    def trigger_voice_deliver(self):
+    def trigger_deliver(self):
         """Called when 'D' is pressed during assembly."""
         if self.phase != "DUAL_ASSEMBLY":
             return
@@ -478,18 +477,12 @@ class DualTaskScreen(QWidget):
         cam_ms: camera frame -> message sent; link_ms: sent -> received here (-1 = unknown)."""
         if round_number != self.current_round or self.phase not in ("DUAL_ASSEMBLY", "DELIVERY_PAUSE"):
             return
-        scenario = self.get_scenario_cb()
-        channels = BATTERY_CUE_CONDITIONS.get(scenario, ())
+        channels = channels_for(self.get_scenario_cb())
+        play_feedback(channels, is_correct, radio=self.game_widget)
         result = "correct" if is_correct else "incorrect"
-        if "haptic" in channels:
-            play_correct_cue() if is_correct else play_incorrect_cue()
-        if "audio" in channels:
-            pos_wav, neg_wav = get_cue_audio_paths(state.audio_cue_mode)
-            audio_sys.play_participant_clip(pos_wav if is_correct else neg_wav,
-                                            CUE_AUDIO_MAX_SECONDS)
         send_marker(
             f"Battery_Cue_Round_{round_number}_Slot_{slot}_{result}"
-            f"_{'+'.join(channels) or 'none'}_{state.audio_cue_mode}"
+            f"_{'+'.join(channels) or 'none'}_{state.audio_cue_mode}_CamMs_{cam_ms}_LinkMs_{link_ms}"
         )
 
     def flush_pending_log(self):
@@ -555,6 +548,6 @@ class DualTaskScreen(QWidget):
         elif event.key() == Qt.Key_Right:
             self.game_widget.press(2)
         elif event.key() == Qt.Key_D:
-            self.trigger_voice_deliver()
+            self.trigger_deliver()
         else:
             super().keyPressEvent(event)

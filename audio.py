@@ -57,7 +57,12 @@ class AudioController:
             if not os.path.exists(filepath):
                 print(f"Cue sound not found: {filepath}")
                 return None
-            data, fs = sf.read(filepath, dtype='float32', always_2d=True)
+            try:
+                data, fs = sf.read(filepath, dtype='float32', always_2d=True)
+            except Exception as e:          # a broken file must not stop the experiment
+                print(f"Cue sound not readable: {filepath} ({e})")
+                self._clips[key] = None
+                return None
             data = data[:int(fs * max_seconds)].copy()
             fade = min(len(data), int(0.03 * fs))
             if fade > 0:

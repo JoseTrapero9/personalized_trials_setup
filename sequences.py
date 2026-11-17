@@ -123,7 +123,8 @@ def slot_sum(order):
     return sum(v * (i + 1) for i, v in enumerate(order))
 
 
-def build_training_sequence(n_tasks=12, seed=None):
+def build_training_sequence(n_tasks=20, seed=None):
+    """Battery tasks for the whole training (all blocks). log_files/training.txt is used if it exists."""
     path = os.path.join(base_dir, "log_files", "training.txt")
     if os.path.exists(path):
         seq = load_synch_sequence(path)

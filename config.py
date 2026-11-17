@@ -30,9 +30,21 @@ DIFFICULTY_PORT = 50001
 # Timing / Dual-Task / Training Configuration
 # ---------------------------------------------------------------------------
 MAX_ROUNDS_PER_CONDITION = 8    # Fixed 8 battery rounds per condition for equal data
-TRAINING_ROUNDS = 3             # Practice rounds in training mode
+TRAINING_ROUNDS = 5             # Practice rounds per training block
+# Training = one short block per condition, always in this order (not randomised). Before every block a slide
+# explains that block's feedback cues.
+TRAINING_CONDITIONS = ["baseline", "audio", "audio_haptic", "haptic"]
+
+# Pre-train ("pre-train" in the condition menu): learn the feedback cues of the experiment before training.
+# A cue is played, the participant presses <- if it meant CORRECT and -> if it meant INCORRECT.
+# Uses exactly the cues of the main paradigm (HAPTIC_* patterns below, audio cue mode of the setup screen).
+PRETRAIN_BLOCKS = ["audio", "audio_haptic", "haptic"]   # one block per cue modality, in this order
+PRETRAIN_BLOCK_SECONDS = 40                             # length of each block (3 x 40 s = 2 min, as the pre-study)
+PRETRAIN_FEEDBACK_MS = 750                              # result shown this long before the next cue
+PRETRAIN_HIT_POINTS = 5
+PRETRAIN_WRONG_PENALTY = 5
 RETRIEVAL_SECONDS = 5           # 5-second safe pause at checkpoint to pick up a piece
-DELIVERY_WINDOW_SECONDS = 5     # 5-second safe pause after pressing "D" (deliver)
+DELIVERY_WINDOW_SECONDS = 5     # 5-second safe pause after pressing "D" (deliver) - the only way to deliver
 TASK_SECONDS_DEFAULT = 25       # Assembly time in baseline / audio / haptic scenarios
 WARNING_SECONDS = 10            # Red timer + blinking warning threshold
 
