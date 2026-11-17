@@ -13,6 +13,7 @@ class SessionState:
         self.audio_cue_mode = "voice"  # "voice" ("input correct"/"input incorrect") | "tone"
         self.language = "en"          # "en" | "es" | "de" (radio + participant screens)
         self.training_sequence = []   # battery tasks of the current training block
+        self.training_sequence_file = ""      # log_files/training_<condition>.txt of the block ("" = generated)
         self.training_block = 0       # index in config.TRAINING_CONDITIONS
         self.training_condition = "baseline"   # condition of the current training block (its cues are used)
         self.controller = None        # the main window (set in main.py)

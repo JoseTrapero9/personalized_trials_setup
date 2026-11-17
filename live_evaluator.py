@@ -419,9 +419,12 @@ class ParadigmTracker:
 
         msg = (f"Round_{rec.number}_{rec.verdict}_Slots_{fmt_slots(slots)}_Sum_{slot_sum(slots)}"
                f"_Expected_{fmt_slots(rec.expected)}_Target_{rec.target_sum}_Trigger_{trigger}")
-        self.send(("Eval_Verdict_" if (self.mode == "live" and SEND_VERDICTS) else "Eval_Result_") + msg)
+        # training (TRAIN_ markers): practice only - battery cues yes, verdict to the GUI no
+        verdict_to_gui = self.mode == "live" and SEND_VERDICTS and not self.training
+        self.send(("Eval_Verdict_" if verdict_to_gui else "Eval_Result_") + msg)
         self._note(f"Round {rec.number}: {rec.verdict.upper()} ({trigger.replace('_', ' ')}) "
-                   f"read {fmt_slots(slots)}, expected {fmt_slots(rec.expected)}")
+                   f"read {fmt_slots(slots)}, expected {fmt_slots(rec.expected)}"
+                   + ("  [training: not sent to the GUI]" if self.training and self.mode == "live" else ""))
         if self.on_verdict is not None:
             self.on_verdict(rec)
 

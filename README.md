@@ -77,6 +77,7 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 * The GUI loads the file of the chosen subject + condition (round N = piece N, first 8 pieces used) and
   sends the marker `Sequence_File_<name>`. Missing file -> fallback `s06_haptics.txt` (`Sequence_File_fallback`).
 * `log_files/Answer_Key_s01-s25.pdf`: every subject and condition with the answers (one page per subject).
+* `log_files/training_<condition>.txt`: the training blocks (see Pre-train and training).
 * `python generate_log_files.py [--subjects 30] [--seed 2026]` rebuilds all files + the PDF (seeded:
   the same seed gives the same files). Needs `reportlab` for the PDF.
 
@@ -196,6 +197,13 @@ Order for a participant: **pre-train** -> **training** -> the four conditions ->
   then four blocks of `TRAINING_ROUNDS` = 5 rounds, always in the order baseline -> audio -> audio_haptic -> haptic
   (`TRAINING_CONDITIONS`). Before each block a slide explains its cues; keys **1** / **2** play a sample right /
   wrong cue. Each block uses the cues of its condition and its own battery tasks. Scoreboard after the last block.
+* **Training log files**: `log_files/training_baseline.txt`, `training_audio.txt`, `training_audio_haptics.txt`,
+  `training_haptics.txt` (5 pieces each, same for every subject, also on the first page of the answer-key PDF).
+  The GUI and the camera PC load the same file, so the camera PC knows the answers and sends the per-battery
+  cues. Training is **not evaluated**: the camera PC sends no verdict (`Eval_Result_...` instead of
+  `Eval_Verdict_...`), the GUI ignores any verdict in training, and nothing is written to the CSV logs.
+  If a file is missing, the GUI falls back to generated tasks (the camera PC then reads the answers from the
+  GUI markers). `generate_log_files.py` rebuilds them without changing the subject files.
   Markers `TRAIN_Training_Block_Start|Complete_<i>_<condition>`, `TRAIN_Cue_Slide_Shown_...`, `TRAIN_Cue_Demo_...`.
 * Delivery is always the **D** key; the Vosk speech recognition and its `model/` folder were removed.
 
