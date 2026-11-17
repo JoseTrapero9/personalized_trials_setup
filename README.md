@@ -118,10 +118,21 @@ Live mode plays no sounds for now.
 * A reading counts when it is stable for `STABLE_FRAMES` frames with no hand at the station. The previous
   round's tray does not count until the station was cleared or the tray changed.
 
-**Per-battery cues (predictive):** as soon as a battery is seen in a slot for `CUE_STABLE_FRAMES` frames
-(default 4, `--cue-frames`), the evaluator sends `Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect_...`.
-A hand at the station does not block this. A battery that is taken out and put in again (same colour or another) gets a new cue every time; a slot only covered by a hand for a moment (under `RECUE_EMPTY_FRAMES` = 12 frames, `--recue-frames`) does not. The GUI answers during the assembly with the cue of the condition
-(marker `Battery_Cue_Round_<r>_Slot_<k>_<result>_<channels>`):
+**Fast loop and model area:** the model runs in its own loop, separate from the window (drawn at 12 fps), and
+only on the area around the station (yellow MODEL AREA box). The station is found on a full frame, which is
+repeated every 2 s; in between only the cut-out is processed, at the same battery size as in training
+(`--roi-scale` changes that, `--no-roi` uses the full frame again). `--exposure` (microseconds) and `--fps`
+override the camera settings of `live_test.py`. The window footer shows the model rate and time per frame.
+
+**Per-battery cues:** a battery in a slot fires its cue on the first frame when the model is at least
+`CUE_FAST_CONFIDENCE` (0.75) sure, otherwise after `CUE_STABLE_FRAMES` frames in a row (default 2, `--cue-frames`).
+The evaluator sends `Eval_Battery_Round_<r>_Slot_<k>_correct|incorrect_..._CamMs_<ms>`.
+A hand at the station does not block this. A battery that is taken out and put in again (same colour or another)
+gets a new cue every time; "taken out" = slot empty for 0.15 s with no hand at the station, or 0.4 s while a hand
+is there (`SLOT_EMPTY_SECONDS`, `RECUE_EMPTY_SECONDS`). The GUI answers during the assembly with the cue of the
+condition; sounds are mixed into the radio stream that is already open, so they start within one audio block
+(marker `Battery_Cue_Round_<r>_Slot_<k>_<result>_<channels>_CamMs_<ms>_LinkMs_<ms>`: camera frame -> message sent,
+and sent -> received on the GUI PC):
 
 | condition | correct battery | wrong battery |
 |---|---|---|

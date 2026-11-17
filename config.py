@@ -105,6 +105,9 @@ def get_cue_audio_paths(audio_cue_mode=None):
 
 HAPTIC_CORRECT_PATTERN = "positive_3"      # warm swell (pre-study)
 HAPTIC_INCORRECT_PATTERN = "negative_2"    # sharp staccato (pre-study)
+HAPTIC_POSITIVE_3_ONSET = 45               # strength of the first pulse of positive_3 (pre-study: 25).
+                                           # Stronger start = the cue is felt sooner. Set 25 for the exact
+                                           # pre-study pattern.
 HAPTIC_CORRECT_POSITION = "VestBack"       # pre-study mapping "correct_back": correct on the back,
 HAPTIC_INCORRECT_POSITION = "VestFront"    # incorrect on the front
 

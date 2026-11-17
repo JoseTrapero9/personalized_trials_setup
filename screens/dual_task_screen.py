@@ -473,8 +473,9 @@ class DualTaskScreen(QWidget):
             return
         self.record_evaluation(is_correct, source="camera")
 
-    def remote_battery_cue(self, round_number: int, slot: int, is_correct: bool):
-        """A battery was seen in a slot (live_evaluator.py): confirm or alert with the condition's cue."""
+    def remote_battery_cue(self, round_number: int, slot: int, is_correct: bool, cam_ms: int = -1, link_ms: int = -1):
+        """A battery was seen in a slot (live_evaluator.py): confirm or alert with the condition's cue.
+        cam_ms: camera frame -> message sent; link_ms: sent -> received here (-1 = unknown)."""
         if round_number != self.current_round or self.phase not in ("DUAL_ASSEMBLY", "DELIVERY_PAUSE"):
             return
         scenario = self.get_scenario_cb()
