@@ -4,15 +4,16 @@ Pure Python (no Qt, no audio), so it can be edited and checked on its own.
 After editing ANY text here, re-run:   python generate_radio_audio.py --lang all
 
 Rules the text must follow (checked by validate()):
-  * Filler chatter never mentions colors, buttons, keys or alarm words, so the only colors the
-    participant hears are inside real instructions.
+  * Filler chatter and incident descriptions intentionally mention the task colors (red, blue,
+    green, yellow, purple) as distractors so the participant must discriminate real button
+    commands from background color mentions.
 """
 
 import hashlib
 import json
 import re
 
-SCRIPT_VERSION = 3
+SCRIPT_VERSION = 4
 
 LANGUAGES = {
     "en": "English",
@@ -116,68 +117,68 @@ def command_text(lang, steps):
 # ---------------------------------------------------------------------------
 FILLER = {
     "en": [
-        "Control room update: all systems normal.",
+        "Control room update: all green status lights are normal.",
         "All four turbines are running smoothly.",
-        "Cooling tower inspection is complete.",
+        "Cooling tower inspection near the blue gate is complete.",
         "Weather outside is calm and clear.",
-        "Energy output is right on target.",
+        "Energy output is right in the green zone.",
         "Cafeteria is open until two o'clock.",
-        "Boiler room sensors show clean data.",
+        "Boiler room sensors show clean data on the yellow display.",
         "Grid demand is steady this afternoon.",
-        "Shift change is at six o'clock.",
+        "Shift change is at six o'clock in the red hall.",
         "Coal yard storage is full.",
-        "Condenser water temperature is normal.",
+        "Condenser water temperature is normal in the blue pipe.",
         "Sector two safety walk is finished.",
-        "Solar field is adding extra power.",
-        "University visitors arrive later today.",
+        "Solar field is adding extra power to the purple grid.",
+        "University visitors in yellow vests arrive later today.",
         "Fuel use is below plan today.",
         "Remember to drink some water.",
-        "Main shaft vibration is low.",
-        "Please park near the main gate.",
+        "Main shaft vibration is low on the red monitor.",
+        "Please park near the purple fence by the main gate.",
         "Steam pressure is holding steady.",
         "Control room out. Enjoy your shift.",
     ],
     "es": [
-        "Sala de control: todo normal.",
+        "Sala de control: todas las luces verdes están normales.",
         "Las cuatro turbinas funcionan bien.",
-        "Inspección de torres terminada.",
+        "Inspección de torres cerca de la puerta azul terminada.",
         "El clima afuera está tranquilo.",
-        "La producción va según lo planeado.",
+        "La producción sigue en la zona verde.",
         "El comedor cierra a las dos.",
-        "Sensores de calderas sin novedades.",
+        "Sensores de calderas sin novedades en la pantalla amarilla.",
         "La demanda de la red está estable.",
-        "El cambio de turno es a las seis.",
+        "El cambio de turno es a las seis en la sala roja.",
         "El almacén de carbón está lleno.",
-        "Temperatura del condensador normal.",
+        "Temperatura del condensador normal en la tubería azul.",
         "Recorrido de seguridad terminado.",
-        "El campo solar aporta energía extra.",
-        "Hoy vienen visitantes de la universidad.",
+        "El campo solar aporta energía extra a la red morada.",
+        "Hoy vienen visitantes de la universidad con chaleco amarillo.",
         "El consumo de combustible es bajo.",
         "Recuerden tomar un poco de agua.",
-        "Vibración del eje baja y estable.",
-        "Estaciónense cerca de la entrada.",
+        "Vibración del eje baja en el monitor rojo.",
+        "Estaciónense cerca de la cerca morada junto a la entrada.",
         "La presión de vapor se mantiene bien.",
         "Eso es todo. Buen turno a todos.",
     ],
     "de": [
-        "Leitwarte hier: alles im Normalbereich.",
+        "Leitwarte hier: alle grünen Statuslichter sind normal.",
         "Alle vier Turbinen laufen rund.",
-        "Kühlturm-Inspektion ist abgeschlossen.",
+        "Kühlturm-Inspektion am blauen Tor ist abgeschlossen.",
         "Draußen ist das Wetter ruhig.",
-        "Die Leistung liegt genau im Plan.",
+        "Die Leistung liegt genau im grünen Bereich.",
         "Die Kantine hat bis vierzehn Uhr offen.",
-        "Kesselhaus-Sensoren melden saubere Daten.",
+        "Kesselhaus-Sensoren zeigen saubere Daten auf dem gelben Display.",
         "Die Netzlast ist heute stabil.",
-        "Schichtwechsel ist um achtzehn Uhr.",
+        "Schichtwechsel ist um achtzehn Uhr in der roten Halle.",
         "Das Kohlelager ist voll.",
-        "Wassertemperatur im Kondensator normal.",
+        "Wassertemperatur im Kondensator der blauen Leitung normal.",
         "Sicherheitsrundgang in Sektor zwei beendet.",
-        "Das Solarfeld erzeugt Zusatzstrom.",
-        "Später kommt eine Besuchergruppe.",
+        "Das Solarfeld liefert Zusatzstrom für das violette Netz.",
+        "Später kommt eine Besuchergruppe in gelben Westen.",
         "Der Brennstoffverbrauch ist niedrig.",
         "Denkt daran, etwas Wasser zu trinken.",
-        "Vibrationen an der Hauptwelle sind gering.",
-        "Bitte nahe am Haupttor parken.",
+        "Vibrationen an der Hauptwelle sind auf dem roten Monitor gering.",
+        "Bitte nahe am violetten Zaun beim Haupttor parken.",
         "Der Dampfdruck bleibt stabil.",
         "Leitwarte Ende. Gute Schicht.",
     ],
@@ -189,34 +190,34 @@ FILLER = {
 # ---------------------------------------------------------------------------
 INCIDENTS = {
     "en": [
-        ("Alert, problem in the turbine hall!", "There is a short circuit on the line.", "Isolate the fault now."),
-        ("Attention, boiler two pressure is rising!", "The relief valve is stuck.", "Watch the main gauge."),
-        ("Warning, the main cooling pump stopped!", "Water flow is dropping fast.", "Backup flow is starting."),
-        ("Alert, transformer three is overloaded!", "The coils are heating up.", "Shed the extra load now."),
-        ("Warning, steam leak in the north pipe!", "Pressure is falling in that sector.", "Seal that section now."),
-        ("Attention, the coal conveyor is jammed!", "The drive motor is straining.", "Clear the belt quickly."),
-        ("Alert, voltage is dropping on line four!", "The feeder is unstable.", "Balance the network now."),
-        ("Warning, the main generator is overheating!", "Exhaust temperature is high.", "Cool the unit down fast."),
+        ("Alert, problem in the red turbine hall!", "There is a short circuit on the line.", "Isolate the fault now."),
+        ("Attention, boiler two pressure is rising!", "The yellow relief valve is stuck.", "Watch the main gauge."),
+        ("Warning, the blue cooling pump stopped!", "Water flow is dropping fast.", "Backup flow is starting."),
+        ("Alert, transformer three is overloaded!", "The purple coils are heating up.", "Shed the extra load now."),
+        ("Warning, steam leak in the green north pipe!", "Pressure is falling in that sector.", "Seal that section now."),
+        ("Attention, the coal conveyor is jammed!", "The red drive motor is straining.", "Clear the belt quickly."),
+        ("Alert, voltage is dropping on the blue line!", "The feeder is unstable.", "Balance the network now."),
+        ("Warning, the main generator is overheating!", "The green exhaust sensor is high.", "Cool the unit down fast."),
     ],
     "es": [
-        ("¡Alerta, problema en las turbinas!", "Hay un cortocircuito en la línea.", "Aísla la falla ahora."),
-        ("¡Atención, sube la presión en caldera dos!", "La válvula de alivio se trabó.", "Vigila el medidor."),
-        ("¡Cuidado, se detuvo la bomba de enfriamiento!", "El flujo de agua cae rápido.", "Ya entra el respaldo."),
-        ("¡Alerta, sobrecarga en el transformador tres!", "Las bobinas se calientan.", "Baja la carga ahora."),
-        ("¡Cuidado, fuga de vapor en tubería norte!", "Cae la presión en ese sector.", "Cierra esa sección ya."),
-        ("¡Atención, se atoró la banda de carbón!", "El motor principal se esfuerza.", "Libera la banda rápido."),
-        ("¡Alerta, cae el voltaje en la línea cuatro!", "El alimentador está inestable.", "Equilibra la red ya."),
-        ("¡Cuidado, el generador se sobrecalienta!", "La temperatura de escape es alta.", "Enfría la unidad rápido."),
+        ("¡Alerta, problema en la sala roja de turbinas!", "Hay un cortocircuito en la línea.", "Aísla la falla ahora."),
+        ("¡Atención, sube la presión en caldera dos!", "La válvula amarilla de alivio se trabó.", "Vigila el medidor."),
+        ("¡Cuidado, se detuvo la bomba azul de enfriamiento!", "El flujo de agua cae rápido.", "Ya entra el respaldo."),
+        ("¡Alerta, sobrecarga en el transformador tres!", "Las bobinas moradas se calientan.", "Baja la carga ahora."),
+        ("¡Cuidado, fuga de vapor en la tubería verde!", "Cae la presión en ese sector.", "Cierra esa sección ya."),
+        ("¡Atención, se atoró la banda de carbón!", "El motor rojo se esfuerza.", "Libera la banda rápido."),
+        ("¡Alerta, cae el voltaje en la línea azul!", "El alimentador está inestable.", "Equilibra la red ya."),
+        ("¡Cuidado, el generador se sobrecalienta!", "El sensor verde de escape marca alto.", "Enfría la unidad rápido."),
     ],
     "de": [
-        ("Alarm, Problem in der Turbinenhalle!", "Kurzschluss auf der Leitung.", "Isoliere sofort den Fehler."),
-        ("Achtung, Druckanstieg in Kessel zwei!", "Das Sicherheitsventil klemmt.", "Prüfe die Hauptanzeige."),
-        ("Warnung, die Hauptkühlpumpe steht!", "Der Wasserfluss fällt schnell.", "Der Ersatzlauf startet."),
-        ("Alarm, Trafo drei ist überlastet!", "Die Spulen werden heiß.", "Senke sofort die Last."),
-        ("Warnung, Dampfleck in der Nordleitung!", "Der Druck im Sektor fällt.", "Sperre den Abschnitt ab."),
-        ("Achtung, das Kohleband klemmt!", "Der Antriebsmotor ist überlastet.", "Mach das Band schnell frei."),
-        ("Alarm, Spannungsabfall auf Leitung vier!", "Die Einspeisung schwankt stark.", "Stabilisiere das Netz."),
-        ("Warnung, der Generator überhitzt!", "Die Abgastemperatur ist zu hoch.", "Kühle die Einheit schnell."),
+        ("Alarm, Problem in der roten Turbinenhalle!", "Kurzschluss auf der Leitung.", "Isoliere sofort den Fehler."),
+        ("Achtung, Druckanstieg in Kessel zwei!", "Das gelbe Sicherheitsventil klemmt.", "Prüfe die Hauptanzeige."),
+        ("Warnung, die blaue Kühlpumpe steht!", "Der Wasserfluss fällt schnell.", "Der Ersatzlauf startet."),
+        ("Alarm, Trafo drei ist überlastet!", "Die violetten Spulen werden heiß.", "Senke sofort die Last."),
+        ("Warnung, Dampfleck in der grünen Nordleitung!", "Der Druck im Sektor fällt.", "Sperre den Abschnitt ab."),
+        ("Achtung, das Kohleband klemmt!", "Der rote Antriebsmotor ist überlastet.", "Mach das Band schnell frei."),
+        ("Alarm, Spannungsabfall auf der blauen Leitung!", "Die Einspeisung schwankt stark.", "Stabilisiere das Netz."),
+        ("Warnung, der Generator überhitzt!", "Der grüne Abgassensor ist zu hoch.", "Kühle die Einheit schnell."),
     ],
 }
 
@@ -308,22 +309,18 @@ def clips_hash(clips):
 def validate():
     """Return a list of problems with the script (empty list = OK)."""
     issues = []
+    # Inflected color stems per language so we can verify all 5 distractor colors appear.
+    color_stems = {
+        "en": {"red": "red", "blue": "blue", "green": "green", "yellow": "yellow", "purple": "purple"},
+        "es": {"red": "roj", "blue": "azul", "green": "verd", "yellow": "amarill", "purple": "morad"},
+        "de": {"red": "rot", "blue": "blau", "green": "grün", "yellow": "gelb", "purple": "violett"},
+    }
     for lang in LANGUAGES:
         incident_texts = [part for pair in INCIDENTS[lang]
                           for part in (pair if isinstance(pair, (tuple, list)) else (pair,))]
-        pools = {
-            "filler": FILLER[lang],
-            "incident": incident_texts,
-            "feedback": [t for v in FEEDBACK[lang].values() for t in v],
-            "announcement": list(ANNOUNCEMENTS[lang].values()),
-            "command": [command_text(lang, [("C", c), ("L", c2)]) for c in COLOR_KEYS for c2 in COLOR_KEYS],
-        }
-        color_words = set()
-        for table in (LABELS, COLOR_ADJ, LABEL_SPOKEN):
-            color_words |= {w.lower() for w in table[lang].values()}
-        for t in FILLER[lang] + incident_texts:
-            words = set(re.findall(r"\w+", t.lower()))
-            hit = words & color_words
-            if hit:
-                issues.append(f"[{lang}] color word {sorted(hit)} outside an instruction: {t!r}")
+        for pool_name, texts in (("filler", FILLER[lang]), ("incident", incident_texts)):
+            joined_words = re.findall(r"\w+", " ".join(texts).lower())
+            for color_key, stem in color_stems[lang].items():
+                if not any(w.startswith(stem) for w in joined_words):
+                    issues.append(f"[{lang}] {pool_name} missing distractor color {color_key!r}")
     return issues
