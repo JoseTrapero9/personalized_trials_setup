@@ -7,17 +7,14 @@ Only records video: no model, no detection. Settings come from old_code/3CAM_Str
     python ximea_recorder.py --out D:\\videos
 
 Synchronisation (LSL)
-  * Stream "ximeasync_mq013" (2 channels, int32): one sample per camera frame, stamped with the LSL clock
-    at the moment the frame arrived from the camera:
-        [video_frame, camera_nframe]
-    video_frame = index of the frame inside the open video file (0, 1, 2 ...), -1 when not recording.
-    LabRecorder records it together with the GUI markers; LSL corrects the clock offset between the PCs.
-  * Stream "ximeasync_mq013_markers" (strings): Recording_Start_<file>, Recording_Stop_<file>_Frames_<n>,
-    Camera_Lost / Camera_Restored.
-  * Next to every video: <video>_frames.csv with video_frame, lsl_time, camera_nframe, camera_time_s
-    (the same timestamps, so a video frame can be matched to the markers even without the XDF file).
-  Every captured frame is written exactly once (no frames duplicated or dropped to fake a constant rate),
-  so row N of the CSV is frame N of the video. Frames the PC could not save fast enough are counted.
+  * One marker stream "ximeasync_mq013" (strings), recorded by LabRecorder with the GUI markers; LSL corrects
+    the clock offset between the PCs:
+        Recording_Start_<file>                      stamped with the capture time of the first video frame
+        Recording_Stop_<file>_Frames_<n>_Seconds_<s>   stamped with the end of the last video frame
+  * The video keeps real time: frame N was captured at  start + N / 30 s.  If the camera skips a frame (or the
+    PC cannot keep up) the previous frame is repeated; a frame that arrives early is dropped. So the two
+    markers are enough to place every frame on the LSL time line.
+  * Only if the camera drops out: Camera_Lost / Camera_Restored (the video shows the last frame meanwhile).
 
 Recording control
   * Automatic (default): follows the GUI over LSL ("ParadigmMarkers"). Starts at Condition_Start_<condition>
@@ -26,12 +23,10 @@ Recording control
   * R starts / stops a manual recording at any time. Q / Esc stops cleanly and quits.
 
 Camera: runs in its own process; if no frame arrives for 3 s (XIMEA error 10, USB problem) that process is
-restarted and the camera reopened. A recording keeps going in the same file; the gap is visible in the CSV
-and as Camera_Lost / Camera_Restored markers.
+restarted and the camera reopened. A recording keeps going in the same file (still in real time).
 """
 
 import argparse
-import csv
 import os
 import queue
 import re
@@ -60,7 +55,7 @@ FPS = 30.0                           # hardware frame rate (acq_timing_mode = FR
 XIMEA_API_PATH = r"C:\XIMEA\API\Python\v3"
 RECORDINGS_DIR = os.path.join(BASE_DIR, "recordings")
 VIDEO_FOURCC, VIDEO_EXT = "mp4v", ".mp4"
-WRITE_QUEUE_FRAMES = 90              # frames waiting to be written (3 s); beyond that frames are counted as lost
+WRITE_QUEUE_FRAMES = 90              # frames waiting to be written (3 s); beyond that they are replaced by repeats
 GUI_MARKER_STREAM = "ParadigmMarkers"
 TRAINING_PREFIX = "TRAIN_"
 FRAME_TIMEOUT_MS = 1000
@@ -287,68 +282,75 @@ class CameraSource:
 
 
 # ---------------------------------------------------------------------------
-# Video file + per-frame CSV
+# Video file (kept in real time)
 # ---------------------------------------------------------------------------
 class Recording:
-    """One video file. add() is called for every camera frame and returns the frame's index in the file
-    (or -1 if it could not be queued); a writer thread encodes the video and writes the CSV."""
+    """One video file at a constant FPS that follows the capture times: frame N = first frame + N / FPS.
+    add() is called for every camera frame; a writer thread encodes."""
 
     def __init__(self, path, fps):
         self.path, self.fps = path, fps
-        self.csv_path = os.path.splitext(path)[0] + "_frames.csv"
         self.q = queue.Queue(maxsize=WRITE_QUEUE_FRAMES)
-        self.next_index = 0
-        self.written = 0
-        self.lost = 0
+        self.t0 = None              # LSL time of the first frame (= video time 0)
+        self.written = 0            # frames in the file
+        self.repeated = 0           # frames repeated to fill a gap (camera skipped / PC too slow)
+        self.dropped = 0            # early frames left out to stay in real time
         self.error = ""
         self.started = time.time()
         self.thread = threading.Thread(target=self._writer, daemon=True)
         self.thread.start()
 
-    def add(self, frame, lsl_time, nframe, cam_ts):
+    def add(self, frame, lsl_time):
+        """Queue a frame. Returns True for the first frame of the file (its time is the start marker)."""
+        first = self.t0 is None
+        if first:
+            self.t0 = lsl_time
         try:
-            self.q.put_nowait((frame, self.next_index, lsl_time, nframe, cam_ts))
+            self.q.put_nowait((frame, lsl_time))
         except queue.Full:
-            self.lost += 1
-            return -1
-        self.next_index += 1
-        return self.next_index - 1
+            pass                    # the writer fills the hole with repeats, the video stays in real time
+        return first
+
+    @property
+    def end_time(self):
+        return None if self.t0 is None else self.t0 + self.written / self.fps
 
     def _writer(self):
         import cv2
-        out, f, w = None, None, None
+        out, last = None, None
         try:
-            f = open(self.csv_path, "w", newline="", encoding="utf-8")
-            w = csv.writer(f)
-            w.writerow(["video_frame", "lsl_time", "camera_nframe", "camera_time_s"])
             while True:
                 item = self.q.get()
                 if item is None:
                     break
-                frame, index, lsl_time, nframe, cam_ts = item
+                frame, t = item
                 if out is None:
-                    h, wd = frame.shape[:2]
-                    out = cv2.VideoWriter(self.path, cv2.VideoWriter_fourcc(*VIDEO_FOURCC), self.fps, (wd, h),
+                    h, w = frame.shape[:2]
+                    out = cv2.VideoWriter(self.path, cv2.VideoWriter_fourcc(*VIDEO_FOURCC), self.fps, (w, h),
                                           frame.ndim == 3)
                     if not out.isOpened():
                         raise RuntimeError(f"cannot open the video file {self.path}")
+                target = int(round((t - self.t0) * self.fps))       # slot of this frame on the time line
+                if target < self.written:
+                    self.dropped += 1                                # early / extra frame
+                    continue
+                while self.written < target and last is not None:    # gap: repeat the previous frame
+                    out.write(last)
+                    self.written += 1
+                    self.repeated += 1
                 out.write(frame)
-                w.writerow([index, f"{lsl_time:.6f}", nframe, f"{cam_ts:.6f}"])
                 self.written += 1
-                if self.written % 30 == 0:
-                    f.flush()
+                last = frame
         except Exception as e:
             self.error = str(e)
             print(f"[REC] ERROR while writing {self.path}: {e}")
         finally:
             if out is not None:
                 out.release()
-            if f is not None:
-                f.close()
 
     def close(self):
         self.q.put(None)
-        self.thread.join(30.0)
+        self.thread.join(60.0)
 
 
 # ---------------------------------------------------------------------------
@@ -394,25 +396,21 @@ class Recorder:
         import pylsl
         self.preset, self.out_dir, self.auto = preset, out_dir, auto
         os.makedirs(out_dir, exist_ok=True)
-        # irregular rate (0): XDF readers then keep the exact capture timestamps instead of smoothing them
-        info = pylsl.StreamInfo(preset["lsl_stream_name"], "VideoFrames", 2, 0, "int32", preset["lsl_source_id"])
-        chans = info.desc().append_child("channels")
-        for label in ("video_frame", "camera_nframe"):
-            chans.append_child("channel").append_child_value("label", label)
+        info = pylsl.StreamInfo(preset["lsl_stream_name"], "Markers", 1, 0, "string", preset["lsl_source_id"])
         info.desc().append_child_value("camera", preset["name_match"])
-        self.frame_outlet = pylsl.StreamOutlet(info)
-        minfo = pylsl.StreamInfo(preset["lsl_stream_name"] + "_markers", "Markers", 1, 0, "string",
-                                 preset["lsl_source_id"] + "_markers")
-        self.marker_outlet = pylsl.StreamOutlet(minfo)
+        info.desc().append_child_value("video_fps", str(FPS))
+        self.outlet = pylsl.StreamOutlet(info)
         self.clock = clock or pylsl.local_clock
         self.rec = None
         self.subject, self.condition = None, None
-        self.frames_seen = 0
         self.fps_now, self._fps_count, self._fps_t = 0.0, 0, time.monotonic()
         self.last_file = ""
 
-    def marker(self, text):
-        self.marker_outlet.push_sample([text])
+    def marker(self, text, timestamp=None):
+        if timestamp is None:
+            self.outlet.push_sample([text])
+        else:
+            self.outlet.push_sample([text], timestamp)
         print(f"[MARK] {text}")
 
     # ---------------- recordings
@@ -422,7 +420,7 @@ class Recorder:
         name = f"{label}_{self.preset['id']}_{stamp}{VIDEO_EXT}"
         self.rec = Recording(os.path.join(self.out_dir, name), FPS)
         self.last_file = name
-        self.marker(f"Recording_Start_{name}")
+        print(f"[REC] waiting for the first frame -> {name}")
 
     def stop(self):
         rec, self.rec = self.rec, None
@@ -430,15 +428,19 @@ class Recorder:
             return
         rec.close()
         name = os.path.basename(rec.path)
-        self.marker(f"Recording_Stop_{name}_Frames_{rec.written}_Lost_{rec.lost}")
-        if rec.lost:
-            print(f"[REC] {rec.lost} frame(s) could not be saved fast enough (disk / CPU too slow?)")
+        if rec.t0 is None:                                  # no frame arrived at all
+            self.marker(f"Recording_Failed_No_Frames_{name}")
+            return
+        seconds = rec.written / rec.fps
+        self.marker(f"Recording_Stop_{name}_Frames_{rec.written}_Seconds_{seconds:.2f}", rec.end_time)
+        if rec.repeated or rec.dropped:
+            print(f"[REC] {name}: {rec.repeated} frame(s) repeated to fill gaps, {rec.dropped} early frame(s) left out")
 
     # ---------------- input
-    def on_frame(self, frame, lsl_time, nframe, cam_ts):
-        index = self.rec.add(frame, lsl_time, nframe, cam_ts) if self.rec is not None else -1
-        self.frame_outlet.push_sample([index, nframe], lsl_time)       # stamped with the capture time
-        self.frames_seen += 1
+    def on_frame(self, frame, lsl_time, nframe=None, cam_ts=None):
+        if self.rec is not None and self.rec.add(frame, lsl_time):
+            # first frame of the file: its capture time is the start of the video
+            self.marker(f"Recording_Start_{os.path.basename(self.rec.path)}", lsl_time)
         self._fps_count += 1
         now = time.monotonic()
         if now - self._fps_t >= 1.0:
@@ -469,7 +471,7 @@ class Recorder:
                  f"{'auto (follows the GUI)' if self.auto else 'manual'}"]
         if rec is not None:
             lines.append(f"REC  {os.path.basename(rec.path)}   {rec.written} frames   "
-                         f"{time.time() - rec.started:5.0f} s" + (f"   LOST {rec.lost}" if rec.lost else "")
+                         f"{time.time() - rec.started:5.0f} s" + (f"   repeated {rec.repeated}" if rec.repeated else "")
                          + (f"   ERROR {rec.error}" if rec.error else ""))
         else:
             lines.append("not recording" + (f"   (last: {self.last_file})" if self.last_file else ""))

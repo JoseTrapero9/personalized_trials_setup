@@ -234,13 +234,14 @@ python ximea_recorder.py --manual     # only R starts / stops
 python ximea_recorder.py --out D:\videos
 ```
 
-* Videos: `recordings/sXX_<condition>_mq013_<date_time>.mp4` + `..._frames.csv` (video frame, LSL time, camera
-  frame number, camera time). Every captured frame is written once, so CSV row N = video frame N.
-* LSL: `ximeasync_mq013` sends one sample per camera frame `[video_frame (-1 = not recording), camera_nframe]`,
-  stamped with the capture time; `ximeasync_mq013_markers` sends Recording_Start / Stop, Camera_Lost / Restored.
-  Add both streams in LabRecorder: LSL corrects the clock offset between the PCs.
+* Videos: `recordings/sXX_<condition>_mq013_<date_time>.mp4`.
+* LSL: one marker stream `ximeasync_mq013` with `Recording_Start_<file>` (stamped with the capture time of the first
+  frame) and `Recording_Stop_<file>_Frames_<n>_Seconds_<s>` (end of the last frame). Add it in LabRecorder: LSL
+  corrects the clock offset between the PCs. The video keeps real time (a skipped frame is filled with the previous
+  one, an early one is left out), so frame N was captured at start + N / 30 s. `Camera_Lost` / `Camera_Restored`
+  only appear if the camera drops out.
 * The camera runs in its own process and is restarted after 3 s without frames; the recording continues in the
-  same file (the gap is visible in the CSV).
+  same file, still in real time.
 * The third PC needs this repo, the XIMEA API (`C:\XIMEA\API\Python\v3`), `pylsl`, `opencv-python`, `numpy`,
   the same network as the GUI PC and Python allowed through the firewall.
 * `old_code/cam_probe.py` has other MQ013 values (exposure 31000, wb_kb 1.90); change `CAMERA_PRESETS` at the top
