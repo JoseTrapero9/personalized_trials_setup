@@ -127,11 +127,14 @@ Live mode plays no sounds for now.
   only inside a tray whose centre is on the station; batteries dropped around it, trays elsewhere and
   hands away from the station are ignored. The station position is remembered while the tray covers it.
   Without a `Station` detection the whole image is used (shown as STATION NOT FOUND).
-* The round is evaluated when the tray leaves the station: no tray on it and no hand at it for 10 frames in
-  a row (`--tray-gone`). Not when the third battery is placed, not when the clock runs out and not at
-  "deliver"; batteries can still be changed until the tray is taken away. Safety net in live mode: if the
-  camera never saw the tray leave, the handover ends the round. In test mode "deliver" / D still closes
-  an open row.
+* The round is evaluated when the tray leaves the station: the tray is seen **off** the station (carried away)
+  for 0.4 s (`TRAY_MOVED_SECONDS`), or no tray is seen at all, with no hand at the station, for 1.5 s
+  (`--tray-gone`, `TRAY_GONE_SECONDS`). An arm passing over the tray hides it for less than that, so it no longer
+  ends the round. Not when the third battery is placed, not when the clock runs out and not at "deliver";
+  batteries can still be changed until the tray is taken away. Safety net in live mode: if the camera never saw
+  the tray leave, the handover ends the round. In test mode "deliver" / D still closes an open row.
+* The verdict uses the battery each slot had at its latest per-battery cue (these stay up to date while a hand is
+  at the station), and the last whole-tray reading only for slots without a cue.
 * Correct only if all 3 slots match the log file; a slot not seen counts as wrong
   (fewer than 3 batteries in view = mistake).
 * A reading counts when it is stable for `STABLE_FRAMES` frames with no hand at the station. The previous

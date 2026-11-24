@@ -36,8 +36,9 @@ How a row / round is evaluated (both modes)
     whose centre is on the station. Batteries lying around (dropped on the table / floor), trays
     elsewhere and hands away from the station are ignored. The station box is remembered, so it
     still works while the tray covers the station.
-  * The round is evaluated when the TRAY LEAVES THE STATION: no tray on it (and no hand at it) for
-    TRAY_GONE_FRAMES frames in a row. Not when the third battery is placed, not when the clock runs
+  * The round is evaluated when the TRAY LEAVES THE STATION: either the tray is seen OFF the station
+    (being carried away) for TRAY_MOVED_SECONDS, or no tray is seen at all (and no hand at the station) for
+    TRAY_GONE_SECONDS. A short occlusion (an arm over the tray) is not enough. Not when the third battery is placed, not when the clock runs
     out and not at "deliver": the participant can still change batteries until the tray is taken away.
     Safety net (live mode): if the camera never saw the tray leave, the handover ends the round.
     Test mode: "deliver" / D still closes a row that is open, so you can move on.
@@ -101,8 +102,11 @@ ROI_SCALE = 1.0                            # >1 = more detail in the model area 
 USE_HALF_PRECISION = True                  # half precision on the GPU
 DISPLAY_FPS = 12                           # the window is drawn this often; the model runs as fast as it can
 
-TRAY_GONE_FRAMES = 10                      # tray off the station (no hand at it) this many frames -> evaluate
-TRAY_GONE_MIN_SECONDS = 0.25               # ... and at least this long (the model now runs faster than 30 fps)
+# Tray left the station -> the round is evaluated. Positive evidence is quick, mere absence must last:
+TRAY_MOVED_SECONDS = 0.4                   # the tray is SEEN off the station (carried away) this long
+TRAY_GONE_SECONDS = 1.5                    # no tray seen anywhere and no hand at the station this long
+                                           # (an arm passing over the tray hides it for less than this)
+TRAY_GONE_FRAMES = 10                      # ... and at least this many frames in a row (guards a slow camera)
 STATION_CLEAR_SECONDS = 0.3                # no tray on the station this long = cleared (arms "tray left")
 STATION_LABEL = "station"                  # YOLO class of the assembly station (case-insensitive)
 STATION_MARGIN = 0.10                      # tray centre may be this fraction of the station size outside it
@@ -229,6 +233,7 @@ class ParadigmTracker:
         self._candidate_count = 0
         self._absent_since = None
         self._absent_frames = 0
+        self._moved_since = None        # tray seen off the station since
         self.live_slots = None
         self.hand = False
         self.tray = False
@@ -397,6 +402,13 @@ class ParadigmTracker:
         rec.row = self.table.index(row)
         self._note(f"Round {number}: sum {target_sum}, {instruction} -> {fmt_slots(rec.expected)}")
 
+    @staticmethod
+    def _final_slots(rec):
+        """What is in each slot at the end: the battery of the latest per-battery cue (kept up to date while a
+        hand is at the station), else the last whole-tray reading. A slot seen empty for a while is empty."""
+        stable = tuple(rec.stable_slots) if rec.stable_slots else EMPTY
+        return tuple(cued if cued is not None else seen for cued, seen in zip(rec.slot_cued, stable))
+
     def evaluate(self, trigger, ts=None):
         """Final verdict of the active round. Slots not seen count as wrong."""
         ts = self.clock() if ts is None else ts
@@ -409,7 +421,7 @@ class ParadigmTracker:
             rec.verdict = "none"
             self.send(f"Eval_NoVerdict_Round_{rec.number}_no_expected_answer")
             return
-        slots = tuple(rec.stable_slots) if rec.stable_slots else EMPTY
+        slots = self._final_slots(rec)
         marks = [s is not None and s == e for s, e in zip(slots, rec.expected)]
         rec.final_slots = slots
         rec.verdict = "correct" if all(marks) else "incorrect"
@@ -429,7 +441,8 @@ class ParadigmTracker:
             self.on_verdict(rec)
 
     # ---------------- tray readings ----------------
-    def update_reading(self, slots, hand, tray_seen, ts=None, detail="", confs=None, frame_time=None):
+    def update_reading(self, slots, hand, tray_seen, ts=None, detail="", confs=None, frame_time=None,
+                       tray_elsewhere=False):
         """slots: tray on the station; hand: hand at the station; tray_seen: a tray is ON the station.
         confs: model confidence per slot (None = unknown); frame_time: time.monotonic() of the camera frame."""
         ts = self.clock() if ts is None else ts
@@ -441,7 +454,7 @@ class ParadigmTracker:
             # the whole-tray reading used for the final verdict still waits for the hand to leave
             # (a hand covering batteries must not turn a correct tray into a mistake)
             self._candidate, self._candidate_count, self._absent_since = None, 0, None
-            self._absent_frames = 0
+            self._absent_frames, self._moved_since = 0, None
             return
         if not tray_seen:
             self._candidate, self._candidate_count = None, 0
@@ -449,10 +462,15 @@ class ParadigmTracker:
             if self._absent_since is None:
                 self._absent_since = ts
             self._absent_frames += 1
+            if tray_elsewhere:
+                if self._moved_since is None:
+                    self._moved_since = ts
+            else:
+                self._moved_since = None
             self._check_station(ts)
             return
         self._absent_since = None
-        self._absent_frames = 0
+        self._absent_frames, self._moved_since = 0, None
         slots = tuple(slots)
         self.live_slots = slots
         if slots == self._candidate:
@@ -507,7 +525,11 @@ class ParadigmTracker:
         gone = ts - self._absent_since
         if not rec.armed and gone >= STATION_CLEAR_SECONDS:
             rec.armed = True
-        if rec.armed and rec.tray_seen and self._absent_frames >= TRAY_GONE_FRAMES and gone >= TRAY_GONE_MIN_SECONDS:
+        if not (rec.armed and rec.tray_seen):
+            return
+        moved = self._moved_since is not None and ts - self._moved_since >= TRAY_MOVED_SECONDS
+        vanished = gone >= TRAY_GONE_SECONDS and self._absent_frames >= TRAY_GONE_FRAMES
+        if moved or vanished:
             self.evaluate("tray_left", ts)
 
     def _on_stable(self, slots, ts):
@@ -1240,7 +1262,8 @@ class Pipeline(threading.Thread):
                 r = out["reading"]
                 with self.lock:
                     self.tracker.update_reading(r["slots"], r["hand"], r["tray_on_station"], detail=camera_detail(r),
-                                                confs=r["confs"], frame_time=out["frame_time"])
+                                                confs=r["confs"], frame_time=out["frame_time"],
+                                                tray_elsewhere=r["tray_elsewhere"])
                 self.latest = out
                 self.model_ms = 0.9 * self.model_ms + 0.1 * out["model_ms"] if self.model_ms else out["model_ms"]
                 count += 1
@@ -1574,36 +1597,25 @@ def run_test(args):
             if name:
                 tracker._note(f"Row {rec.number}: played {name}")
         tracker.on_verdict = feedback
-    camera = CameraModel(args.webcam)
-    cv2.namedWindow("Battery evaluator - TEST", cv2.WINDOW_NORMAL)
-    image = None
+    camera = make_camera(args)
+    lock = threading.RLock()
+
+    def on_key(key):
+        if key in (ord("d"), ord("D")):
+            tracker.deliver()
+        elif key in (ord("r"), ord("R")):
+            tracker.redo_row()
+        elif key in (ord("m"), ord("M")) and sounds is not None:
+            tracker._note(f"Audio feedback switched to {sounds.toggle_mode()} mode")
+
     protect_console()
-    pipeline = Pipeline(camera, tracker, lock, before)
+    pipeline = Pipeline(camera, tracker, lock)
     pipeline.start()
     try:
-        while True:
-            watch.kick()
-            got = camera.read()
-            if got is not None:
-                image, reading = got
-                tracker.update_reading(reading["slots"], reading["hand"], reading["tray_on_station"],
-                                       detail=camera_detail(reading))
-            mode_hint = f"D = deliver | M = {sounds.cue_mode}" if sounds else "D = deliver"
-            cv2.imshow("Battery evaluator - TEST",
-                       compose(image, tracker, mode_hint, True,
-                               alert=camera.status))
-            key = cv2.waitKey(1) & 0xFF
-            if key in (ord("q"), ord("Q"), 27):
-                break
-            if key in (ord("d"), ord("D")):
-                tracker.deliver()
-            elif key in (ord("r"), ord("R")):
-                tracker.redo_row()
-            elif key in (ord("m"), ord("M")) and sounds is not None:
-                new_mode = sounds.toggle_mode()
-                tracker._note(f"Audio feedback switched to {new_mode} mode")
+        show_window("Battery evaluator - TEST", pipeline, tracker, lock, camera,
+                    lambda: (f"D = deliver | M = {sounds.cue_mode}" if sounds else "D = deliver", True), on_key)
     finally:
-        watch.stop()
+        pipeline.stop()
         camera.stop()
         tracker.close()
         if tracker.csv_path:
@@ -1655,7 +1667,7 @@ def run_live(args):
 
 
 def main():
-    global SEND_VERDICTS, TRAY_GONE_FRAMES
+    global SEND_VERDICTS, TRAY_GONE_SECONDS
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--test", nargs="?", const="pick", metavar="FILE",
                     help="test mode without the GUI; FILE like s03_audio (no FILE = choose in a window)")
@@ -1672,8 +1684,9 @@ def main():
                     help="detail of the station area for the model: 1 = as trained, <1 faster, >1 finer")
     ap.add_argument("--exposure", type=int, metavar="US", help="camera exposure in microseconds (default: live_test.py)")
     ap.add_argument("--fps", type=float, help="camera frame rate (default: live_test.py)")
-    ap.add_argument("--tray-gone", type=int, default=TRAY_GONE_FRAMES,
-                    help="frames the tray must be off the station before the round is evaluated (default 10)")
+    ap.add_argument("--tray-gone", type=float, default=TRAY_GONE_SECONDS,
+                    help="seconds without any tray (and no hand at the station) before the round is evaluated "
+                         "(default 1.5; a tray seen being carried away counts after 0.4 s)")
     ap.add_argument("--predict-only", action="store_true", help="live mode: never send verdicts to the GUI")
     ap.add_argument("--audio-out", default=PARTICIPANT_AUDIO_KEYWORD, metavar="NAME",
                     help="test mode: output device for the feedback sounds (part of its name, default Trekz)")
@@ -1682,7 +1695,7 @@ def main():
     ap.add_argument("--no-sounds", action="store_true", help="test mode: no correct / mistake sounds")
     args = ap.parse_args()
     SEND_VERDICTS = SEND_VERDICTS and not args.predict_only
-    TRAY_GONE_FRAMES = args.tray_gone
+    TRAY_GONE_SECONDS = args.tray_gone
 
     if args.test:
         run_test(args)
