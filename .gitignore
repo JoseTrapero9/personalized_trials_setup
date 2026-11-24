@@ -9,3 +9,4 @@ logs/
 
 # Videos from ximea_recorder.py (large, keep them on the recording PC / lab drive)
 recordings/
+evaluator_area.json
