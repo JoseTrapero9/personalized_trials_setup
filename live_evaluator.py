@@ -1159,10 +1159,23 @@ class CameraModel:
             return None
         return x1, y1, x2, y2
 
+    @staticmethod
+    def _half_precision_args():
+        """Newer ultralytics renamed half=True to quantize=16 (and warns about 'half' on every call);
+        older versions only know 'half'. Use whichever the installed version has."""
+        try:
+            from ultralytics.utils import DEFAULT_CFG_KEYS
+            if "quantize" in DEFAULT_CFG_KEYS:
+                return {"quantize": 16}
+        except Exception:
+            pass
+        return {"half": True}
+
     def _predict(self, image, imgsz):
         try:
+            precision = self._half_precision_args() if self.half else {}
             return self.model.predict(source=image, conf=self.conf, device=self.device, verbose=False,
-                                      imgsz=imgsz, half=self.half)[0]
+                                      imgsz=imgsz, **precision)[0]
         except Exception as e:
             if not self.half:
                 raise
