@@ -82,6 +82,7 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 | `generate_log_files.py` | makes `log_files/` + answer-key PDF |
 | `live_evaluator.py` | camera PC: YOLO tray check, follows the GUI over LSL, sends verdicts |
 | `evaluator_link.py` | GUI side: receives the camera verdicts |
+| `ximea_recorder.py` | third PC: records the MQ013 camera, LSL-synchronised |
 
 ## Battery sequences (`log_files/`)
 
@@ -221,6 +222,29 @@ Order for a participant: **pre-train** -> **training** -> the four conditions ->
   GUI markers). `generate_log_files.py` rebuilds them without changing the subject files.
   Markers `TRAIN_Training_Block_Start|Complete_<i>_<condition>`, `TRAIN_Cue_Slide_Shown_...`, `TRAIN_Cue_Demo_...`.
 * Delivery is always the **D** key; the Vosk speech recognition and its `model/` folder were removed.
+
+## Video recording on a third PC (`ximea_recorder.py`)
+
+Records the second XIMEA camera (**MQ013**) with the settings of `old_code/3CAM_Stream`
+(exposure 25000 us, gain 8, gamma 0.47, white balance 1.00 / 2.05, no binning, 30 fps). Video only, no model.
+
+```powershell
+python ximea_recorder.py              # records each condition / training block automatically (follows the GUI)
+python ximea_recorder.py --manual     # only R starts / stops
+python ximea_recorder.py --out D:\videos
+```
+
+* Videos: `recordings/sXX_<condition>_mq013_<date_time>.mp4` + `..._frames.csv` (video frame, LSL time, camera
+  frame number, camera time). Every captured frame is written once, so CSV row N = video frame N.
+* LSL: `ximeasync_mq013` sends one sample per camera frame `[video_frame (-1 = not recording), camera_nframe]`,
+  stamped with the capture time; `ximeasync_mq013_markers` sends Recording_Start / Stop, Camera_Lost / Restored.
+  Add both streams in LabRecorder: LSL corrects the clock offset between the PCs.
+* The camera runs in its own process and is restarted after 3 s without frames; the recording continues in the
+  same file (the gap is visible in the CSV).
+* The third PC needs this repo, the XIMEA API (`C:\XIMEA\API\Python\v3`), `pylsl`, `opencv-python`, `numpy`,
+  the same network as the GUI PC and Python allowed through the firewall.
+* `old_code/cam_probe.py` has other MQ013 values (exposure 31000, wb_kb 1.90); change `CAMERA_PRESETS` at the top
+  of `ximea_recorder.py` if those are the right ones.
 
 ## Questionnaires
 

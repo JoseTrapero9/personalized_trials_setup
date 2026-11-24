@@ -6,3 +6,6 @@ __pycache__/
 # Keeping it out of git avoids merge conflicts on pull and participant data on GitHub.
 # Files that were already committed stay tracked until they are removed on purpose (see README).
 logs/
+
+# Videos from ximea_recorder.py (large, keep them on the recording PC / lab drive)
+recordings/
