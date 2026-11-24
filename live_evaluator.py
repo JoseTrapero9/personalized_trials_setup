@@ -39,7 +39,8 @@ How a row / round is evaluated (both modes)
     whose centre is on the station. Batteries lying around (dropped on the table / floor), trays
     elsewhere and hands away from the station are ignored. The station box is remembered, so it
     still works while the tray covers the station.
-  * The round is evaluated when the TRAY LEAVES THE STATION: either the tray is seen OFF the station
+  * As soon as all 3 slots are correct the round is evaluated (correct) and locked - nothing seen afterwards can
+    change it (FINISH_WHEN_ALL_CORRECT). Otherwise the round is evaluated when the TRAY LEAVES THE STATION: either the tray is seen OFF the station
     (being carried away) for TRAY_MOVED_SECONDS, or no tray is seen at all (and no hand at the station) for
     TRAY_GONE_SECONDS. A short occlusion (an arm over the tray) is not enough. Not when the third battery is placed, not when the clock runs
     out and not at "deliver": the participant can still change batteries until the tray is taken away.
@@ -110,6 +111,9 @@ ROI_SCALE = 1.0                            # >1 = more detail in the model area 
 USE_HALF_PRECISION = True                  # half precision on the GPU
 DISPLAY_FPS = 12                           # the window is drawn this often; the model runs as fast as it can
 
+FINISH_WHEN_ALL_CORRECT = True             # all 3 slots correct -> the round is evaluated (correct) at once and
+                                           # locked: later readings (a hand covering a battery, a misread) cannot
+                                           # change it. A tray with a wrong battery stays open until the tray leaves.
 # Tray left the station -> the round is evaluated. Positive evidence is quick, mere absence must last:
 TRAY_MOVED_SECONDS = 0.4                   # the tray is SEEN off the station (carried away) this long
 TRAY_GONE_SECONDS = 1.5                    # no tray seen anywhere and no hand at the station this long
@@ -419,8 +423,9 @@ class ParadigmTracker:
         stable = tuple(rec.stable_slots) if rec.stable_slots else EMPTY
         return tuple(cued if cued is not None else seen for cued, seen in zip(rec.slot_cued, stable))
 
-    def evaluate(self, trigger, ts=None):
-        """Final verdict of the active round. Slots not seen count as wrong."""
+    def evaluate(self, trigger, ts=None, slots=None):
+        """Final verdict of the active round. Slots not seen count as wrong. slots: what to judge
+        (default: the per-battery state, see _final_slots)."""
         ts = self.clock() if ts is None else ts
         rec = self.round
         if rec is None or not rec.active:
@@ -431,7 +436,7 @@ class ParadigmTracker:
             rec.verdict = "none"
             self.send(f"Eval_NoVerdict_Round_{rec.number}_no_expected_answer")
             return
-        slots = self._final_slots(rec)
+        slots = tuple(slots) if slots is not None else self._final_slots(rec)
         marks = [s is not None and s == e for s, e in zip(slots, rec.expected)]
         rec.final_slots = slots
         rec.verdict = "correct" if all(marks) else "incorrect"
@@ -519,14 +524,20 @@ class ParadigmTracker:
             sure = confs is not None and confs[k] is not None and confs[k] >= CUE_FAST_CONFIDENCE
             if not sure and rec.slot_count[k] < self.cue_frames:
                 continue
-            rec.slot_cued[k] = color
-            correct = color == rec.expected[k]
-            cam_ms = -1 if self.frame_time is None else int(round((time.monotonic() - self.frame_time) * 1000))
-            rec.cues.append((round(ts - rec.start, 3), k + 1, color, correct))
-            if rec.row is not None:
-                self.table[rec.row]["marks"][k] = correct
-            self.send(f"Eval_Battery_Round_{rec.number}_Slot_{k + 1}_{'correct' if correct else 'incorrect'}"
-                      f"_Color_{color}_Expected_{rec.expected[k]}_CamMs_{cam_ms}")
+            self._send_cue(rec, k, color, ts)
+        if FINISH_WHEN_ALL_CORRECT and tuple(rec.slot_cued) == tuple(rec.expected):
+            self.evaluate("all_correct", ts)            # after the last cue: finished, nothing can change it
+
+    def _send_cue(self, rec, k, color, ts):
+        """Per-battery cue for slot k (the GUI plays the sound / vest cue of the condition)."""
+        rec.slot_cued[k] = color
+        correct = color == rec.expected[k]
+        cam_ms = -1 if self.frame_time is None else int(round((time.monotonic() - self.frame_time) * 1000))
+        rec.cues.append((round(ts - rec.start, 3), k + 1, color, correct))
+        if rec.row is not None:
+            self.table[rec.row]["marks"][k] = correct
+        self.send(f"Eval_Battery_Round_{rec.number}_Slot_{k + 1}_{'correct' if correct else 'incorrect'}"
+                  f"_Color_{color}_Expected_{rec.expected[k]}_CamMs_{cam_ms}")
 
     def _check_station(self, ts):
         rec = self.round
@@ -567,6 +578,13 @@ class ParadigmTracker:
         rec.prediction = prediction
         self.send(f"Eval_Prediction_Round_{rec.number}_{prediction}_Slots_{fmt_slots(slots)}"
                   f"_Sum_{slot_sum(slots)}_Target_{rec.target_sum}")
+        if FINISH_WHEN_ALL_CORRECT and prediction == "correct":
+            # the whole tray read correct: first the cue of every battery that has not had its cue yet,
+            # so the participant always hears / feels "correct" before the round is closed
+            for k, color in enumerate(slots):
+                if rec.slot_cued[k] != color:
+                    self._send_cue(rec, k, color, ts)
+            self.evaluate("all_correct", ts, slots=slots)
 
     # ---------------- logging ----------------
     def _finish_round(self):

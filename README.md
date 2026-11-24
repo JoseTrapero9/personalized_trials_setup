@@ -127,7 +127,10 @@ Live mode plays no sounds for now.
   only inside a tray whose centre is on the station; batteries dropped around it, trays elsewhere and
   hands away from the station are ignored. The station position is remembered while the tray covers it.
   Without a `Station` detection the whole image is used (shown as STATION NOT FOUND).
-* The round is evaluated when the tray leaves the station: the tray is seen **off** the station (carried away)
+* As soon as **all 3 slots are correct** the round is finished: the cue of the last battery is sent first, then the
+  verdict (trigger `all_correct`), and the round is locked; a hand covering a battery or a misread afterwards
+  cannot change it (`FINISH_WHEN_ALL_CORRECT`). A tray with a wrong battery stays open so it can still be fixed.
+* Otherwise the round is evaluated when the tray leaves the station: the tray is seen **off** the station (carried away)
   for 0.4 s (`TRAY_MOVED_SECONDS`), or no tray is seen at all, with no hand at the station, for 1.5 s
   (`--tray-gone`, `TRAY_GONE_SECONDS`). An arm passing over the tray hides it for less than that, so it no longer
   ends the round. Not when the third battery is placed, not when the clock runs out and not at "deliver";
