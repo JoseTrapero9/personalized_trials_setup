@@ -17,6 +17,21 @@ After editing `radio_script.py`, re-run the generator; it only redoes changed cl
 Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `workpieces/`,
 `radio_audio/` (generated) and `robot_sequence.py`. Delivery is always the **D** key (no speech recognition).
 
+## Safety checks
+
+* **Check before starting**: after *Start Selected Mode* (condition, training, pre-train, sus) a researcher window shows
+  subject, condition and settings, files that would be **overwritten** (NASA-TLX, pre-train, questionnaire), the
+  conditions already finished for this subject, and whether the participant headphones, the vest (bHaptics Player),
+  the camera PC and LSL are ready. It refreshes twice a second. Red lines make *Go back* the default; *Start anyway*
+  is still possible. Marker `Preflight_Start|Back_<kind>_<condition>_fail<n>_warn<n>`.
+* **Quit** is **Ctrl+Q** (or Alt+F4), always with a confirmation. The single `q` key no longer quits.
+* **Program errors** do not stop a session: they are written to `logs/errors.log` (with subject, condition and the
+  traceback), sent as marker `Program_Error_<type>_<file>_<line>`, and the program keeps running (`safety.py`).
+  The check window shows how many errors happened in this run.
+* **Data and git**: `logs/` and Python caches are in `.gitignore`. Back up `logs/` separately (lab drive); it is
+  not pushed to GitHub. Files committed earlier (`logs/questionnaires/s01_*`) stay tracked until you remove them
+  with `git rm --cached` after copying them somewhere safe.
+
 ## The game
 
 * The radio talks all the time (chatter). Suddenly an incident: it says which button(s) to press,

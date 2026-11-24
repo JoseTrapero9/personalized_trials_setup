@@ -17,6 +17,7 @@ class SessionState:
         self.training_block = 0       # index in config.TRAINING_CONDITIONS
         self.training_condition = "baseline"   # condition of the current training block (its cues are used)
         self.controller = None        # the main window (set in main.py)
+        self.error_count = 0          # program errors caught by safety.py in this run
 
 
 state = SessionState()

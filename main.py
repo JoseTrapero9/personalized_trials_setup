@@ -10,6 +10,7 @@ from controller import paradigmcontroller
 from haptics import shutdown_haptics, start_haptic_thread
 from lsl_markers import init_lsl, send_marker
 from robot import stop_robot_process
+from safety import install as install_safety_net
 from state import state
 
 
@@ -27,6 +28,7 @@ def cleanup_resources():
 
 
 def run_paradigm():
+    install_safety_net()          # program errors are logged (logs/errors.log), the session keeps running
     init_lsl()
     start_haptic_thread()
 

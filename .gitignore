@@ -1,0 +1,8 @@
+# Python caches: rebuilt automatically, and different on every PC
+__pycache__/
+*.pyc
+
+# Experiment data stays on the lab PCs (back it up separately, e.g. to the lab drive).
+# Keeping it out of git avoids merge conflicts on pull and participant data on GitHub.
+# Files that were already committed stay tracked until they are removed on purpose (see README).
+logs/

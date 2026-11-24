@@ -39,6 +39,7 @@ class paradigmcontroller(QWidget):
         self.setWindowTitle("Dual-Task Assembly and Collaboration Paradigm")
         self.mistake_on_cooldown = False
         self._training_tasks = []
+        self.evaluator_connected = False
 
         self.stacked_widget = QStackedWidget()
         self.setup_screen = setupscreen(self.setup_finished_callback, self.start_sus_questionnaire,
@@ -67,8 +68,9 @@ class paradigmcontroller(QWidget):
         layout.addWidget(self.stacked_widget)
 
         # Global Shortcuts
-        self.quit_shortcut = QShortcut(QKeySequence("q"), self)
-        self.quit_shortcut.activated.connect(QApplication.instance().quit)
+        # Ctrl+Q (not a single key) and always with a confirmation, also for Alt+F4 (closeEvent)
+        self.quit_shortcut = QShortcut(QKeySequence("Ctrl+Q"), self)
+        self.quit_shortcut.activated.connect(self.close)
 
         self.mistake_shortcut = QShortcut(QKeySequence("F12"), self)
         self.mistake_shortcut.activated.connect(self.trigger_mistake)
@@ -93,11 +95,51 @@ class paradigmcontroller(QWidget):
             self.evaluator_link = EvaluatorLink(parent=self)
             self.evaluator_link.verdict_received.connect(self.dual_task_screen.remote_verdict)
             self.evaluator_link.battery_received.connect(self.dual_task_screen.remote_battery_cue)
-            self.evaluator_link.connection_changed.connect(
-                lambda ok: send_marker("Evaluator_Connected" if ok else "Evaluator_Disconnected"))
+            self.evaluator_link.connection_changed.connect(self._evaluator_connection)
             self.evaluator_link.start()
 
         send_marker("Screen_Setup")
+
+    # ------------------------------------------------------------------ safety
+    def _evaluator_connection(self, ok):
+        self.evaluator_connected = ok
+        send_marker("Evaluator_Connected" if ok else "Evaluator_Disconnected")
+
+    def closeEvent(self, event):
+        answer = QMessageBox.question(
+            self, "Quit the experiment?",
+            "Quit the experiment program now?\n\nA running condition is stopped (the rounds so far are saved).",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if answer == QMessageBox.Yes:
+            send_marker("Quit_Confirmed")
+            event.accept()
+        else:
+            send_marker("Quit_Cancelled")
+            event.ignore()
+
+    def preflight(self, kind, condition=""):
+        """Researcher check before a run. True = start, False = back to the main menu."""
+        import haptics
+        import lsl_markers
+        from audio import audio_sys
+        from preflight import session_checks
+        from screens.preflight_dialog import PreflightDialog
+
+        def rows():
+            return session_checks(
+                kind, state.subject_number, condition, language=state.language, game_mode=state.game_mode,
+                audio_cue_mode=state.audio_cue_mode, participant_device=audio_sys.participant_device,
+                researcher_device=audio_sys.researcher_device, vest_connected=haptics.player.connected,
+                vest_supported=haptics.WEBSOCKET_AVAILABLE, evaluator_connected=self.evaluator_connected,
+                lsl_ok=lsl_markers.marker_outlet is not None, error_count=state.error_count)
+
+        dialog = PreflightDialog("Check before starting", rows, self)
+        ok = dialog.exec_() == PreflightDialog.Accepted
+        levels = "_".join(f"{lv}{dialog.levels.count(lv)}" for lv in ("fail", "warn"))
+        send_marker(f"Preflight_{'Start' if ok else 'Back'}_{kind}_{condition or 'none'}_{levels}")
+        if not ok:
+            self.return_to_setup()
+        return ok
 
     def get_current_scenario(self):
         """Condition whose cues are used: in training, the condition of the current training block."""
@@ -106,6 +148,9 @@ class paradigmcontroller(QWidget):
         return state.current_condition
 
     def setup_finished_callback(self):
+        if not self.preflight("training" if state.current_condition == "training" else "condition",
+                              state.current_condition):
+            return
         if state.current_condition == "training":
             self._training_tasks = build_training_sequence(len(TRAINING_CONDITIONS) * TRAINING_ROUNDS)
             state.training_block = 0
@@ -226,12 +271,16 @@ class paradigmcontroller(QWidget):
 
     def start_pretrain(self):
         """'pre-train' chosen in the condition menu: learn the cues, then back to the main menu."""
+        if not self.preflight("pretrain"):
+            return
         self.stacked_widget.setCurrentIndex(6)
         self.pretrain_screen.start(state.subject_number, state.language, state.audio_cue_mode,
                                    finish_cb=self.return_to_setup)
 
     def start_sus_questionnaire(self):
         """'sus' chosen in the condition menu: experience questionnaire for all conditions + summary files."""
+        if not self.preflight("sus"):
+            return
         missing = missing_conditions(state.subject_number, "nasatlx")
         if missing:
             box = QMessageBox(self)
