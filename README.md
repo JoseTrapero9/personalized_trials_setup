@@ -84,7 +84,8 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 | `generate_log_files.py` | makes `log_files/` + answer-key PDF |
 | `live_evaluator.py` | camera PC: YOLO tray check, follows the GUI over LSL, sends verdicts |
 | `evaluator_link.py` | GUI side: receives the camera verdicts |
-| `ximea_recorder.py` | third PC: records the MQ013 camera, LSL-synchronised |
+| `ximea_recorder.py` | third PC: records the MQ013 camera + face webcam, LSL-synchronised |
+| `video_writer.py` | real-time video files encoded in a background process (recorder + evaluator) |
 
 ## Battery sequences (`log_files/`)
 
@@ -205,7 +206,21 @@ python live_evaluator.py                  # camera + YOLO
 python live_evaluator.py --no-camera      # test the link: prints the GUI phase/timer it follows
 python live_evaluator.py --predict-only   # never send verdicts, only predict and log
 python live_evaluator.py --subject 3 --condition audio   # started after the GUI setup screen
+python live_evaluator.py --record gui     # record each condition itself (no recorder PC)
+python live_evaluator.py --record off --record-fps 25   # no video / other video frame rate
 ```
+
+**Video of the evaluator camera (for the VLM).** The evaluator records its camera to
+`recordings/sXX_<condition>_mc050_<date_time>.mp4` (30 fps, `--record-fps` to change). By default
+(`--record sync`) it starts and stops together with `ximea_recorder.py` on the third PC and uses the same
+`<date_time>`, so the three videos of a condition (mc050, mq013, webcam) belong together. `--record gui` follows
+the GUI conditions itself, `--record manual` / **V** records by hand (V works in every mode), `--record off` = no video.
+Every camera frame goes into the video, also the ones the model skips; the window shows `REC <file>` while
+recording. Markers on the evaluator stream: `Eval_Recording_Start_<file>` (time of the first frame),
+`Eval_Recording_Stop_<file>_Frames_<n>_Seconds_<s>`.
+To keep the model fast, the video is encoded by a separate background process at lower priority
+(`video_writer.py`): the camera thread only copies each frame once into shared memory (about 1 ms) and never
+waits. If the encoder falls behind, the previous frame is repeated in the file instead of slowing the model.
 
 The camera PC needs this repo (for `log_files/`, `config.py`, `sequences.py`), `pylsl`, and the
 `live_test.py` packages (ultralytics, torch, opencv, XIMEA API). Allow Python through the Windows firewall on both PCs
@@ -240,22 +255,31 @@ Order for a participant: **pre-train** -> **training** -> the four conditions ->
 ## Video recording on a third PC (`ximea_recorder.py`)
 
 Records the second XIMEA camera (**MQ013**) with the settings of `old_code/3CAM_Stream`
-(exposure 25000 us, gain 8, gamma 0.47, white balance 1.00 / 2.05, no binning, 30 fps). Video only, no model.
+(exposure 25000 us, gain 8, gamma 0.47, white balance 1.00 / 2.05, no binning) and the **face webcam**, both at
+30 fps. Video only, no model. The window shows both cameras live (red dot = recording).
 
 ```powershell
 python ximea_recorder.py              # records each condition / training block automatically (follows the GUI)
 python ximea_recorder.py --manual     # only R starts / stops
+python ximea_recorder.py --fps 25     # other frame rate (both cameras and videos)
+python ximea_recorder.py --webcam 1 --webcam-size 1920x1080   # which webcam / its resolution (default 0, 1280x720)
+python ximea_recorder.py --no-webcam  # MQ013 only
 python ximea_recorder.py --out D:\videos
 ```
 
-* Videos: `recordings/sXX_<condition>_mq013_<date_time>.mp4`.
-* LSL: one marker stream `ximeasync_mq013` with `Recording_Start_<file>` (stamped with the capture time of the first
-  frame) and `Recording_Stop_<file>_Frames_<n>_Seconds_<s>` (end of the last frame). Add it in LabRecorder: LSL
-  corrects the clock offset between the PCs. The video keeps real time (a skipped frame is filled with the previous
-  one, an early one is left out), so frame N was captured at start + N / 30 s. `Camera_Lost` / `Camera_Restored`
-  only appear if the camera drops out.
-* The camera runs in its own process and is restarted after 3 s without frames; the recording continues in the
-  same file, still in real time.
+* Videos: `recordings/sXX_<condition>_mq013_<date_time>.mp4` and `..._webcam_<date_time>.mp4`. Both start and stop
+  together, and `live_evaluator.py` on the camera PC starts / stops its `..._mc050_<date_time>.mp4` at the same
+  moment (same `<date_time>`). In a test the three first frames were within 20 ms of each other.
+* LSL: one marker stream `ximeasync_mq013`: `Recording_Session_Start_<label>_<date_time>` /
+  `Recording_Session_Stop_...` (the evaluator follows these), and per video `Recording_Start_<file>` (stamped with
+  the capture time of its first frame) and `Recording_Stop_<file>_Frames_<n>_Seconds_<s>` (end of the last frame).
+  Add it in LabRecorder: LSL corrects the clock offset between the PCs. Every video keeps real time (a skipped
+  frame is filled with the previous one, an early one is left out), so frame N was captured at start + N / fps.
+  `Camera_Lost` / `Camera_Restored`, `Webcam_Lost` / `Webcam_Restored` only appear if a camera drops out.
+* The XIMEA camera runs in its own process and is restarted after 3 s without frames; the webcam is reopened if it
+  stops. A recording continues in the same file, still in real time. Each video is encoded by its own background
+  process, so encoding never delays the capture.
+* Start `live_evaluator.py` before the first recording starts: it only hears the start markers sent while it runs.
 * The third PC needs this repo, the XIMEA API (`C:\XIMEA\API\Python\v3`), `pylsl`, `opencv-python`, `numpy`,
   the same network as the GUI PC and Python allowed through the firewall.
 * `old_code/cam_probe.py` has other MQ013 values (exposure 31000, wb_kb 1.90); change `CAMERA_PRESETS` at the top

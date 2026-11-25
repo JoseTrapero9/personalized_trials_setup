@@ -53,6 +53,20 @@ How a row / round is evaluated (both modes)
   * Live mode: the verdict is sent to the GUI (Eval_Verdict_Round_<r>_correct|incorrect_..._Trigger_...)
     and applied there right away. The answer table on screen is the subject's log file.
 
+Video recording (data for the VLM)
+  * The evaluator camera is recorded to recordings/<label>_mc050_<stamp>.mp4 at --record-fps (default 30), in
+    real time (frame N = start + N / fps; a skipped camera frame is repeated). Every camera frame goes to the
+    video, also the ones the model has no time for.
+  * --record sync (default): starts and stops together with ximea_recorder.py on the 3rd PC (MQ013 + face webcam),
+    with the same <label>_<stamp> in the file name. --record gui: every GUI condition. --record manual / V key:
+    by hand (V works in every mode, test mode included). --record off: no video.
+  * Markers on the evaluator stream: Eval_Recording_Start_<file> (time of the first frame) and
+    Eval_Recording_Stop_<file>_Frames_<n>_Seconds_<s>.
+  * Low impact on the model: the video is encoded by a separate background process at lower priority
+    (video_writer.py). The camera thread only copies each frame once into shared memory (~1 ms) and never
+    waits; if the encoder falls behind, frames are replaced by repeats instead of slowing anything down.
+  * The window shows REC <file> while it records.
+
 Writes logs/evaluator_<subject>_<condition>_<time>.csv (test mode: evaluator_test_<file>_<time>.csv).
 Needs: pylsl (live mode) and everything live_test.py needs (ultralytics, torch, opencv, XIMEA API).
 """
@@ -135,6 +149,14 @@ CORRECT_SOUNDS = VOICE_CORRECT_SOUNDS if AUDIO_CUE_MODE == "voice" else TONE_COR
 MISTAKE_SOUNDS = VOICE_MISTAKE_SOUNDS if AUDIO_CUE_MODE == "voice" else TONE_MISTAKE_SOUNDS
 FEEDBACK_MAX_SECONDS = 1.5                 # every clip is cut to this length (short fade-out, files untouched)
 PARTICIPANT_AUDIO_KEYWORD = "Trekz"        # subject audio output (same device as the GUI); --audio-out to change
+
+# Video recording of the evaluator camera (data for the VLM). Encoded by a background process (video_writer.py):
+# the model loop only hands over a copy of each frame and never waits for the encoder.
+RECORD_MODE = "sync"                       # --record: sync = start / stop with ximea_recorder.py (3rd PC),
+                                           # gui = with each condition of the GUI, manual = V key only, off
+RECORD_FPS = 30.0                          # --record-fps (video frame rate; frames are repeated / skipped to keep real time)
+RECORDINGS_DIR = os.path.join(base_dir, "recordings")   # --record-dir
+RECORDER_STREAM_NAME = "ximeasync_mq013"   # the marker stream of ximea_recorder.py
 # =================================================
 
 AREA_FILE = os.path.join(base_dir, "evaluator_area.json")   # this camera PC only (in .gitignore)
@@ -808,6 +830,7 @@ class WebcamCaptureThread(threading.Thread):
         self.index = index
         self.frame_queue = queue.Queue(maxsize=2)
         self.running = True
+        self.on_frame = None                 # recording tap: gets EVERY frame, before the model skips any
 
     def run(self):
         import cv2
@@ -817,6 +840,8 @@ class WebcamCaptureThread(threading.Thread):
             if not ok:
                 time.sleep(0.05)
                 continue
+            if self.on_frame is not None:
+                self.on_frame(frame)
             if self.frame_queue.full():
                 try:
                     self.frame_queue.get_nowait()
@@ -1054,6 +1079,7 @@ class XimeaProcessCamera:
         self.restarts = 0
         self.running = True
         self.proc = None
+        self.on_frame = None                 # recording tap: gets EVERY camera frame, before the model skips any
         self.thread = threading.Thread(target=self._supervise, daemon=True)
 
     def start(self):
@@ -1123,6 +1149,11 @@ class XimeaProcessCamera:
                     self.status, self.last_frame = "", now
                     if frame.shape[2] == 1:
                         frame = frame[:, :, 0]
+                    if self.on_frame is not None:
+                        try:
+                            self.on_frame(frame)             # only a copy into shared memory (video_writer.py)
+                        except Exception as e:
+                            print(f"[REC] {e!r}")
                     if self.frame_queue.full():
                         try:
                             self.frame_queue.get_nowait()
@@ -1483,6 +1514,134 @@ class MarkerListener(threading.Thread):
                 self.connected = False
 
 
+SESSION_START_RE = re.compile(r"^Recording_Session_Start_(.+)_(\d{8}_\d{6})$")
+SESSION_STOP_RE = re.compile(r"^Recording_Session_Stop_(.+)_(\d{8}_\d{6})$")
+
+
+class EvalRecorder:
+    """Records the evaluator camera to recordings/<label>_<camera>_<stamp>.mp4 at a constant fps, in real time.
+
+    sync mode: ximea_recorder.py (3rd PC) says Recording_Session_Start_<label>_<stamp> -> this video starts with the
+    same label and stamp, so it belongs to the MQ013 and webcam videos of that moment; Recording_Session_Stop ends it.
+    Markers on the evaluator stream: Eval_Recording_Start_<file> (stamped with the first frame) and
+    Eval_Recording_Stop_<file>_Frames_<n>_Seconds_<s> (stamped with the end of the last frame)."""
+
+    def __init__(self, send, camera_id, mode=RECORD_MODE, fps=RECORD_FPS, out_dir=RECORDINGS_DIR):
+        from video_writer import BackgroundVideoWriter
+        try:
+            import pylsl
+            self.clock = pylsl.local_clock
+        except ImportError:
+            self.clock = time.monotonic
+        self.send, self.camera_id, self.mode, self.fps, self.out_dir = send, camera_id, mode, float(fps), out_dir
+        self.writer = BackgroundVideoWriter(camera_id, on_closed=self._closed)
+        self.session = None
+        self.recorder_linked = False
+        print(f"[REC] evaluator video: mode {mode}, {self.fps:g} fps -> {out_dir}")
+
+    # ---------------- control
+    def start(self, label, stamp=None):
+        stamp = stamp or time.strftime("%Y%m%d_%H%M%S")
+        name = f"{label}_{self.camera_id}_{stamp}.mp4"
+        self.stop()
+        self.session = (label, stamp)
+        self.writer.start(os.path.join(self.out_dir, name), self.fps)
+        print(f"[REC] recording -> {name}")
+
+    def stop(self):
+        if self.session is None:
+            return
+        self.session = None
+        if self.writer.recording and self.writer.t0 is None:
+            self.send(f"Eval_Recording_Failed_No_Frames_{os.path.basename(self.writer.path)}")
+        self.writer.stop()
+
+    def toggle_manual(self, subject=None):
+        if self.session is not None:
+            self.stop()
+        else:
+            self.start(f"{subject_tag(subject) if subject else 's__'}_manual")
+
+    # ---------------- frames (camera thread)
+    def on_frame(self, frame):
+        if not self.writer.recording:
+            return
+        t = self.clock()
+        if self.writer.add(frame, t):
+            self.send(f"Eval_Recording_Start_{os.path.basename(self.writer.path)}", t)
+
+    def _closed(self, info):
+        if info["t0"] is None:
+            return
+        name = os.path.basename(info["path"])
+        self.send(f"Eval_Recording_Stop_{name}_Frames_{info['written']}_Seconds_{info['seconds']:.2f}", info["end_time"])
+        if info["repeated"] or info["left_out"]:
+            print(f"[REC] {name}: {info['repeated']} frame(s) repeated to keep real time "
+                  f"({info['left_out']} left out because the PC was busy)")
+        if info["error"]:
+            print(f"[REC] ERROR in {name}: {info['error']}")
+
+    # ---------------- triggers
+    def on_recorder_marker(self, msg):
+        if self.mode != "sync":
+            return
+        if (m := SESSION_START_RE.match(msg)):
+            self.start(m.group(1), m.group(2))
+        elif (m := SESSION_STOP_RE.match(msg)) and self.session == (m.group(1), m.group(2)):
+            self.stop()
+
+    def on_gui_marker(self, marker, tracker):
+        m = marker[len(TRAINING_MARKER_PREFIX):] if marker.startswith(TRAINING_MARKER_PREFIX) else marker
+        ending = m.startswith("Condition_Complete_") or m in ("Returned_To_Main_Menu", "Application_Closing")
+        if self.mode == "gui":
+            if (r := re.match(r"^Condition_Start_(.+)$", m)):
+                self.start(f"{subject_tag(tracker.subject) if tracker.subject else 's__'}_{r.group(1)}")
+            elif ending:
+                self.stop()
+        elif self.mode == "sync" and ending:
+            self.stop()                    # safety net if the recorder's stop marker never arrives
+
+    def status(self):
+        text = self.writer.status()
+        if text:
+            return text
+        if self.mode == "sync":
+            return "REC waits for the recorder" if self.recorder_linked else "REC: recorder PC not found"
+        return "V = record" if self.mode in ("manual", "gui") else ""
+
+    def close(self):
+        self.stop()
+        self.writer.close()
+
+
+class RecorderSyncListener(threading.Thread):
+    """Follows the marker stream of ximea_recorder.py so the evaluator video starts and stops with it."""
+
+    def __init__(self, recorder, stream_name=RECORDER_STREAM_NAME):
+        super().__init__(daemon=True)
+        self.recorder, self.stream_name, self.running = recorder, stream_name, True
+
+    def run(self):
+        import pylsl
+        lost_error = getattr(pylsl, "LostError", None) or pylsl.util.LostError
+        while self.running:
+            streams = pylsl.resolve_byprop("name", self.stream_name, 1, 1.0)
+            if not streams:
+                continue
+            inlet = pylsl.StreamInlet(streams[0], max_buflen=60, recover=False)
+            print(f"[REC] linked to the video recorder on {streams[0].hostname()}")
+            self.recorder.recorder_linked = True
+            try:
+                while self.running:
+                    sample, _ = inlet.pull_sample(timeout=0.2)
+                    if sample:
+                        self.recorder.on_recorder_marker(str(sample[0]))
+            except lost_error:
+                print("[REC] video recorder stream lost - waiting for it to come back...")
+            finally:
+                self.recorder.recorder_linked = False
+
+
 def make_outlet():
     import socket
     import pylsl
@@ -1490,19 +1649,24 @@ def make_outlet():
                             f"battery_evaluator_{socket.gethostname()}")
     outlet = pylsl.StreamOutlet(info)
 
-    def send(msg):
-        outlet.push_sample([msg])
+    def send(msg, timestamp=None):
+        if timestamp is None:
+            outlet.push_sample([msg])
+        else:
+            outlet.push_sample([msg], timestamp)
         print(f"[SEND] {msg}")
     return send
 
 
-def drain(q, tracker):
+def drain(q, tracker, recorder=None):
     while True:
         try:
             marker, ts = q.get_nowait()
         except queue.Empty:
             return
         tracker.handle_marker(marker, ts)
+        if recorder is not None:
+            recorder.on_gui_marker(marker, tracker)
 
 
 # ---------------------------------------------------------------------------
@@ -1702,6 +1866,18 @@ def make_camera(args):
                        recalibrate=args.recalibrate)
 
 
+def make_recorder(args, camera, send, mode):
+    """Video recording of the evaluator camera, or None (--record off)."""
+    if mode == "off":
+        return None
+    cam_id = "mc050" if args.webcam is None else f"webcam{args.webcam}"
+    rec = EvalRecorder(send, cam_id, mode=mode, fps=args.record_fps, out_dir=args.record_dir)
+    camera.cam.on_frame = rec.on_frame
+    if mode == "sync":
+        RecorderSyncListener(rec).start()
+    return rec
+
+
 def run_test(args):
     path = choose_log_file(args.test)
     tracker = ParadigmTracker(time.monotonic, lambda msg: print(f"[TEST] {msg}"),
@@ -1716,9 +1892,14 @@ def run_test(args):
         tracker.on_verdict = feedback
     camera = make_camera(args)
     lock = threading.RLock()
+    # test mode: V records by hand (or follow the recorder PC with --record sync)
+    rec = make_recorder(args, camera, lambda msg, ts=None: print(f"[TEST] {msg}"),
+                        args.record if args.record in ("sync", "off") else "manual")
 
     def on_key(key):
-        if key in (ord("d"), ord("D")):
+        if key in (ord("v"), ord("V")) and rec is not None:
+            rec.toggle_manual()
+        elif key in (ord("d"), ord("D")):
             tracker.deliver()
         elif key in (ord("r"), ord("R")):
             tracker.redo_row()
@@ -1730,9 +1911,12 @@ def run_test(args):
     pipeline.start()
     try:
         show_window("Battery evaluator - TEST", pipeline, tracker, lock, camera,
-                    lambda: (f"D = deliver | M = {sounds.cue_mode}" if sounds else "D = deliver", True), on_key)
+                    lambda: ((f"D = deliver | M = {sounds.cue_mode}" if sounds else "D = deliver")
+                             + (f"   |   {rec.status()}" if rec else ""), True), on_key)
     finally:
         pipeline.stop()
+        if rec is not None:
+            rec.close()
         camera.stop()
         tracker.close()
         if tracker.csv_path:
@@ -1766,14 +1950,25 @@ def run_live(args):
         else:
             camera = make_camera(args)
             lock = threading.RLock()
+            rec = make_recorder(args, camera, send, args.record)
+
+            def on_key(key):
+                if key in (ord("v"), ord("V")) and rec is not None:
+                    rec.toggle_manual(tracker.subject)
+
+            def footer():
+                text = "GUI linked" if listener.connected else "GUI NOT FOUND"
+                return (text + (f"   |   {rec.status()}" if rec else ""), listener.connected)
+
             protect_console()
-            pipeline = Pipeline(camera, tracker, lock, before=lambda: drain(q, tracker))
+            pipeline = Pipeline(camera, tracker, lock, before=lambda: drain(q, tracker, rec))
             pipeline.start()
             try:
-                show_window("Battery evaluator", pipeline, tracker, lock, camera,
-                            lambda: ("GUI linked" if listener.connected else "GUI NOT FOUND", listener.connected))
+                show_window("Battery evaluator", pipeline, tracker, lock, camera, footer, on_key)
             finally:
                 pipeline.stop()
+                if rec is not None:
+                    rec.close()                  # finishes the video file properly
                 camera.stop()
     finally:
         listener.running = False
@@ -1812,6 +2007,12 @@ def main():
     ap.add_argument("--cue-mode", default=AUDIO_CUE_MODE, choices=AUDIO_CUE_MODES,
                     help="test mode: 'voice' ('input correct'/'input incorrect') or 'tone' (default: %(default)s)")
     ap.add_argument("--no-sounds", action="store_true", help="test mode: no correct / mistake sounds")
+    ap.add_argument("--record", default=RECORD_MODE, choices=("sync", "gui", "manual", "off"),
+                    help="video of the evaluator camera: sync = start / stop with ximea_recorder.py on the 3rd PC "
+                         "(default), gui = every condition of the GUI, manual = V key only, off = no video. "
+                         "V starts / stops a recording by hand in every mode except off")
+    ap.add_argument("--record-fps", type=float, default=RECORD_FPS, help="video frame rate (default 30)")
+    ap.add_argument("--record-dir", default=RECORDINGS_DIR, help="folder for the videos (default: recordings/)")
     args = ap.parse_args()
     SEND_VERDICTS = SEND_VERDICTS and not args.predict_only
     TRAY_GONE_SECONDS = args.tray_gone
