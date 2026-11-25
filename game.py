@@ -27,10 +27,10 @@ from PyQt5.QtWidgets import QWidget
 
 from audio import audio_sys
 from config import (
-    FAIL_PENALTY, FILLER_GAP_SECONDS, HARD_INSTRUCTION_MULTIPLIER, HARD_PENALTY_MULTIPLIER,
+    ERROR_CUES, FAIL_PENALTY, FILLER_GAP_SECONDS, HARD_INSTRUCTION_MULTIPLIER, HARD_PENALTY_MULTIPLIER,
     IDLE_HIT_POINTS, IDLE_WRONG_PENALTY, LATE_PRESS_SECONDS, ROULETTE_DURING_INSTRUCTION, ROULETTE_FRAME_SECONDS, LOG_TRAINING_CSV, POINTS_PER_STEP,
     PRESS_GRACE_SECONDS, PROBLEM_GAP_SECONDS, PROBLEMS_PER_CHECKPOINT, RESPONSE_SECONDS,
-    RESUME_GAP_SECONDS, SHOW_RESPONSE_BAR, SHUFFLE_SECONDS, base_dir
+    RESUME_GAP_SECONDS, SHOW_RESPONSE_BAR, SHUFFLE_SECONDS, base_dir, error_cue_audio
 )
 from lsl_markers import send_marker
 from panel_logic import (
@@ -268,6 +268,8 @@ class RadioPanelGame(QWidget):
         else:
             send_marker(f"Radio_Press_Wrong_{p['id']}_Step_{p['progress'] + 1}_Pos_{pos}"
                         f"_Expected_{p['targets'][p['progress']]}")
+            if ERROR_CUES:
+                audio_sys.play_researcher(error_cue_audio)
             self._resolve("wrong", now)
         self.update()
 

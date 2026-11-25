@@ -8,6 +8,7 @@ audio_dir = os.path.join(base_dir, "audios")
 
 correct_audio = os.path.join(audio_dir, "correct_answer.wav")
 incorrect_audio = os.path.join(audio_dir, "loud_incorrect_answer.wav")
+error_cue_audio = os.path.join(audio_dir, "incorrect_answer.wav")
 alarm_audio = os.path.join(audio_dir, "alarm_llm.wav")
 
 if not os.path.exists(alarm_audio):
@@ -65,6 +66,7 @@ RADIO_VOLUME = 1.0
 RADIO_FX = True                    # light band-pass "radio" sound
 RADIO_STATIC_DB = -48              # constant soft hiss in dBFS (None = off)
 USE_RADIO_CONTAINER_CUES = True    # checkpoint announcement in the chosen language (else the old WAVs)
+ERROR_CUES = True                 # when True, play incorrect_answer.wav on the alarm/researcher PC on wrong button combinations
 
 # Game mode (chosen on the setup screen)
 GAME_MODES = ["normal", "hard"]
