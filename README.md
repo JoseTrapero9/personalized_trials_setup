@@ -127,7 +127,10 @@ Live mode plays no sounds for now.
   only inside a tray whose centre is on the station; batteries dropped around it, trays elsewhere and
   hands away from the station are ignored. The station position is remembered while the tray covers it.
   Without a `Station` detection the whole image is used (shown as STATION NOT FOUND).
-* The round is evaluated when the tray leaves the station: the tray is seen **off** the station (carried away)
+* As soon as **all 3 slots are correct** the round is finished: the cue of the last battery is sent first, then the
+  verdict (trigger `all_correct`), and the round is locked; a hand covering a battery or a misread afterwards
+  cannot change it (`FINISH_WHEN_ALL_CORRECT`). A tray with a wrong battery stays open so it can still be fixed.
+* Otherwise the round is evaluated when the tray leaves the station: the tray is seen **off** the station (carried away)
   for 0.4 s (`TRAY_MOVED_SECONDS`), or no tray is seen at all, with no hand at the station, for 1.5 s
   (`--tray-gone`, `TRAY_GONE_SECONDS`). An arm passing over the tray hides it for less than that, so it no longer
   ends the round. Not when the third battery is placed, not when the clock runs out and not at "deliver";
@@ -140,10 +143,16 @@ Live mode plays no sounds for now.
 * A reading counts when it is stable for `STABLE_FRAMES` frames with no hand at the station. The previous
   round's tray does not count until the station was cleared or the tray changed.
 
-**Fast loop and model area:** the model runs in its own loop, separate from the window (drawn at 12 fps), and
-only on the area around the station (yellow MODEL AREA box). The station is found on a full frame, which is
-repeated every 2 s; in between only the cut-out is processed, at the same battery size as in training
-(`--roi-scale` changes that, `--no-roi` uses the full frame again). `--exposure` (microseconds) and `--fps`
+**Fast loop and fixed areas:** the model runs in its own loop, separate from the window (drawn at 12 fps), and
+only on a **fixed** area around the station (yellow MODEL AREA box), at the same battery size as in training.
+* At the first start the station is measured for 2 s (median of all detections; keep it visible and empty, the
+  window says SETTING THE EVALUATION AREA). Then the MODEL AREA and the EVALUATION AREA (station) are locked for
+  the whole session: something covering the station no longer shrinks or moves them.
+* They are saved in `evaluator_area.json` on the camera PC (not in git) and reused at the next start.
+* Keys in the evaluator window: **A** = draw the model area, **E** = draw the evaluation area (mouse, ENTER),
+  **C** = measure both again (after moving the camera or the station). `--recalibrate` measures again at start.
+* Default model area = station + 10 % left / right / bottom and 40 % on top (the tray stands above the station),
+  `ROI_MARGINS`. `--roi-scale` changes the detail, `--no-roi` runs the model on the full frame (areas stay fixed). `--exposure` (microseconds) and `--fps`
 override the camera settings of `live_test.py`. The window footer shows the model rate and time per frame.
 
 **Per-battery cues:** a battery in a slot fires its cue on the first frame when the model is at least
