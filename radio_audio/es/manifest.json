@@ -2,2739 +2,2863 @@
  "language": "es",
  "voice": "Microsoft Sabina Desktop - Spanish (Mexico)",
  "voice_source": "desktop",
- "rate": 0,
- "script_hash": "d4ad26ed1dac",
- "generated": "2026-11-13 15:36:15",
+ "rate": 2,
+ "script_hash": "bf5396a3e5be",
+ "generated": "2026-11-24 13:56:02",
  "clips": {
   "filler_00": {
    "parts": [
-    "Sala de control: todo normal."
+    "Sala de control: todas las luces verdes están normales."
    ],
-   "duration_s": 2.008
+   "duration_s": 2.771
   },
   "filler_01": {
    "parts": [
     "Las cuatro turbinas funcionan bien."
    ],
-   "duration_s": 1.997
+   "duration_s": 1.618
   },
   "filler_02": {
    "parts": [
-    "Inspección de torres terminada."
+    "Inspección de torres cerca de la puerta azul terminada."
    ],
-   "duration_s": 1.774
+   "duration_s": 2.408
   },
   "filler_03": {
    "parts": [
     "El clima afuera está tranquilo."
    ],
-   "duration_s": 1.738
+   "duration_s": 1.415
   },
   "filler_04": {
    "parts": [
-    "La producción va según lo planeado."
+    "La producción sigue en la zona verde."
    ],
-   "duration_s": 1.958
+   "duration_s": 1.658
   },
   "filler_05": {
    "parts": [
     "El comedor cierra a las dos."
    ],
-   "duration_s": 1.592
+   "duration_s": 1.292
   },
   "filler_06": {
    "parts": [
-    "Sensores de calderas sin novedades."
+    "Sensores de calderas sin novedades en la pantalla amarilla."
    ],
-   "duration_s": 2.026
+   "duration_s": 2.51
   },
   "filler_07": {
    "parts": [
     "La demanda de la red está estable."
    ],
-   "duration_s": 1.865
+   "duration_s": 1.517
   },
   "filler_08": {
    "parts": [
-    "El cambio de turno es a las seis."
+    "El cambio de turno es a las seis en la sala roja."
    ],
-   "duration_s": 1.87
+   "duration_s": 2.153
   },
   "filler_09": {
    "parts": [
     "El almacén de carbón está lleno."
    ],
-   "duration_s": 1.765
+   "duration_s": 1.432
   },
   "filler_10": {
    "parts": [
-    "Temperatura del condensador normal."
+    "Temperatura del condensador normal en la tubería azul."
    ],
-   "duration_s": 1.948
+   "duration_s": 2.36
   },
   "filler_11": {
    "parts": [
     "Recorrido de seguridad terminado."
    ],
-   "duration_s": 1.893
+   "duration_s": 1.536
   },
   "filler_12": {
    "parts": [
-    "El campo solar aporta energía extra."
+    "El campo solar aporta energía extra a la red morada."
    ],
-   "duration_s": 2.271
+   "duration_s": 2.423
   },
   "filler_13": {
    "parts": [
-    "Hoy vienen visitantes de la universidad."
+    "Hoy vienen visitantes de la universidad con chaleco amarillo."
    ],
-   "duration_s": 2.058
+   "duration_s": 2.603
   },
   "filler_14": {
    "parts": [
     "El consumo de combustible es bajo."
    ],
-   "duration_s": 1.993
+   "duration_s": 1.614
   },
   "filler_15": {
    "parts": [
     "Recuerden tomar un poco de agua."
    ],
-   "duration_s": 1.81
+   "duration_s": 1.472
   },
   "filler_16": {
    "parts": [
-    "Vibración del eje baja y estable."
+    "Vibración del eje baja en el monitor rojo."
    ],
-   "duration_s": 1.958
+   "duration_s": 1.947
   },
   "filler_17": {
    "parts": [
-    "Estaciónense cerca de la entrada."
+    "Estaciónense cerca de la cerca morada junto a la entrada."
    ],
-   "duration_s": 1.96
+   "duration_s": 2.638
   },
   "filler_18": {
    "parts": [
     "La presión de vapor se mantiene bien."
    ],
-   "duration_s": 1.995
+   "duration_s": 1.615
   },
   "filler_19": {
    "parts": [
     "Eso es todo. Buen turno a todos."
    ],
-   "duration_s": 2.846
+   "duration_s": 2.308
   },
   "fb_solved_0": {
    "parts": [
     "Listo, arreglado."
    ],
-   "duration_s": 1.474
+   "duration_s": 1.199
   },
   "fb_solved_1": {
    "parts": [
     "Bien, estable otra vez."
    ],
-   "duration_s": 1.777
+   "duration_s": 1.438
   },
   "fb_solved_2": {
    "parts": [
     "Problema resuelto."
    ],
-   "duration_s": 1.1
+   "duration_s": 0.902
   },
   "fb_wrong_0": {
    "parts": [
     "Botón incorrecto."
    ],
-   "duration_s": 1.079
+   "duration_s": 0.877
   },
   "fb_wrong_1": {
    "parts": [
     "No, hubo daños."
    ],
-   "duration_s": 1.32
+   "duration_s": 1.077
   },
   "fb_wrong_2": {
    "parts": [
     "Movimiento equivocado."
    ],
-   "duration_s": 1.34
+   "duration_s": 1.095
   },
   "fb_timeout_0": {
    "parts": [
     "Muy tarde."
    ],
-   "duration_s": 0.686
+   "duration_s": 0.562
   },
   "fb_timeout_1": {
    "parts": [
     "Se acabó el tiempo."
    ],
-   "duration_s": 1.136
+   "duration_s": 0.924
   },
   "ann_container_1": {
    "parts": [
     "Punto de control. Regresa la pieza vacía, y toma piezas nuevas del contenedor uno."
    ],
-   "duration_s": 5.735
+   "duration_s": 4.615
   },
   "ann_container_2": {
    "parts": [
     "Punto de control. Regresa la pieza vacía, y toma piezas nuevas del contenedor dos."
    ],
-   "duration_s": 5.81
+   "duration_s": 4.687
   },
   "prob_e000": {
    "parts": [
-    "Presiona primero el botón verde.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice amarillo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Pulsa el botón verde.",
+    "Más el botón que dice amarillo."
    ],
-   "duration_s": 13.534
+   "duration_s": 5.029
   },
   "prob_e001": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón que dice morado.",
-    "Vigila el medidor.",
-    "También presiona el botón morado."
+    "Sube la presión en caldera dos.",
+    "Toca el botón que dice morado.",
+    "La válvula amarilla se trabó.",
+    "Más el botón morado."
    ],
-   "duration_s": 13.713
+   "duration_s": 7.235
   },
   "prob_e002": {
    "parts": [
-    "Presiona primero el botón que dice amarillo.",
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "También presiona el botón azul.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Pulsa el botón que dice amarillo.",
+    "Sensor amarillo de escape alto.",
+    "Al final, el botón azul."
    ],
-   "duration_s": 14.276
+   "duration_s": 8.087
   },
   "prob_e003": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón verde.",
-    "La válvula de alivio se trabó.",
-    "Vigila el medidor.",
-    "También presiona el botón que dice azul."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Usa el botón verde.",
+    "Al final, el botón que dice azul."
    ],
-   "duration_s": 13.626
+   "duration_s": 7.636
   },
   "prob_e004": {
    "parts": [
-    "Presiona primero el botón que dice amarillo.",
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "También presiona el botón que dice morado.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Activa el botón que dice amarillo.",
+    "Libera la banda.",
+    "Más el botón que dice morado."
    ],
-   "duration_s": 14.488
+   "duration_s": 21.088
   },
   "prob_e005": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice azul.",
-    "Las bobinas se calientan.",
-    "También presiona el botón morado.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Toca el botón que dice azul.",
+    "Luego el botón morado."
    ],
-   "duration_s": 13.831
+   "duration_s": 12.229
   },
   "prob_e006": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "Presiona primero el botón que dice morado.",
-    "Libera la banda rápido.",
-    "También presiona el botón que dice rojo."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Usa el botón que dice morado.",
+    "Libera la banda.",
+    "Después, el botón que dice rojo."
    ],
-   "duration_s": 14.398
+   "duration_s": 21.356
   },
   "prob_e007": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón que dice azul.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice verde."
+    "¡Alerta en turbina roja!",
+    "Usa el botón que dice azul.",
+    "Más el botón que dice verde."
    ],
-   "duration_s": 13.882
+   "duration_s": 5.193
   },
   "prob_e008": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón amarillo.",
-    "La válvula de alivio se trabó.",
-    "También presiona el botón que dice rojo.",
-    "Vigila el medidor."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Primero, el botón amarillo.",
+    "Después, el botón que dice rojo."
    ],
-   "duration_s": 13.787
+   "duration_s": 8.23
   },
   "prob_e009": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón que dice azul.",
-    "Cae la presión en ese sector.",
-    "Cierra esa sección ya.",
-    "También presiona el botón que dice rojo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Toca el botón que dice azul.",
+    "Y el botón que dice rojo."
    ],
-   "duration_s": 14.211
+   "duration_s": 15.25
   },
   "prob_e010": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Cae la presión en ese sector.",
-    "Presiona primero el botón rojo.",
-    "Cierra esa sección ya.",
-    "También presiona el botón amarillo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Pulsa el botón rojo.",
+    "Cierra esa sección.",
+    "Después, el botón amarillo."
    ],
-   "duration_s": 13.453
+   "duration_s": 15.313
   },
   "prob_e011": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón azul.",
-    "La válvula de alivio se trabó.",
-    "Vigila el medidor.",
-    "También presiona el botón que dice azul."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Pulsa el botón azul.",
+    "Después, el botón que dice azul."
    ],
-   "duration_s": 13.656
+   "duration_s": 7.736
   },
   "prob_e012": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón rojo.",
-    "Vigila el medidor.",
-    "También presiona el botón que dice morado."
+    "Sube la presión en caldera dos.",
+    "Usa el botón rojo.",
+    "La válvula amarilla se trabó.",
+    "Más el botón que dice morado."
    ],
-   "duration_s": 13.679
+   "duration_s": 7.194
   },
   "prob_e013": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón rojo.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice amarillo."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Toca el botón rojo.",
+    "Más el botón que dice amarillo."
    ],
-   "duration_s": 13.925
+   "duration_s": 12.291
   },
   "prob_e014": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "Presiona primero el botón morado.",
-    "Libera la banda rápido.",
-    "También presiona el botón que dice azul."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Usa el botón morado.",
+    "Libera la banda.",
+    "Más el botón que dice azul."
    ],
-   "duration_s": 13.93
+   "duration_s": 20.487
   },
   "prob_e015": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón azul.",
-    "Cae la presión en ese sector.",
-    "También presiona el botón rojo.",
-    "Cierra esa sección ya."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Usa el botón azul.",
+    "Después, el botón rojo."
    ],
-   "duration_s": 13.317
+   "duration_s": 15.14
   },
   "prob_e016": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón que dice rojo.",
-    "Cae la presión en ese sector.",
-    "Cierra esa sección ya.",
-    "También presiona el botón amarillo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Usa el botón que dice rojo.",
+    "Y el botón amarillo."
    ],
-   "duration_s": 13.913
+   "duration_s": 14.973
   },
   "prob_e017": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón azul.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón amarillo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Primero, el botón azul.",
+    "Y el botón amarillo."
    ],
-   "duration_s": 13.163
+   "duration_s": 4.909
   },
   "prob_e018": {
    "parts": [
-    "Presiona primero el botón que dice amarillo.",
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "También presiona el botón que dice verde.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Primero, el botón que dice amarillo.",
+    "Sensor amarillo de escape alto.",
+    "Más el botón que dice verde."
    ],
-   "duration_s": 14.681
+   "duration_s": 8.308
   },
   "prob_e019": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón amarillo.",
-    "El flujo de agua cae rápido.",
-    "Ya entra el respaldo.",
-    "También presiona el botón que dice verde."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Toca el botón amarillo.",
+    "Después, el botón que dice verde."
    ],
-   "duration_s": 13.962
+   "duration_s": 9.251
   },
   "prob_e020": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice rojo.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón verde."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Toca el botón que dice rojo.",
+    "Más el botón verde."
    ],
-   "duration_s": 13.821
+   "duration_s": 12.18
   },
   "prob_e021": {
    "parts": [
-    "Presiona primero el botón amarillo.",
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "También presiona el botón que dice verde.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Pulsa el botón amarillo.",
+    "Baja la carga extra.",
+    "Después, el botón que dice verde."
    ],
-   "duration_s": 13.887
+   "duration_s": 12.818
   },
   "prob_e022": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón verde.",
-    "El motor principal se esfuerza.",
-    "También presiona el botón amarillo.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Usa el botón verde.",
+    "Al final, el botón amarillo."
    ],
-   "duration_s": 13.587
+   "duration_s": 20.683
   },
   "prob_e023": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón rojo.",
-    "El motor principal se esfuerza.",
-    "Libera la banda rápido.",
-    "También presiona el botón verde."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Primero, el botón rojo.",
+    "Después, el botón verde."
    ],
-   "duration_s": 13.465
+   "duration_s": 21.02
   },
   "prob_e024": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón que dice morado.",
-    "Vigila el medidor.",
-    "También presiona el botón azul."
+    "Sube la presión en caldera dos.",
+    "Pulsa el botón que dice morado.",
+    "La válvula amarilla se trabó.",
+    "Al final, el botón azul."
    ],
-   "duration_s": 13.685
+   "duration_s": 7.752
   },
   "prob_e025": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón amarillo.",
-    "La válvula de alivio se trabó.",
-    "Vigila el medidor.",
-    "También presiona el botón que dice amarillo."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Activa el botón amarillo.",
+    "Y el botón que dice amarillo."
    ],
-   "duration_s": 13.906
+   "duration_s": 7.362
   },
   "prob_e026": {
    "parts": [
-    "Presiona primero el botón azul.",
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "También presiona el botón que dice morado.",
-    "Vigila el medidor."
+    "Sube la presión en caldera dos.",
+    "Toca el botón azul.",
+    "La válvula amarilla se trabó.",
+    "Luego el botón que dice morado."
    ],
-   "duration_s": 13.649
+   "duration_s": 7.242
   },
   "prob_e027": {
    "parts": [
-    "Presiona primero el botón rojo.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón morado.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Primero, el botón rojo.",
+    "Luego el botón morado."
    ],
-   "duration_s": 13.009
+   "duration_s": 4.992
   },
   "prob_e028": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Cae la presión en ese sector.",
-    "Presiona primero el botón verde.",
-    "Cierra esa sección ya.",
-    "También presiona el botón amarillo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Usa el botón verde.",
+    "Cierra esa sección.",
+    "Después, el botón amarillo."
    ],
-   "duration_s": 13.433
+   "duration_s": 15.223
   },
   "prob_e029": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón azul.",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón que dice rojo.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Usa el botón azul.",
+    "Y el botón que dice rojo."
    ],
-   "duration_s": 13.863
+   "duration_s": 8.529
   },
   "prob_e030": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón morado.",
-    "La temperatura de escape es alta.",
-    "También presiona el botón que dice verde.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Primero, el botón morado.",
+    "Después, el botón que dice verde."
    ],
-   "duration_s": 14.131
+   "duration_s": 8.357
   },
   "prob_e031": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón azul.",
-    "La temperatura de escape es alta.",
-    "También presiona el botón verde.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Usa el botón azul.",
+    "Después, el botón verde."
    ],
-   "duration_s": 13.682
+   "duration_s": 7.551
   },
   "prob_e032": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón que dice rojo.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice azul."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Usa el botón que dice rojo.",
+    "Baja la carga extra.",
+    "Más el botón que dice azul."
    ],
-   "duration_s": 14.261
+   "duration_s": 12.535
   },
   "prob_e033": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón amarillo.",
-    "La temperatura de escape es alta.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón que dice rojo."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Primero, el botón amarillo.",
+    "Al final, el botón que dice rojo."
    ],
-   "duration_s": 14.285
+   "duration_s": 8.475
   },
   "prob_e034": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "Presiona primero el botón que dice morado.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón verde."
+    "¡Generador verde sobrecalentado!",
+    "Toca el botón que dice morado.",
+    "Sensor amarillo de escape alto.",
+    "Después, el botón verde."
    ],
-   "duration_s": 14.167
+   "duration_s": 7.949
   },
   "prob_e035": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice verde.",
-    "Las bobinas se calientan.",
-    "También presiona el botón azul.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Usa el botón que dice verde.",
+    "Al final, el botón azul."
    ],
-   "duration_s": 13.791
+   "duration_s": 12.62
   },
   "prob_e036": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón rojo.",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón azul.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Usa el botón rojo.",
+    "Luego el botón azul."
    ],
-   "duration_s": 13.404
+   "duration_s": 8.335
   },
   "prob_e037": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón que dice rojo.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice verde."
+    "¡Alerta en turbina roja!",
+    "Usa el botón que dice rojo.",
+    "Después, el botón que dice verde."
    ],
-   "duration_s": 13.901
+   "duration_s": 5.699
   },
   "prob_e038": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice azul.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón rojo."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Primero, el botón que dice azul.",
+    "Más el botón rojo."
    ],
-   "duration_s": 13.803
+   "duration_s": 12.604
   },
   "prob_e039": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice verde.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón amarillo."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Primero, el botón que dice verde.",
+    "Después, el botón amarillo."
    ],
-   "duration_s": 13.915
+   "duration_s": 13.169
   },
   "prob_e040": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón rojo.",
-    "Vigila el medidor.",
-    "También presiona el botón azul."
+    "Sube la presión en caldera dos.",
+    "Pulsa el botón rojo.",
+    "La válvula amarilla se trabó.",
+    "Más el botón azul."
    ],
-   "duration_s": 13.21
+   "duration_s": 6.885
   },
   "prob_e041": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón que dice verde.",
-    "El motor principal se esfuerza.",
-    "Libera la banda rápido.",
-    "También presiona el botón morado."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Activa el botón que dice verde.",
+    "Al final, el botón morado."
    ],
-   "duration_s": 13.913
+   "duration_s": 21.073
   },
   "prob_e042": {
    "parts": [
-    "Presiona primero el botón que dice morado.",
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón azul.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Activa el botón que dice morado.",
+    "Entra el respaldo.",
+    "Al final, el botón azul."
    ],
-   "duration_s": 13.879
+   "duration_s": 9.285
   },
   "prob_e043": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón que dice morado.",
-    "El alimentador está inestable.",
-    "También presiona el botón rojo.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Activa el botón que dice morado.",
+    "Más el botón rojo."
    ],
-   "duration_s": 13.781
+   "duration_s": 24.135
   },
   "prob_e044": {
    "parts": [
-    "Presiona primero el botón que dice verde.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice amarillo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Pulsa el botón que dice verde.",
+    "Al final, el botón que dice amarillo."
    ],
-   "duration_s": 13.969
+   "duration_s": 5.855
   },
   "prob_e045": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón azul.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice verde."
+    "¡Alerta en turbina roja!",
+    "Toca el botón azul.",
+    "Y el botón que dice verde."
    ],
-   "duration_s": 13.452
+   "duration_s": 4.725
   },
   "prob_e046": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón azul.",
-    "Vigila el medidor.",
-    "También presiona el botón morado."
+    "Sube la presión en caldera dos.",
+    "Toca el botón azul.",
+    "La válvula amarilla se trabó.",
+    "Luego el botón morado."
    ],
-   "duration_s": 13.248
+   "duration_s": 6.88
   },
   "prob_e047": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "Presiona primero el botón morado.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón que dice morado."
+    "¡Generador verde sobrecalentado!",
+    "Pulsa el botón morado.",
+    "Sensor amarillo de escape alto.",
+    "Más el botón que dice morado."
    ],
-   "duration_s": 14.191
+   "duration_s": 7.541
   },
   "prob_e048": {
    "parts": [
-    "Presiona primero el botón rojo.",
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón morado.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Activa el botón rojo.",
+    "Entra el respaldo.",
+    "Más el botón morado."
    ],
-   "duration_s": 13.419
+   "duration_s": 8.44
   },
   "prob_e049": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice morado.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice verde."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Activa el botón que dice morado.",
+    "Más el botón que dice verde."
    ],
-   "duration_s": 14.262
+   "duration_s": 12.644
   },
   "prob_e050": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón verde.",
-    "Aísla la falla ahora.",
-    "También presiona el botón azul."
+    "¡Alerta en turbina roja!",
+    "Toca el botón verde.",
+    "Después, el botón azul."
    ],
-   "duration_s": 12.995
+   "duration_s": 4.992
   },
   "prob_e051": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón verde.",
-    "El motor principal se esfuerza.",
-    "Libera la banda rápido.",
-    "También presiona el botón amarillo."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Toca el botón verde.",
+    "Luego el botón amarillo."
    ],
-   "duration_s": 13.585
+   "duration_s": 20.238
   },
   "prob_e052": {
    "parts": [
-    "Presiona primero el botón morado.",
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Cae la presión en ese sector.",
-    "También presiona el botón verde.",
-    "Cierra esa sección ya."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Pulsa el botón morado.",
+    "Cierra esa sección.",
+    "Luego el botón verde."
    ],
-   "duration_s": 13.301
+   "duration_s": 14.758
   },
   "prob_e053": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón verde.",
-    "Cae la presión en ese sector.",
-    "Cierra esa sección ya.",
-    "También presiona el botón que dice verde."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Primero, el botón verde.",
+    "Y el botón que dice verde."
    ],
-   "duration_s": 13.72
+   "duration_s": 15.267
   },
   "prob_e054": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón rojo.",
-    "La temperatura de escape es alta.",
-    "También presiona el botón que dice rojo.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Pulsa el botón rojo.",
+    "Y el botón que dice rojo."
    ],
-   "duration_s": 14.151
+   "duration_s": 7.376
   },
   "prob_e055": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón azul.",
-    "La válvula de alivio se trabó.",
-    "También presiona el botón que dice morado.",
-    "Vigila el medidor."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Primero, el botón azul.",
+    "Al final, el botón que dice morado."
    ],
-   "duration_s": 13.683
+   "duration_s": 8.128
   },
   "prob_e056": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón verde.",
-    "El motor principal se esfuerza.",
-    "También presiona el botón rojo.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Toca el botón verde.",
+    "Y el botón rojo."
    ],
-   "duration_s": 13.452
+   "duration_s": 19.968
   },
   "prob_e057": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice azul.",
-    "Las bobinas se calientan.",
-    "También presiona el botón que dice verde.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Primero, el botón que dice azul.",
+    "Y el botón que dice verde."
    ],
-   "duration_s": 14.221
+   "duration_s": 12.802
   },
   "prob_e058": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "Presiona primero el botón que dice azul.",
-    "Equilibra la red ya.",
-    "También presiona el botón que dice verde."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Pulsa el botón que dice azul.",
+    "Equilibra la red.",
+    "Al final, el botón que dice verde."
    ],
-   "duration_s": 14.167
+   "duration_s": 24.896
   },
   "prob_e059": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón que dice azul.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice morado."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Pulsa el botón que dice azul.",
+    "Baja la carga extra.",
+    "Después, el botón que dice morado."
    ],
-   "duration_s": 14.274
+   "duration_s": 13.108
   },
   "prob_e060": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "El flujo de agua cae rápido.",
-    "Presiona primero el botón que dice morado.",
-    "Ya entra el respaldo.",
-    "También presiona el botón verde."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Toca el botón que dice morado.",
+    "Entra el respaldo.",
+    "Al final, el botón verde."
    ],
-   "duration_s": 13.876
+   "duration_s": 9.163
   },
   "prob_e061": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón verde.",
-    "El alimentador está inestable.",
-    "También presiona el botón que dice amarillo.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Pulsa el botón verde.",
+    "Y el botón que dice amarillo."
    ],
-   "duration_s": 13.856
+   "duration_s": 24.008
   },
   "prob_e062": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón morado.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice amarillo."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Activa el botón morado.",
+    "Baja la carga extra.",
+    "Después, el botón que dice amarillo."
    ],
-   "duration_s": 13.95
+   "duration_s": 12.901
   },
   "prob_e063": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón morado.",
-    "Las bobinas se calientan.",
-    "También presiona el botón rojo.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Pulsa el botón morado.",
+    "Después, el botón rojo."
    ],
-   "duration_s": 13.396
+   "duration_s": 12.374
   },
   "prob_e064": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón morado.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice amarillo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Activa el botón morado.",
+    "Después, el botón que dice amarillo."
    ],
-   "duration_s": 13.613
+   "duration_s": 5.598
   },
   "prob_e065": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Cae la presión en ese sector.",
-    "Presiona primero el botón que dice verde.",
-    "Cierra esa sección ya.",
-    "También presiona el botón que dice rojo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Toca el botón que dice verde.",
+    "Cierra esa sección.",
+    "Luego el botón que dice rojo."
    ],
-   "duration_s": 14.186
+   "duration_s": 15.385
   },
   "prob_e066": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón morado.",
-    "La válvula de alivio se trabó.",
-    "Vigila el medidor.",
-    "También presiona el botón que dice rojo."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Usa el botón morado.",
+    "Más el botón que dice rojo."
    ],
-   "duration_s": 13.688
+   "duration_s": 7.184
   },
   "prob_e067": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón morado.",
-    "Cae la presión en ese sector.",
-    "También presiona el botón que dice amarillo.",
-    "Cierra esa sección ya."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Primero, el botón morado.",
+    "Al final, el botón que dice amarillo."
    ],
-   "duration_s": 13.902
+   "duration_s": 16.055
   },
   "prob_e068": {
    "parts": [
-    "Presiona primero el botón azul.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice rojo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Toca el botón azul.",
+    "Más el botón que dice rojo."
    ],
-   "duration_s": 13.449
+   "duration_s": 4.888
   },
   "prob_e069": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón que dice morado.",
-    "El alimentador está inestable.",
-    "Equilibra la red ya.",
-    "También presiona el botón verde."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Activa el botón que dice morado.",
+    "Al final, el botón verde."
    ],
-   "duration_s": 13.776
+   "duration_s": 24.606
   },
   "prob_e070": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón azul.",
-    "Cae la presión en ese sector.",
-    "Cierra esa sección ya.",
-    "También presiona el botón que dice azul."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Primero, el botón azul.",
+    "Luego el botón que dice azul."
    ],
-   "duration_s": 13.763
+   "duration_s": 15.468
   },
   "prob_e071": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice verde.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón verde."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Activa el botón que dice verde.",
+    "Luego el botón verde."
    ],
-   "duration_s": 13.775
+   "duration_s": 12.286
   },
   "prob_e072": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón azul.",
-    "La temperatura de escape es alta.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón rojo."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Activa el botón azul.",
+    "Al final, el botón rojo."
    ],
-   "duration_s": 13.705
+   "duration_s": 7.686
   },
   "prob_e073": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón verde.",
-    "Las bobinas se calientan.",
-    "También presiona el botón que dice morado.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Pulsa el botón verde.",
+    "Más el botón que dice morado."
    ],
-   "duration_s": 13.826
+   "duration_s": 12.251
   },
   "prob_e074": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón rojo.",
-    "Vigila el medidor.",
-    "También presiona el botón morado."
+    "Sube la presión en caldera dos.",
+    "Primero, el botón rojo.",
+    "La válvula amarilla se trabó.",
+    "Después, el botón morado."
    ],
-   "duration_s": 13.238
+   "duration_s": 7.769
   },
   "prob_e075": {
    "parts": [
-    "Presiona primero el botón verde.",
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "También presiona el botón morado.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Toca el botón verde.",
+    "Equilibra la red.",
+    "Y el botón morado."
    ],
-   "duration_s": 13.269
+   "duration_s": 23.506
   },
   "prob_e076": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón morado.",
-    "Aísla la falla ahora.",
-    "También presiona el botón azul."
+    "¡Alerta en turbina roja!",
+    "Toca el botón morado.",
+    "Al final, el botón azul."
    ],
-   "duration_s": 13.04
+   "duration_s": 5.026
   },
   "prob_e077": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón azul.",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón que dice morado.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Activa el botón azul.",
+    "Luego el botón que dice morado."
    ],
-   "duration_s": 13.883
+   "duration_s": 8.832
   },
   "prob_e078": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón rojo.",
-    "La temperatura de escape es alta.",
-    "También presiona el botón que dice verde.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Primero, el botón rojo.",
+    "Más el botón que dice verde."
    ],
-   "duration_s": 14.106
+   "duration_s": 7.843
   },
   "prob_e079": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Cae la presión en ese sector.",
-    "Presiona primero el botón que dice morado.",
-    "Cierra esa sección ya.",
-    "También presiona el botón que dice amarillo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Pulsa el botón que dice morado.",
+    "Cierra esa sección.",
+    "Luego el botón que dice amarillo."
    ],
-   "duration_s": 14.355
+   "duration_s": 15.596
   },
   "prob_e080": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón azul.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón morado.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Activa el botón azul.",
+    "Más el botón morado."
    ],
-   "duration_s": 13.048
+   "duration_s": 4.66
   },
   "prob_e081": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón que dice morado.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice amarillo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Primero, el botón que dice morado.",
+    "Después, el botón que dice amarillo."
    ],
-   "duration_s": 14.063
+   "duration_s": 6.277
   },
   "prob_e082": {
    "parts": [
-    "Presiona primero el botón verde.",
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "También presiona el botón que dice azul.",
-    "Vigila el medidor."
+    "Sube la presión en caldera dos.",
+    "Usa el botón verde.",
+    "La válvula amarilla se trabó.",
+    "Después, el botón que dice azul."
    ],
-   "duration_s": 13.579
+   "duration_s": 7.641
   },
   "prob_e083": {
    "parts": [
-    "Presiona primero el botón verde.",
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón morado.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Toca el botón verde.",
+    "Entra el respaldo.",
+    "Y el botón morado."
    ],
-   "duration_s": 13.394
+   "duration_s": 8.178
   },
   "prob_e084": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón amarillo.",
-    "El alimentador está inestable.",
-    "También presiona el botón que dice rojo.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Toca el botón amarillo.",
+    "Al final, el botón que dice rojo."
    ],
-   "duration_s": 13.896
+   "duration_s": 24.623
   },
   "prob_e085": {
    "parts": [
-    "Presiona primero el botón que dice verde.",
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "También presiona el botón que dice amarillo.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Activa el botón que dice verde.",
+    "Libera la banda.",
+    "Luego el botón que dice amarillo."
    ],
-   "duration_s": 14.423
+   "duration_s": 21.058
   },
   "prob_e086": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón rojo.",
-    "Cae la presión en ese sector.",
-    "También presiona el botón que dice amarillo.",
-    "Cierra esa sección ya."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Usa el botón rojo.",
+    "Luego el botón que dice amarillo."
    ],
-   "duration_s": 13.877
+   "duration_s": 15.141
   },
   "prob_e087": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón que dice amarillo.",
-    "El alimentador está inestable.",
-    "También presiona el botón que dice morado.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Usa el botón que dice amarillo.",
+    "Más el botón que dice morado."
    ],
-   "duration_s": 14.356
+   "duration_s": 24.481
   },
   "prob_e088": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón amarillo.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice verde."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Usa el botón amarillo.",
+    "Luego el botón que dice verde."
    ],
-   "duration_s": 13.922
+   "duration_s": 12.287
   },
   "prob_e089": {
    "parts": [
-    "Presiona primero el botón azul.",
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "También presiona el botón verde.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Pulsa el botón azul.",
+    "Libera la banda.",
+    "Al final, el botón verde."
    ],
-   "duration_s": 13.423
+   "duration_s": 20.657
   },
   "prob_e090": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón que dice amarillo.",
-    "La temperatura de escape es alta.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón morado."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Toca el botón que dice amarillo.",
+    "Y el botón morado."
    ],
-   "duration_s": 14.3
+   "duration_s": 7.439
   },
   "prob_e091": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón que dice azul.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice amarillo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Primero, el botón que dice azul.",
+    "Más el botón que dice amarillo."
    ],
-   "duration_s": 14.028
+   "duration_s": 5.768
   },
   "prob_e092": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón morado.",
-    "La válvula de alivio se trabó.",
-    "También presiona el botón que dice rojo.",
-    "Vigila el medidor."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Usa el botón morado.",
+    "Al final, el botón que dice rojo."
    ],
-   "duration_s": 13.677
+   "duration_s": 7.688
   },
   "prob_e093": {
    "parts": [
-    "Presiona primero el botón que dice verde.",
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "También presiona el botón que dice azul.",
-    "Vigila el medidor."
+    "Sube la presión en caldera dos.",
+    "Pulsa el botón que dice verde.",
+    "La válvula amarilla se trabó.",
+    "Más el botón que dice azul."
    ],
-   "duration_s": 14.014
+   "duration_s": 7.576
   },
   "prob_e094": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón amarillo.",
-    "Cae la presión en ese sector.",
-    "Cierra esa sección ya.",
-    "También presiona el botón azul."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Usa el botón amarillo.",
+    "Y el botón azul."
    ],
-   "duration_s": 13.452
+   "duration_s": 14.626
   },
   "prob_e095": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón que dice amarillo.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice morado."
+    "¡Alerta en turbina roja!",
+    "Pulsa el botón que dice amarillo.",
+    "Después, el botón que dice morado."
    ],
-   "duration_s": 14.064
+   "duration_s": 5.914
   },
   "prob_e096": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón que dice azul.",
-    "Cae la presión en ese sector.",
-    "Cierra esa sección ya.",
-    "También presiona el botón que dice amarillo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Activa el botón que dice azul.",
+    "Después, el botón que dice amarillo."
    ],
-   "duration_s": 14.32
+   "duration_s": 16.08
   },
   "prob_e097": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón verde.",
-    "El alimentador está inestable.",
-    "Equilibra la red ya.",
-    "También presiona el botón que dice azul."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Toca el botón verde.",
+    "Más el botón que dice azul."
    ],
-   "duration_s": 13.721
+   "duration_s": 23.996
   },
   "prob_e098": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón amarillo.",
-    "La temperatura de escape es alta.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón verde."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Toca el botón amarillo.",
+    "Más el botón verde."
    ],
-   "duration_s": 13.827
+   "duration_s": 7.19
   },
   "prob_e099": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón amarillo.",
-    "El motor principal se esfuerza.",
-    "También presiona el botón que dice morado.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Activa el botón amarillo.",
+    "Más el botón que dice morado."
    ],
-   "duration_s": 14.082
+   "duration_s": 20.729
   },
   "prob_e100": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice rojo.",
-    "Las bobinas se calientan.",
-    "También presiona el botón rojo.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Usa el botón que dice rojo.",
+    "Después, el botón rojo."
    ],
-   "duration_s": 13.831
+   "duration_s": 12.65
   },
   "prob_e101": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón que dice verde.",
-    "Vigila el medidor.",
-    "También presiona el botón morado."
+    "Sube la presión en caldera dos.",
+    "Toca el botón que dice verde.",
+    "La válvula amarilla se trabó.",
+    "Luego el botón morado."
    ],
-   "duration_s": 13.653
+   "duration_s": 7.205
   },
   "prob_e102": {
    "parts": [
-    "Presiona primero el botón que dice azul.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón morado.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Toca el botón que dice azul.",
+    "Luego el botón morado."
    ],
-   "duration_s": 13.444
+   "duration_s": 4.927
   },
   "prob_e103": {
    "parts": [
-    "Presiona primero el botón amarillo.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón rojo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Usa el botón amarillo.",
+    "Más el botón rojo."
    ],
-   "duration_s": 13.119
+   "duration_s": 4.614
   },
   "prob_e104": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón que dice rojo.",
-    "Hay un cortocircuito en la línea.",
-    "Aísla la falla ahora.",
-    "También presiona el botón amarillo."
+    "¡Alerta en turbina roja!",
+    "Activa el botón que dice rojo.",
+    "Y el botón amarillo."
    ],
-   "duration_s": 13.615
+   "duration_s": 4.954
   },
   "prob_e105": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón rojo.",
-    "Baja la carga ahora.",
-    "También presiona el botón morado."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Pulsa el botón rojo.",
+    "Baja la carga extra.",
+    "Y el botón morado."
    ],
-   "duration_s": 13.394
+   "duration_s": 11.756
   },
   "prob_e106": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón morado.",
-    "Baja la carga ahora.",
-    "También presiona el botón verde."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Toca el botón morado.",
+    "Baja la carga extra.",
+    "Y el botón verde."
    ],
-   "duration_s": 13.386
+   "duration_s": 11.691
   },
   "prob_e107": {
    "parts": [
-    "Presiona primero el botón que dice morado.",
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "También presiona el botón azul.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Pulsa el botón que dice morado.",
+    "Sensor amarillo de escape alto.",
+    "Y el botón azul."
    ],
-   "duration_s": 14.181
+   "duration_s": 7.388
   },
   "prob_e108": {
    "parts": [
-    "Presiona primero el botón que dice verde.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón verde.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Pulsa el botón que dice verde.",
+    "Luego el botón verde."
    ],
-   "duration_s": 13.374
+   "duration_s": 4.929
   },
   "prob_e109": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Cae la presión en ese sector.",
-    "Presiona primero el botón azul.",
-    "Cierra esa sección ya.",
-    "También presiona el botón morado."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Primero, el botón azul.",
+    "Cierra esa sección.",
+    "Después, el botón morado."
    ],
-   "duration_s": 13.356
+   "duration_s": 15.603
   },
   "prob_e110": {
    "parts": [
-    "Presiona primero el botón que dice morado.",
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón azul.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Toca el botón que dice morado.",
+    "Entra el respaldo.",
+    "Y el botón azul."
    ],
-   "duration_s": 13.879
+   "duration_s": 8.567
   },
   "prob_e111": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón verde.",
-    "Vigila el medidor.",
-    "También presiona el botón rojo."
+    "Sube la presión en caldera dos.",
+    "Activa el botón verde.",
+    "La válvula amarilla se trabó.",
+    "Después, el botón rojo."
    ],
-   "duration_s": 13.188
+   "duration_s": 7.404
   },
   "prob_e112": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón que dice azul.",
-    "La temperatura de escape es alta.",
-    "También presiona el botón azul.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Toca el botón que dice azul.",
+    "Luego el botón azul."
    ],
-   "duration_s": 14.142
+   "duration_s": 7.488
   },
   "prob_e113": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón que dice rojo.",
-    "El flujo de agua cae rápido.",
-    "Ya entra el respaldo.",
-    "También presiona el botón amarillo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Usa el botón que dice rojo.",
+    "Luego el botón amarillo."
    ],
-   "duration_s": 14.0
+   "duration_s": 8.79
   },
   "prob_e114": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón morado.",
-    "El alimentador está inestable.",
-    "Equilibra la red ya.",
-    "También presiona el botón azul."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Activa el botón morado.",
+    "Al final, el botón azul."
    ],
-   "duration_s": 13.33
+   "duration_s": 24.265
   },
   "prob_e115": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón amarillo.",
-    "Cae la presión en ese sector.",
-    "También presiona el botón rojo.",
-    "Cierra esa sección ya."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Pulsa el botón amarillo.",
+    "Al final, el botón rojo."
    ],
-   "duration_s": 13.442
+   "duration_s": 15.32
   },
   "prob_e116": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón verde.",
-    "El flujo de agua cae rápido.",
-    "Ya entra el respaldo.",
-    "También presiona el botón que dice morado."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Usa el botón verde.",
+    "Y el botón que dice morado."
    ],
-   "duration_s": 13.855
+   "duration_s": 8.525
   },
   "prob_e117": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice morado.",
-    "Las bobinas se calientan.",
-    "También presiona el botón que dice verde.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Activa el botón que dice morado.",
+    "Más el botón que dice verde."
    ],
-   "duration_s": 14.256
+   "duration_s": 12.644
   },
   "prob_e118": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón que dice verde.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice morado."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Primero, el botón que dice verde.",
+    "Baja la carga extra.",
+    "Luego el botón que dice morado."
    ],
-   "duration_s": 14.249
+   "duration_s": 12.986
   },
   "prob_e119": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón morado.",
-    "Hay un cortocircuito en la línea.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice azul."
+    "¡Alerta en turbina roja!",
+    "Primero, el botón morado.",
+    "Luego el botón que dice azul."
    ],
-   "duration_s": 13.469
+   "duration_s": 5.337
   },
   "prob_e120": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Cae la presión en ese sector.",
-    "Presiona primero el botón que dice azul.",
-    "Cierra esa sección ya.",
-    "También presiona el botón rojo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Toca el botón que dice azul.",
+    "Cierra esa sección.",
+    "Y el botón rojo."
    ],
-   "duration_s": 13.756
+   "duration_s": 14.886
   },
   "prob_e121": {
    "parts": [
-    "Presiona primero el botón amarillo.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice morado.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Toca el botón amarillo.",
+    "Más el botón que dice morado."
    ],
-   "duration_s": 13.594
+   "duration_s": 5.016
   },
   "prob_e122": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón azul.",
-    "El motor principal se esfuerza.",
-    "Libera la banda rápido.",
-    "También presiona el botón morado."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Pulsa el botón azul.",
+    "Después, el botón morado."
    ],
-   "duration_s": 13.508
+   "duration_s": 20.698
   },
   "prob_e123": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón que dice amarillo.",
-    "Vigila el medidor.",
-    "También presiona el botón que dice verde."
+    "Sube la presión en caldera dos.",
+    "Activa el botón que dice amarillo.",
+    "La válvula amarilla se trabó.",
+    "Después, el botón que dice verde."
    ],
-   "duration_s": 14.207
+   "duration_s": 8.235
   },
   "prob_e124": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón azul.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice rojo."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Toca el botón azul.",
+    "Baja la carga extra.",
+    "Más el botón que dice rojo."
    ],
-   "duration_s": 13.828
+   "duration_s": 12.191
   },
   "prob_e125": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón verde.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice rojo."
+    "¡Alerta en turbina roja!",
+    "Pulsa el botón verde.",
+    "Y el botón que dice rojo."
    ],
-   "duration_s": 13.453
+   "duration_s": 4.789
   },
   "prob_e126": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón amarillo.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón morado.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Pulsa el botón amarillo.",
+    "Al final, el botón morado."
    ],
-   "duration_s": 13.173
+   "duration_s": 5.192
   },
   "prob_e127": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "Presiona primero el botón que dice amarillo.",
-    "Libera la banda rápido.",
-    "También presiona el botón que dice azul."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Pulsa el botón que dice amarillo.",
+    "Libera la banda.",
+    "Al final, el botón que dice azul."
    ],
-   "duration_s": 14.48
+   "duration_s": 21.488
   },
   "prob_e128": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "Presiona primero el botón que dice rojo.",
-    "Libera la banda rápido.",
-    "También presiona el botón verde."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Pulsa el botón que dice rojo.",
+    "Libera la banda.",
+    "Al final, el botón verde."
    ],
-   "duration_s": 13.925
+   "duration_s": 21.014
   },
   "prob_e129": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón morado.",
-    "Hay un cortocircuito en la línea.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice azul."
+    "¡Alerta en turbina roja!",
+    "Usa el botón morado.",
+    "Luego el botón que dice azul."
    ],
-   "duration_s": 13.469
+   "duration_s": 4.894
   },
   "prob_e130": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón que dice morado.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice rojo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Activa el botón que dice morado.",
+    "Y el botón que dice rojo."
    ],
-   "duration_s": 13.948
+   "duration_s": 5.234
   },
   "prob_e131": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "Presiona primero el botón morado.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón que dice rojo."
+    "¡Generador verde sobrecalentado!",
+    "Usa el botón morado.",
+    "Sensor amarillo de escape alto.",
+    "Luego el botón que dice rojo."
    ],
-   "duration_s": 14.175
+   "duration_s": 7.47
   },
   "prob_e132": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón que dice morado.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón azul.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Activa el botón que dice morado.",
+    "Más el botón azul."
    ],
-   "duration_s": 13.498
+   "duration_s": 5.009
   },
   "prob_e133": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón que dice azul.",
-    "El motor principal se esfuerza.",
-    "También presiona el botón que dice rojo.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Primero, el botón que dice azul.",
+    "Luego el botón que dice rojo."
    ],
-   "duration_s": 14.367
+   "duration_s": 21.295
   },
   "prob_e134": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "Presiona primero el botón verde.",
-    "Equilibra la red ya.",
-    "También presiona el botón que dice amarillo."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Activa el botón verde.",
+    "Equilibra la red.",
+    "Y el botón que dice amarillo."
    ],
-   "duration_s": 13.846
+   "duration_s": 24.056
   },
   "prob_e135": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón morado.",
-    "El flujo de agua cae rápido.",
-    "Ya entra el respaldo.",
-    "También presiona el botón verde."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Pulsa el botón morado.",
+    "Y el botón verde."
    ],
-   "duration_s": 13.426
+   "duration_s": 8.233
   },
   "prob_e136": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón rojo.",
-    "Aísla la falla ahora.",
-    "También presiona el botón verde."
+    "¡Alerta en turbina roja!",
+    "Toca el botón rojo.",
+    "Después, el botón verde."
    ],
-   "duration_s": 12.998
+   "duration_s": 4.994
   },
   "prob_e137": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón que dice rojo.",
-    "Baja la carga ahora.",
-    "También presiona el botón morado."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Activa el botón que dice rojo.",
+    "Baja la carga extra.",
+    "Al final, el botón morado."
    ],
-   "duration_s": 13.853
+   "duration_s": 12.804
   },
   "prob_e138": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón azul.",
-    "Vigila el medidor.",
-    "También presiona el botón morado."
+    "Sube la presión en caldera dos.",
+    "Primero, el botón azul.",
+    "La válvula amarilla se trabó.",
+    "Al final, el botón morado."
    ],
-   "duration_s": 13.248
+   "duration_s": 7.762
   },
   "prob_e139": {
    "parts": [
-    "Presiona primero el botón rojo.",
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "También presiona el botón verde.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Toca el botón rojo.",
+    "Equilibra la red.",
+    "Luego el botón verde."
    ],
-   "duration_s": 13.249
+   "duration_s": 23.675
   },
   "prob_e140": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón que dice rojo.",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón amarillo.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Usa el botón que dice rojo.",
+    "Después, el botón amarillo."
    ],
-   "duration_s": 13.993
+   "duration_s": 9.256
   },
   "prob_e141": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "Presiona primero el botón verde.",
-    "Equilibra la red ya.",
-    "También presiona el botón azul."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Usa el botón verde.",
+    "Equilibra la red.",
+    "Más el botón azul."
    ],
-   "duration_s": 13.285
+   "duration_s": 23.616
   },
   "prob_e142": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón azul.",
-    "La temperatura de escape es alta.",
-    "También presiona el botón que dice verde.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Primero, el botón azul.",
+    "Al final, el botón que dice verde."
    ],
-   "duration_s": 14.116
+   "duration_s": 8.341
   },
   "prob_e143": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón amarillo.",
-    "Cae la presión en ese sector.",
-    "También presiona el botón morado.",
-    "Cierra esa sección ya."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Activa el botón amarillo.",
+    "Luego el botón morado."
    ],
-   "duration_s": 13.462
+   "duration_s": 14.93
   },
   "prob_e144": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón verde.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice rojo."
+    "¡Alerta en turbina roja!",
+    "Toca el botón verde.",
+    "Más el botón que dice rojo."
    ],
-   "duration_s": 13.453
+   "duration_s": 4.863
   },
   "prob_e145": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón verde.",
-    "El motor principal se esfuerza.",
-    "Libera la banda rápido.",
-    "También presiona el botón que dice morado."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Activa el botón verde.",
+    "Y el botón que dice morado."
    ],
-   "duration_s": 13.919
+   "duration_s": 20.461
   },
   "prob_e146": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Cae la presión en ese sector.",
-    "Presiona primero el botón azul.",
-    "Cierra esa sección ya.",
-    "También presiona el botón amarillo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Usa el botón azul.",
+    "Cierra esa sección.",
+    "Luego el botón amarillo."
    ],
-   "duration_s": 13.463
+   "duration_s": 14.783
   },
   "prob_e147": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón rojo.",
-    "La temperatura de escape es alta.",
-    "También presiona el botón que dice rojo.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Activa el botón rojo.",
+    "Y el botón que dice rojo."
    ],
-   "duration_s": 14.151
+   "duration_s": 7.412
   },
   "prob_e148": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón rojo.",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón azul.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Activa el botón rojo.",
+    "Más el botón azul."
    ],
-   "duration_s": 13.404
+   "duration_s": 8.417
   },
   "prob_e149": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón amarillo.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón azul."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Primero, el botón amarillo.",
+    "Luego el botón azul."
    ],
-   "duration_s": 13.499
+   "duration_s": 12.377
   },
   "prob_e150": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "Presiona primero el botón que dice morado.",
-    "Equilibra la red ya.",
-    "También presiona el botón que dice verde."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Usa el botón que dice morado.",
+    "Equilibra la red.",
+    "Y el botón que dice verde."
    ],
-   "duration_s": 14.202
+   "duration_s": 24.21
   },
   "prob_e151": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón que dice rojo.",
-    "Cae la presión en ese sector.",
-    "Cierra esa sección ya.",
-    "También presiona el botón rojo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Primero, el botón que dice rojo.",
+    "Más el botón rojo."
    ],
-   "duration_s": 13.776
+   "duration_s": 15.453
   },
   "prob_e152": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice verde.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón verde."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Pulsa el botón que dice verde.",
+    "Después, el botón verde."
    ],
-   "duration_s": 13.775
+   "duration_s": 12.678
   },
   "prob_e153": {
    "parts": [
-    "Presiona primero el botón que dice rojo.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice azul.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Primero, el botón que dice rojo.",
+    "Al final, el botón que dice azul."
    ],
-   "duration_s": 13.879
+   "duration_s": 6.153
   },
   "prob_e154": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón rojo.",
-    "El alimentador está inestable.",
-    "Equilibra la red ya.",
-    "También presiona el botón que dice azul."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Toca el botón rojo.",
+    "Más el botón que dice azul."
    ],
-   "duration_s": 13.741
+   "duration_s": 24.016
   },
   "prob_e155": {
    "parts": [
-    "Presiona primero el botón morado.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón amarillo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Toca el botón morado.",
+    "Luego el botón amarillo."
    ],
-   "duration_s": 13.144
+   "duration_s": 4.669
   },
   "prob_e156": {
    "parts": [
-    "Presiona primero el botón rojo.",
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "También presiona el botón que dice morado.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Toca el botón rojo.",
+    "Equilibra la red.",
+    "Después, el botón que dice morado."
    ],
-   "duration_s": 13.749
+   "duration_s": 24.524
   },
   "prob_e157": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "Presiona primero el botón que dice morado.",
-    "Equilibra la red ya.",
-    "También presiona el botón morado."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Usa el botón que dice morado.",
+    "Equilibra la red.",
+    "Después, el botón morado."
    ],
-   "duration_s": 13.808
+   "duration_s": 24.524
   },
   "prob_e158": {
    "parts": [
-    "Presiona primero el botón que dice morado.",
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "También presiona el botón morado.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Toca el botón que dice morado.",
+    "Libera la banda.",
+    "Más el botón morado."
    ],
-   "duration_s": 13.938
+   "duration_s": 20.533
   },
   "prob_e159": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón que dice azul.",
-    "Cae la presión en ese sector.",
-    "También presiona el botón que dice amarillo.",
-    "Cierra esa sección ya."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Pulsa el botón que dice azul.",
+    "Más el botón que dice amarillo."
    ],
-   "duration_s": 14.317
+   "duration_s": 15.543
   },
   "prob_e160": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón que dice rojo.",
-    "El alimentador está inestable.",
-    "Equilibra la red ya.",
-    "También presiona el botón azul."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Activa el botón que dice rojo.",
+    "Y el botón azul."
    ],
-   "duration_s": 13.765
+   "duration_s": 23.987
   },
   "prob_e161": {
    "parts": [
-    "Presiona primero el botón verde.",
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "También presiona el botón que dice azul.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Toca el botón verde.",
+    "Baja la carga extra.",
+    "Luego el botón que dice azul."
    ],
-   "duration_s": 13.757
+   "duration_s": 12.182
   },
   "prob_e162": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Cae la presión en ese sector.",
-    "Presiona primero el botón rojo.",
-    "Cierra esa sección ya.",
-    "También presiona el botón que dice rojo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Primero, el botón rojo.",
+    "Cierra esa sección.",
+    "Luego el botón que dice rojo."
    ],
-   "duration_s": 13.771
+   "duration_s": 15.478
   },
   "prob_e163": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón que dice rojo.",
-    "La válvula de alivio se trabó.",
-    "También presiona el botón rojo.",
-    "Vigila el medidor."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Primero, el botón que dice rojo.",
+    "Después, el botón rojo."
    ],
-   "duration_s": 13.658
+   "duration_s": 8.104
   },
   "prob_e164": {
    "parts": [
-    "Presiona primero el botón que dice morado.",
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "También presiona el botón amarillo.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Activa el botón que dice morado.",
+    "Baja la carga extra.",
+    "Y el botón amarillo."
    ],
-   "duration_s": 13.957
+   "duration_s": 12.272
   },
   "prob_e165": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón que dice morado.",
-    "El flujo de agua cae rápido.",
-    "Ya entra el respaldo.",
-    "También presiona el botón que dice amarillo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Toca el botón que dice morado.",
+    "Más el botón que dice amarillo."
    ],
-   "duration_s": 14.441
+   "duration_s": 9.159
   },
   "prob_e166": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón verde.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón rojo."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Toca el botón verde.",
+    "Después, el botón rojo."
    ],
-   "duration_s": 13.343
+   "duration_s": 12.285
   },
   "prob_e167": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice morado.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón amarillo."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Pulsa el botón que dice morado.",
+    "Más el botón amarillo."
    ],
-   "duration_s": 13.975
+   "duration_s": 12.366
   },
   "prob_e168": {
    "parts": [
-    "Presiona primero el botón que dice verde.",
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "También presiona el botón morado.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Primero, el botón que dice verde.",
+    "Equilibra la red.",
+    "Al final, el botón morado."
    ],
-   "duration_s": 13.704
+   "duration_s": 24.911
   },
   "prob_e169": {
    "parts": [
-    "Presiona primero el botón que dice azul.",
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "También presiona el botón que dice amarillo.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Usa el botón que dice azul.",
+    "Libera la banda.",
+    "Después, el botón que dice amarillo."
    ],
-   "duration_s": 14.448
+   "duration_s": 21.414
   },
   "prob_e170": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Cae la presión en ese sector.",
-    "Presiona primero el botón que dice morado.",
-    "Cierra esa sección ya.",
-    "También presiona el botón que dice rojo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Toca el botón que dice morado.",
+    "Cierra esa sección.",
+    "Luego el botón que dice rojo."
    ],
-   "duration_s": 14.246
+   "duration_s": 15.438
   },
   "prob_e171": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón rojo.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice morado.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Usa el botón rojo.",
+    "Luego el botón que dice morado."
    ],
-   "duration_s": 13.493
+   "duration_s": 4.911
   },
   "prob_e172": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "Presiona primero el botón que dice rojo.",
-    "Equilibra la red ya.",
-    "También presiona el botón que dice morado."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Pulsa el botón que dice rojo.",
+    "Equilibra la red.",
+    "Después, el botón que dice morado."
    ],
-   "duration_s": 14.235
+   "duration_s": 24.942
   },
   "prob_e173": {
    "parts": [
-    "Presiona primero el botón que dice azul.",
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón verde.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Activa el botón que dice azul.",
+    "Entra el respaldo.",
+    "Al final, el botón verde."
    ],
-   "duration_s": 13.809
+   "duration_s": 9.244
   },
   "prob_e174": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón amarillo.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice morado."
+    "¡Alerta en turbina roja!",
+    "Primero, el botón amarillo.",
+    "Después, el botón que dice morado."
    ],
-   "duration_s": 13.624
+   "duration_s": 5.927
   },
   "prob_e175": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón que dice rojo.",
-    "Hay un cortocircuito en la línea.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice verde."
+    "¡Alerta en turbina roja!",
+    "Primero, el botón que dice rojo.",
+    "Más el botón que dice verde."
    ],
-   "duration_s": 13.901
+   "duration_s": 5.643
   },
   "prob_e176": {
    "parts": [
-    "Presiona primero el botón que dice amarillo.",
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "También presiona el botón que dice morado.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Usa el botón que dice amarillo.",
+    "Baja la carga extra.",
+    "Al final, el botón que dice morado."
    ],
-   "duration_s": 14.392
+   "duration_s": 13.145
   },
   "prob_e177": {
    "parts": [
-    "Presiona primero el botón que dice azul.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice morado.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Pulsa el botón que dice azul.",
+    "Y el botón que dice morado."
    ],
-   "duration_s": 13.899
+   "duration_s": 5.18
   },
   "prob_e178": {
    "parts": [
-    "Presiona primero el botón morado.",
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "También presiona el botón que dice rojo.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Toca el botón morado.",
+    "Libera la banda.",
+    "Luego el botón que dice rojo."
    ],
-   "duration_s": 13.918
+   "duration_s": 20.53
   },
   "prob_e179": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón azul.",
-    "El motor principal se esfuerza.",
-    "También presiona el botón que dice morado.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Toca el botón azul.",
+    "Más el botón que dice morado."
    ],
-   "duration_s": 13.957
+   "duration_s": 20.517
   },
   "prob_e180": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón verde.",
-    "La temperatura de escape es alta.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón que dice rojo."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Toca el botón verde.",
+    "Después, el botón que dice rojo."
    ],
-   "duration_s": 14.13
+   "duration_s": 7.938
   },
   "prob_e181": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "El flujo de agua cae rápido.",
-    "Presiona primero el botón que dice azul.",
-    "Ya entra el respaldo.",
-    "También presiona el botón azul."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Usa el botón que dice azul.",
+    "Entra el respaldo.",
+    "Luego el botón azul."
    ],
-   "duration_s": 13.845
+   "duration_s": 8.692
   },
   "prob_e182": {
    "parts": [
-    "Presiona primero el botón morado.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón amarillo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Toca el botón morado.",
+    "Más el botón amarillo."
    ],
-   "duration_s": 13.144
+   "duration_s": 4.644
   },
   "prob_e183": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón que dice rojo.",
-    "La válvula de alivio se trabó.",
-    "Vigila el medidor.",
-    "También presiona el botón que dice morado."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Usa el botón que dice rojo.",
+    "Más el botón que dice morado."
    ],
-   "duration_s": 14.139
+   "duration_s": 7.559
   },
   "prob_e184": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón que dice morado.",
-    "El alimentador está inestable.",
-    "También presiona el botón azul.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Toca el botón que dice morado.",
+    "Después, el botón azul."
    ],
-   "duration_s": 13.786
+   "duration_s": 24.523
   },
   "prob_e185": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón amarillo.",
-    "La temperatura de escape es alta.",
-    "También presiona el botón morado.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Toca el botón amarillo.",
+    "Luego el botón morado."
    ],
-   "duration_s": 13.851
+   "duration_s": 7.242
   },
   "prob_e186": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón verde.",
-    "Cae la presión en ese sector.",
-    "Cierra esa sección ya.",
-    "También presiona el botón rojo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Toca el botón verde.",
+    "Al final, el botón rojo."
    ],
-   "duration_s": 13.296
+   "duration_s": 15.139
   },
   "prob_e187": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón que dice rojo.",
-    "El flujo de agua cae rápido.",
-    "Ya entra el respaldo.",
-    "También presiona el botón que dice verde."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Toca el botón que dice rojo.",
+    "Al final, el botón que dice verde."
    ],
-   "duration_s": 14.287
+   "duration_s": 9.511
   },
   "prob_e188": {
    "parts": [
-    "Presiona primero el botón azul.",
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "También presiona el botón que dice amarillo.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Usa el botón azul.",
+    "Sensor amarillo de escape alto.",
+    "Al final, el botón que dice amarillo."
    ],
-   "duration_s": 14.276
+   "duration_s": 8.016
   },
   "prob_e189": {
    "parts": [
-    "Presiona primero el botón que dice verde.",
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "También presiona el botón amarillo.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Pulsa el botón que dice verde.",
+    "Libera la banda.",
+    "Después, el botón amarillo."
    ],
-   "duration_s": 13.988
+   "duration_s": 21.1
   },
   "prob_e190": {
    "parts": [
-    "Presiona primero el botón amarillo.",
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "También presiona el botón que dice verde.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Activa el botón amarillo.",
+    "Sensor amarillo de escape alto.",
+    "Y el botón que dice verde."
    ],
-   "duration_s": 14.241
+   "duration_s": 7.494
   },
   "prob_e191": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón morado.",
-    "La temperatura de escape es alta.",
-    "También presiona el botón azul.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Activa el botón morado.",
+    "Luego el botón azul."
    ],
-   "duration_s": 13.726
+   "duration_s": 7.227
   },
   "prob_e192": {
    "parts": [
-    "Presiona primero el botón que dice verde.",
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "También presiona el botón que dice morado.",
-    "Vigila el medidor."
+    "Sube la presión en caldera dos.",
+    "Toca el botón que dice verde.",
+    "La válvula amarilla se trabó.",
+    "Luego el botón que dice morado."
    ],
-   "duration_s": 14.053
+   "duration_s": 7.566
   },
   "prob_e193": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón morado.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice azul."
+    "¡Alerta en turbina roja!",
+    "Toca el botón morado.",
+    "Al final, el botón que dice azul."
    ],
-   "duration_s": 13.469
+   "duration_s": 5.381
   },
   "prob_e194": {
    "parts": [
-    "Presiona primero el botón que dice azul.",
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "También presiona el botón que dice verde.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Toca el botón que dice azul.",
+    "Sensor amarillo de escape alto.",
+    "Más el botón que dice verde."
    ],
-   "duration_s": 14.546
+   "duration_s": 7.778
   },
   "prob_e195": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón que dice verde.",
-    "Baja la carga ahora.",
-    "También presiona el botón rojo."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Primero, el botón que dice verde.",
+    "Baja la carga extra.",
+    "Luego el botón rojo."
    ],
-   "duration_s": 13.778
+   "duration_s": 12.616
   },
   "prob_e196": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón que dice amarillo.",
-    "Baja la carga ahora.",
-    "También presiona el botón verde."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Usa el botón que dice amarillo.",
+    "Baja la carga extra.",
+    "Más el botón verde."
    ],
-   "duration_s": 13.935
+   "duration_s": 12.261
   },
   "prob_e197": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón que dice rojo.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice amarillo."
+    "¡Alerta en turbina roja!",
+    "Pulsa el botón que dice rojo.",
+    "Luego el botón que dice amarillo."
    ],
-   "duration_s": 14.04
+   "duration_s": 5.435
   },
   "prob_e198": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón que dice rojo.",
-    "Hay un cortocircuito en la línea.",
-    "Aísla la falla ahora.",
-    "También presiona el botón amarillo."
+    "¡Alerta en turbina roja!",
+    "Activa el botón que dice rojo.",
+    "Al final, el botón amarillo."
    ],
-   "duration_s": 13.615
+   "duration_s": 5.584
   },
   "prob_e199": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón que dice azul.",
-    "El alimentador está inestable.",
-    "También presiona el botón que dice morado.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Toca el botón que dice azul.",
+    "Y el botón que dice morado."
    ],
-   "duration_s": 14.221
+   "duration_s": 24.255
   },
   "prob_e200": {
    "parts": [
-    "Presiona primero el botón que dice azul.",
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Cae la presión en ese sector.",
-    "También presiona el botón que dice rojo.",
-    "Cierra esa sección ya."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Primero, el botón que dice azul.",
+    "Cierra esa sección.",
+    "Al final, el botón que dice rojo."
    ],
-   "duration_s": 14.195
+   "duration_s": 16.293
   },
   "prob_e201": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón que dice amarillo.",
-    "Aísla la falla ahora.",
-    "También presiona el botón verde."
+    "¡Alerta en turbina roja!",
+    "Pulsa el botón que dice amarillo.",
+    "Después, el botón verde."
    ],
-   "duration_s": 13.573
+   "duration_s": 5.512
   },
   "prob_e202": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "El flujo de agua cae rápido.",
-    "Presiona primero el botón que dice verde.",
-    "Ya entra el respaldo.",
-    "También presiona el botón verde."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Activa el botón que dice verde.",
+    "Entra el respaldo.",
+    "Al final, el botón verde."
    ],
-   "duration_s": 13.816
+   "duration_s": 9.219
   },
   "prob_e203": {
    "parts": [
-    "Presiona primero el botón amarillo.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice verde.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Pulsa el botón amarillo.",
+    "Luego el botón que dice verde."
    ],
-   "duration_s": 13.529
+   "duration_s": 5.052
   },
   "prob_e204": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón verde.",
-    "La temperatura de escape es alta.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón que dice verde."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Primero, el botón verde.",
+    "Luego el botón que dice verde."
    ],
-   "duration_s": 14.098
+   "duration_s": 7.858
   },
   "prob_e205": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón azul.",
-    "Hay un cortocircuito en la línea.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice verde."
+    "¡Alerta en turbina roja!",
+    "Toca el botón azul.",
+    "Después, el botón que dice verde."
    ],
-   "duration_s": 13.452
+   "duration_s": 5.359
   },
   "prob_e206": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice morado.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice verde."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Primero, el botón que dice morado.",
+    "Luego el botón que dice verde."
    ],
-   "duration_s": 14.262
+   "duration_s": 12.999
   },
   "prob_e207": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón azul.",
-    "Cae la presión en ese sector.",
-    "También presiona el botón que dice azul.",
-    "Cierra esa sección ya."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Pulsa el botón azul.",
+    "Luego el botón que dice azul."
    ],
-   "duration_s": 13.752
+   "duration_s": 15.104
   },
   "prob_e208": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón que dice azul.",
-    "Cae la presión en ese sector.",
-    "Cierra esa sección ya.",
-    "También presiona el botón rojo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Primero, el botón que dice azul.",
+    "Luego el botón rojo."
    ],
-   "duration_s": 13.756
+   "duration_s": 15.485
   },
   "prob_e209": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón que dice verde.",
-    "La válvula de alivio se trabó.",
-    "Vigila el medidor.",
-    "También presiona el botón morado."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Pulsa el botón que dice verde.",
+    "Y el botón morado."
    ],
-   "duration_s": 13.653
+   "duration_s": 7.096
   },
   "prob_e210": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón verde.",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón amarillo.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Primero, el botón verde.",
+    "Al final, el botón amarillo."
    ],
-   "duration_s": 13.513
+   "duration_s": 9.305
   },
   "prob_e211": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón azul.",
-    "Cae la presión en ese sector.",
-    "Cierra esa sección ya.",
-    "También presiona el botón que dice amarillo."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Usa el botón azul.",
+    "Luego el botón que dice amarillo."
    ],
-   "duration_s": 13.891
+   "duration_s": 15.145
   },
   "prob_e212": {
    "parts": [
-    "Presiona primero el botón que dice amarillo.",
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "También presiona el botón que dice rojo.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Usa el botón que dice amarillo.",
+    "Equilibra la red.",
+    "Después, el botón que dice rojo."
    ],
-   "duration_s": 14.299
+   "duration_s": 24.967
   },
   "prob_e213": {
    "parts": [
-    "Presiona primero el botón que dice azul.",
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "También presiona el botón que dice rojo.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Pulsa el botón que dice azul.",
+    "Sensor amarillo de escape alto.",
+    "Al final, el botón que dice rojo."
    ],
-   "duration_s": 14.591
+   "duration_s": 8.355
   },
   "prob_e214": {
    "parts": [
-    "Presiona primero el botón que dice rojo.",
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "También presiona el botón que dice azul.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Usa el botón que dice rojo.",
+    "Equilibra la red.",
+    "Luego el botón que dice azul."
    ],
-   "duration_s": 14.164
+   "duration_s": 24.372
   },
   "prob_e215": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón verde.",
-    "La válvula de alivio se trabó.",
-    "Vigila el medidor.",
-    "También presiona el botón rojo."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Toca el botón verde.",
+    "Luego el botón rojo."
    ],
-   "duration_s": 13.188
+   "duration_s": 6.847
   },
   "prob_e216": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "El flujo de agua cae rápido.",
-    "Presiona primero el botón que dice verde.",
-    "Ya entra el respaldo.",
-    "También presiona el botón que dice amarillo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Pulsa el botón que dice verde.",
+    "Entra el respaldo.",
+    "Después, el botón que dice amarillo."
    ],
-   "duration_s": 14.381
+   "duration_s": 9.649
   },
   "prob_e217": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón azul.",
-    "El motor principal se esfuerza.",
-    "Libera la banda rápido.",
-    "También presiona el botón rojo."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Pulsa el botón azul.",
+    "Después, el botón rojo."
    ],
-   "duration_s": 13.478
+   "duration_s": 20.67
   },
   "prob_e218": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón que dice morado.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice azul."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Activa el botón que dice morado.",
+    "Baja la carga extra.",
+    "Luego el botón que dice azul."
    ],
-   "duration_s": 14.275
+   "duration_s": 12.687
   },
   "prob_e219": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "Presiona primero el botón que dice rojo.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón verde."
+    "¡Generador verde sobrecalentado!",
+    "Pulsa el botón que dice rojo.",
+    "Sensor amarillo de escape alto.",
+    "Luego el botón verde."
    ],
-   "duration_s": 14.152
+   "duration_s": 7.529
   },
   "prob_e220": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón que dice rojo.",
-    "El flujo de agua cae rápido.",
-    "Ya entra el respaldo.",
-    "También presiona el botón verde."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Usa el botón que dice rojo.",
+    "Luego el botón verde."
    ],
-   "duration_s": 13.861
+   "duration_s": 8.68
   },
   "prob_e221": {
    "parts": [
-    "Presiona primero el botón que dice verde.",
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "También presiona el botón amarillo.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Activa el botón que dice verde.",
+    "Libera la banda.",
+    "Y el botón amarillo."
    ],
-   "duration_s": 13.988
+   "duration_s": 20.526
   },
   "prob_e222": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón verde.",
-    "Las bobinas se calientan.",
-    "También presiona el botón que dice verde.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Activa el botón verde.",
+    "Luego el botón que dice verde."
    ],
-   "duration_s": 13.761
+   "duration_s": 12.282
   },
   "prob_e223": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón azul.",
-    "El flujo de agua cae rápido.",
-    "También presiona el botón rojo.",
-    "Ya entra el respaldo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Primero, el botón azul.",
+    "Luego el botón rojo."
    ],
-   "duration_s": 13.409
+   "duration_s": 8.775
   },
   "prob_e224": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón que dice verde.",
-    "La temperatura de escape es alta.",
-    "También presiona el botón que dice azul.",
-    "Enfría la unidad rápido."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Activa el botón que dice verde.",
+    "Al final, el botón que dice azul."
    ],
-   "duration_s": 14.546
+   "duration_s": 8.361
   },
   "prob_e225": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón amarillo.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice rojo."
+    "¡Alerta en turbina roja!",
+    "Activa el botón amarillo.",
+    "Al final, el botón que dice rojo."
    ],
-   "duration_s": 13.608
+   "duration_s": 5.603
   },
   "prob_e226": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón que dice amarillo.",
-    "Vigila el medidor.",
-    "También presiona el botón que dice verde."
+    "Sube la presión en caldera dos.",
+    "Toca el botón que dice amarillo.",
+    "La válvula amarilla se trabó.",
+    "Más el botón que dice verde."
    ],
-   "duration_s": 14.207
+   "duration_s": 7.627
   },
   "prob_e227": {
    "parts": [
-    "Presiona primero el botón que dice azul.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón azul.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Toca el botón que dice azul.",
+    "Y el botón azul."
    ],
-   "duration_s": 13.429
+   "duration_s": 4.746
   },
   "prob_e228": {
    "parts": [
-    "Presiona primero el botón azul.",
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "También presiona el botón que dice rojo.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Pulsa el botón azul.",
+    "Libera la banda.",
+    "Al final, el botón que dice rojo."
    ],
-   "duration_s": 13.903
+   "duration_s": 21.034
   },
   "prob_e229": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón que dice verde.",
-    "El motor principal se esfuerza.",
-    "Libera la banda rápido.",
-    "También presiona el botón morado."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Pulsa el botón que dice verde.",
+    "Más el botón morado."
    ],
-   "duration_s": 13.913
+   "duration_s": 20.533
   },
   "prob_e230": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón azul.",
-    "El alimentador está inestable.",
-    "También presiona el botón que dice verde.",
-    "Equilibra la red ya."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Activa el botón azul.",
+    "Más el botón que dice verde."
    ],
-   "duration_s": 13.726
+   "duration_s": 24.097
   },
   "prob_e231": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón verde.",
-    "Aísla la falla ahora.",
-    "También presiona el botón que dice morado."
+    "¡Alerta en turbina roja!",
+    "Pulsa el botón verde.",
+    "Al final, el botón que dice morado."
    ],
-   "duration_s": 13.469
+   "duration_s": 5.437
   },
   "prob_e232": {
    "parts": [
-    "Presiona primero el botón verde.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice verde.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Primero, el botón verde.",
+    "Después, el botón que dice verde."
    ],
-   "duration_s": 13.374
+   "duration_s": 5.756
   },
   "prob_e233": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón rojo.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón verde.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Primero, el botón rojo.",
+    "Al final, el botón verde."
    ],
-   "duration_s": 12.993
+   "duration_s": 5.415
   },
   "prob_e234": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón que dice rojo.",
-    "Cae la presión en ese sector.",
-    "Cierra esa sección ya.",
-    "También presiona el botón que dice azul."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Activa el botón que dice rojo.",
+    "Más el botón que dice azul."
    ],
-   "duration_s": 14.213
+   "duration_s": 15.502
   },
   "prob_e235": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "Presiona primero el botón que dice amarillo.",
-    "La temperatura de escape es alta.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón que dice azul."
+    "¡Generador verde sobrecalentado!",
+    "Sensor amarillo de escape alto.",
+    "Primero, el botón que dice amarillo.",
+    "Luego el botón que dice azul."
    ],
-   "duration_s": 14.707
+   "duration_s": 8.362
   },
   "prob_e236": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "Presiona primero el botón que dice verde.",
-    "El alimentador está inestable.",
-    "Equilibra la red ya.",
-    "También presiona el botón amarillo."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Equilibra la red.",
+    "Activa el botón que dice verde.",
+    "Al final, el botón amarillo."
    ],
-   "duration_s": 13.855
+   "duration_s": 24.68
   },
   "prob_e237": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón que dice morado.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón morado."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Activa el botón que dice morado.",
+    "Y el botón morado."
    ],
-   "duration_s": 13.868
+   "duration_s": 12.186
   },
   "prob_e238": {
    "parts": [
-    "Presiona primero el botón morado.",
-    "¡Atención, se atoró la banda de carbón!",
-    "El motor principal se esfuerza.",
-    "También presiona el botón que dice amarillo.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Usa el botón morado.",
+    "Libera la banda.",
+    "Después, el botón que dice amarillo."
    ],
-   "duration_s": 14.033
+   "duration_s": 21.072
   },
   "prob_e239": {
    "parts": [
-    "Presiona primero el botón que dice verde.",
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón que dice morado.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Activa el botón que dice verde.",
+    "Y el botón que dice morado."
    ],
-   "duration_s": 13.874
+   "duration_s": 5.207
   },
   "prob_t00": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Presiona primero el botón amarillo.",
-    "Las bobinas se calientan.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice azul."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Baja la carga extra.",
+    "Activa el botón amarillo.",
+    "Y el botón que dice azul."
    ],
-   "duration_s": 13.936
+   "duration_s": 12.256
   },
   "prob_t01": {
    "parts": [
-    "¡Cuidado, fuga de vapor en tubería norte!",
-    "Presiona primero el botón morado.",
-    "Cae la presión en ese sector.",
-    "También presiona el botón que dice verde.",
-    "Cierra esa sección ya."
+    "Fuga de vapor en la tubería verde.",
+    "La presión cae en el sector rojo.",
+    "Los sensores del monitor amarillo marcan una caída brusca.",
+    "Mantenimiento va hacia el sector cuatro.",
+    "Cierra esa sección.",
+    "Toca el botón morado.",
+    "Luego el botón que dice verde."
    ],
-   "duration_s": 13.742
+   "duration_s": 15.051
   },
   "prob_t02": {
    "parts": [
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "Presiona primero el botón que dice rojo.",
-    "Baja la carga ahora.",
-    "También presiona el botón que dice morado."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Usa el botón que dice rojo.",
+    "Baja la carga extra.",
+    "Luego el botón que dice morado."
    ],
-   "duration_s": 14.294
+   "duration_s": 12.578
   },
   "prob_t03": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón verde.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón amarillo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Toca el botón verde.",
+    "Más el botón amarillo."
    ],
-   "duration_s": 13.133
+   "duration_s": 4.609
   },
   "prob_t04": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "Presiona primero el botón azul.",
-    "Vigila el medidor.",
-    "También presiona el botón que dice azul."
+    "Sube la presión en caldera dos.",
+    "Toca el botón azul.",
+    "La válvula amarilla se trabó.",
+    "Luego el botón que dice azul."
    ],
-   "duration_s": 13.656
+   "duration_s": 7.218
   },
   "prob_t05": {
    "parts": [
-    "¡Atención, se atoró la banda de carbón!",
-    "Presiona primero el botón que dice morado.",
-    "El motor principal se esfuerza.",
-    "También presiona el botón amarillo.",
-    "Libera la banda rápido."
+    "Atención, se atoró la banda amarilla junto a la puerta azul.",
+    "El motor rojo se esfuerza con demasiada carga.",
+    "Sube el polvo a lo largo del pasillo morado.",
+    "Sala de control desvía energía desde la línea verde de respaldo.",
+    "Mantén libre la tolva principal mientras reiniciamos.",
+    "Libera la banda.",
+    "Activa el botón que dice morado.",
+    "Después, el botón amarillo."
    ],
-   "duration_s": 14.082
+   "duration_s": 21.203
   },
   "prob_t06": {
    "parts": [
-    "¡Cuidado, se detuvo la bomba de enfriamiento!",
-    "Presiona primero el botón que dice amarillo.",
-    "El flujo de agua cae rápido.",
-    "Ya entra el respaldo.",
-    "También presiona el botón que dice rojo."
+    "Se detuvo la bomba azul.",
+    "No toques el interruptor blanco.",
+    "Entra el respaldo.",
+    "Toca el botón que dice amarillo.",
+    "Y el botón que dice rojo."
    ],
-   "duration_s": 14.433
+   "duration_s": 9.01
   },
   "prob_t07": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón que dice azul.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón rojo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Usa el botón que dice azul.",
+    "Después, el botón rojo."
    ],
-   "duration_s": 13.458
+   "duration_s": 5.348
   },
   "prob_t08": {
    "parts": [
-    "¡Cuidado, el generador se sobrecalienta!",
-    "La temperatura de escape es alta.",
-    "Presiona primero el botón morado.",
-    "Enfría la unidad rápido.",
-    "También presiona el botón amarillo."
+    "¡Generador verde sobrecalentado!",
+    "Usa el botón morado.",
+    "Sensor amarillo de escape alto.",
+    "Más el botón amarillo."
    ],
-   "duration_s": 13.857
+   "duration_s": 7.188
   },
   "prob_t09": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Hay un cortocircuito en la línea.",
-    "Presiona primero el botón verde.",
-    "Aísla la falla ahora.",
-    "También presiona el botón amarillo."
+    "¡Alerta en turbina roja!",
+    "Toca el botón verde.",
+    "Más el botón amarillo."
    ],
-   "duration_s": 13.135
+   "duration_s": 4.609
   },
   "prob_t10": {
    "parts": [
-    "¡Alerta, cae el voltaje en la línea cuatro!",
-    "El alimentador está inestable.",
-    "Presiona primero el botón azul.",
-    "Equilibra la red ya.",
-    "También presiona el botón que dice morado."
+    "Cae el voltaje en la línea principal azul.",
+    "El alimentador de la subestación morada está inestable.",
+    "Los relés auxiliares de la bahía verde fallan seguido.",
+    "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+    "Estamos pasando el bus secundario a control manual.",
+    "Espera a que el medidor de frecuencia se estabilice antes de cerrar.",
+    "Usa el botón azul.",
+    "Equilibra la red.",
+    "Más el botón que dice morado."
    ],
-   "duration_s": 13.785
+   "duration_s": 24.021
   },
   "prob_t11": {
    "parts": [
-    "Presiona primero el botón que dice verde.",
-    "¡Alerta, sobrecarga en el transformador tres!",
-    "Las bobinas se calientan.",
-    "También presiona el botón que dice azul.",
-    "Baja la carga ahora."
+    "Sobrecarga en el transformador tres.",
+    "Las bobinas moradas se calientan rápido.",
+    "Revisa el voltaje en el panel verde.",
+    "Pulsa el botón que dice verde.",
+    "Baja la carga extra.",
+    "Después, el botón que dice azul."
    ],
-   "duration_s": 14.192
+   "duration_s": 13.051
   },
   "prob_t12": {
    "parts": [
-    "¡Alerta, problema en las turbinas!",
-    "Presiona primero el botón morado.",
-    "Hay un cortocircuito en la línea.",
-    "También presiona el botón rojo.",
-    "Aísla la falla ahora."
+    "¡Alerta en turbina roja!",
+    "Activa el botón morado.",
+    "Y el botón rojo."
    ],
-   "duration_s": 13.043
+   "duration_s": 4.51
   },
   "prob_t13": {
    "parts": [
-    "Presiona primero el botón verde.",
-    "¡Atención, sube la presión en caldera dos!",
-    "La válvula de alivio se trabó.",
-    "También presiona el botón rojo.",
-    "Vigila el medidor."
+    "Sube la presión en caldera dos.",
+    "Toca el botón verde.",
+    "La válvula amarilla se trabó.",
+    "Luego el botón rojo."
    ],
-   "duration_s": 13.144
+   "duration_s": 6.847
   },
   "prob_t14": {
    "parts": [
-    "¡Atención, sube la presión en caldera dos!",
-    "Presiona primero el botón que dice azul.",
-    "La válvula de alivio se trabó.",
-    "También presiona el botón verde.",
-    "Vigila el medidor."
+    "Sube la presión en caldera dos.",
+    "La válvula amarilla se trabó.",
+    "Pulsa el botón que dice azul.",
+    "Y el botón verde."
    ],
-   "duration_s": 13.613
+   "duration_s": 7.089
   }
  }
 }

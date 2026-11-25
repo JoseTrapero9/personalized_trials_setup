@@ -45,12 +45,12 @@ PRETRAIN_HIT_POINTS = 5
 PRETRAIN_WRONG_PENALTY = 5
 RETRIEVAL_SECONDS = 5           # 5-second safe pause at checkpoint to pick up a piece
 DELIVERY_WINDOW_SECONDS = 5     # 5-second safe pause after pressing "D" (deliver) - the only way to deliver
-TASK_SECONDS_DEFAULT = 30       # Assembly time in baseline / audio / haptic scenarios
+TASK_SECONDS_DEFAULT = 35       # Assembly time in baseline / audio / haptic scenarios
 WARNING_SECONDS = 10            # Red timer + blinking warning threshold
 
 # Radio game (radio_script.py / panel_logic.py / game.py)
 RADIO_AUDIO_DIR = os.path.join(base_dir, "radio_audio")   # made by generate_radio_audio.py
-PROBLEMS_PER_CHECKPOINT = 3        # radio problems (solved or not) before a checkpoint;
+PROBLEMS_PER_CHECKPOINT = 2        # radio problems (solved or not) before a checkpoint;
                                    # problems during the battery task do not count
 RESPONSE_SECONDS = 6.0             # time to finish the presses after the instruction ends
 SHUFFLE_SECONDS = 4.0              # idle buttons change color/word this often (frozen during a problem)

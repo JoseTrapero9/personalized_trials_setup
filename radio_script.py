@@ -13,7 +13,7 @@ import hashlib
 import json
 import re
 
-SCRIPT_VERSION = 4
+SCRIPT_VERSION = 6
 
 LANGUAGES = {
     "en": "English",
@@ -63,28 +63,71 @@ def step_phrase(lang, kind, color):
     raise ValueError(lang)
 
 
-def first_step_text(lang, step):
+FIRST_STEP_TEMPLATES = {
+    "en": [
+        "Hit {s}.",
+        "Tap {s}.",
+        "First, {s}.",
+        "Use {s}.",
+        "Press {s}.",
+    ],
+    "es": [
+        "Toca {s}.",
+        "Usa {s}.",
+        "Primero, {s}.",
+        "Pulsa {s}.",
+        "Activa {s}.",
+    ],
+    "de": [
+        "Drücke {s}.",
+        "Nimm {s}.",
+        "Zuerst {s}.",
+        "Wähle {s}.",
+        "Tippe {s}.",
+    ],
+}
+
+SECOND_STEP_TEMPLATES = {
+    "en": [
+        "Then {s}.",
+        "And {s}.",
+        "Next, {s}.",
+        "Plus {s}.",
+        "Last, {s}.",
+    ],
+    "es": [
+        "Luego {s}.",
+        "Y {s}.",
+        "Después, {s}.",
+        "Más {s}.",
+        "Al final, {s}.",
+    ],
+    "de": [
+        "Dann {s}.",
+        "Und {s}.",
+        "Danach {s}.",
+        "Plus {s}.",
+        "Zuletzt {s}.",
+    ],
+}
+
+
+def first_step_text(lang, step, variant=0):
     """Spoken command for the FIRST button in an announcement."""
+    if lang not in FIRST_STEP_TEMPLATES:
+        raise ValueError(lang)
     s = step_phrase(lang, *step)
-    if lang == "en":
-        return f"Press first {s}."
-    if lang == "es":
-        return f"Presiona primero {s}."
-    if lang == "de":
-        return f"Drücke zuerst {s}."
-    raise ValueError(lang)
+    templates = FIRST_STEP_TEMPLATES[lang]
+    return templates[variant % len(templates)].format(s=s)
 
 
-def second_step_text(lang, step):
+def second_step_text(lang, step, variant=0):
     """Spoken command for the SECOND button in an announcement."""
+    if lang not in SECOND_STEP_TEMPLATES:
+        raise ValueError(lang)
     s = step_phrase(lang, *step)
-    if lang == "en":
-        return f"Also press {s}."
-    if lang == "es":
-        return f"También presiona {s}."
-    if lang == "de":
-        return f"Drücke außerdem {s}."
-    raise ValueError(lang)
+    templates = SECOND_STEP_TEMPLATES[lang]
+    return templates[variant % len(templates)].format(s=s)
 
 
 def command_text(lang, steps):
@@ -185,39 +228,75 @@ FILLER = {
 }
 
 # ---------------------------------------------------------------------------
-# Incidents: 3 short clauses (alert, issue_detail, status_tail) so the two button
-# commands are split up and woven into different places of the announcement.
+# Incidents: variable-length tuples of clauses (from ~3 s up to ~12 s total)
+# so participants cannot predict when the short commands will arrive at the end.
 # ---------------------------------------------------------------------------
 INCIDENTS = {
     "en": [
-        ("Alert, problem in the red turbine hall!", "There is a short circuit on the line.", "Isolate the fault now."),
-        ("Attention, boiler two pressure is rising!", "The yellow relief valve is stuck.", "Watch the main gauge."),
-        ("Warning, the blue cooling pump stopped!", "Water flow is dropping fast.", "Backup flow is starting."),
-        ("Alert, transformer three is overloaded!", "The purple coils are heating up.", "Shed the extra load now."),
-        ("Warning, steam leak in the green north pipe!", "Pressure is falling in that sector.", "Seal that section now."),
-        ("Attention, the coal conveyor is jammed!", "The red drive motor is straining.", "Clear the belt quickly."),
-        ("Alert, voltage is dropping on the blue line!", "The feeder is unstable.", "Balance the network now."),
-        ("Warning, the main generator is overheating!", "The green exhaust sensor is high.", "Cool the unit down fast."),
+        ("Red turbine alert!",),
+        ("Boiler two pressure is rising.", "The yellow relief valve is stuck."),
+        ("Yellow cooling pump stopped.", "Do not touch the white switch.", "Backup flow is starting."),
+        ("Blue transformer is overloaded.", "Do not press the black switch.",
+         "Check the purple gauge on the green panel.", "Shed the green load now."),
+        ("Green steam leak in the north pipe.", "Pressure is falling in the red sector.",
+         "Sensors on the yellow monitor show a sharp drop.", "Maintenance is heading to sector four.",
+         "Seal that section."),
+        ("Attention, the yellow conveyor is jammed near the blue gate.",
+         "The red drive motor is straining under heavy load.",
+         "Dust levels are climbing along the purple walkway.",
+         "Control room is rerouting power from the green backup line.",
+         "Keep the main hopper clear while we reset.", "Clear the belt."),
+        ("Voltage is dropping on the blue main line.",
+         "The purple feeder is unstable and flickering.",
+         "Auxiliary relays in the green bay are clicking repeatedly.",
+         "Operators report red warning lights in the yellow corridor.",
+         "We are switching the secondary bus to manual hold.",
+         "Wait for the frequency meter to settle before closing the breaker.", "Balance the network."),
+        ("Green generator overheating!", "Yellow exhaust sensor high."),
     ],
     "es": [
-        ("¡Alerta, problema en la sala roja de turbinas!", "Hay un cortocircuito en la línea.", "Aísla la falla ahora."),
-        ("¡Atención, sube la presión en caldera dos!", "La válvula amarilla de alivio se trabó.", "Vigila el medidor."),
-        ("¡Cuidado, se detuvo la bomba azul de enfriamiento!", "El flujo de agua cae rápido.", "Ya entra el respaldo."),
-        ("¡Alerta, sobrecarga en el transformador tres!", "Las bobinas moradas se calientan.", "Baja la carga ahora."),
-        ("¡Cuidado, fuga de vapor en la tubería verde!", "Cae la presión en ese sector.", "Cierra esa sección ya."),
-        ("¡Atención, se atoró la banda de carbón!", "El motor rojo se esfuerza.", "Libera la banda rápido."),
-        ("¡Alerta, cae el voltaje en la línea azul!", "El alimentador está inestable.", "Equilibra la red ya."),
-        ("¡Cuidado, el generador se sobrecalienta!", "El sensor verde de escape marca alto.", "Enfría la unidad rápido."),
+        ("¡Alerta en turbina roja!",),
+        ("Sube la presión en caldera dos.", "La válvula amarilla se trabó."),
+        ("Se detuvo la bomba azul.", "No toques el interruptor blanco.", "Entra el respaldo."),
+        ("Sobrecarga en el transformador tres.", "Las bobinas moradas se calientan rápido.",
+         "Revisa el voltaje en el panel verde.", "Baja la carga extra."),
+        ("Fuga de vapor en la tubería verde.", "La presión cae en el sector rojo.",
+         "Los sensores del monitor amarillo marcan una caída brusca.", "Mantenimiento va hacia el sector cuatro.",
+         "Cierra esa sección."),
+        ("Atención, se atoró la banda amarilla junto a la puerta azul.",
+         "El motor rojo se esfuerza con demasiada carga.",
+         "Sube el polvo a lo largo del pasillo morado.",
+         "Sala de control desvía energía desde la línea verde de respaldo.",
+         "Mantén libre la tolva principal mientras reiniciamos.", "Libera la banda."),
+        ("Cae el voltaje en la línea principal azul.",
+         "El alimentador de la subestación morada está inestable.",
+         "Los relés auxiliares de la bahía verde fallan seguido.",
+         "Los operadores reportan luces rojas parpadeando en el pasillo amarillo.",
+         "Estamos pasando el bus secundario a control manual.",
+         "Espera a que el medidor de frecuencia se estabilice antes de cerrar.", "Equilibra la red."),
+        ("¡Generador verde sobrecalentado!", "Sensor amarillo de escape alto."),
     ],
     "de": [
-        ("Alarm, Problem in der roten Turbinenhalle!", "Kurzschluss auf der Leitung.", "Isoliere sofort den Fehler."),
-        ("Achtung, Druckanstieg in Kessel zwei!", "Das gelbe Sicherheitsventil klemmt.", "Prüfe die Hauptanzeige."),
-        ("Warnung, die blaue Kühlpumpe steht!", "Der Wasserfluss fällt schnell.", "Der Ersatzlauf startet."),
-        ("Alarm, Trafo drei ist überlastet!", "Die violetten Spulen werden heiß.", "Senke sofort die Last."),
-        ("Warnung, Dampfleck in der grünen Nordleitung!", "Der Druck im Sektor fällt.", "Sperre den Abschnitt ab."),
-        ("Achtung, das Kohleband klemmt!", "Der rote Antriebsmotor ist überlastet.", "Mach das Band schnell frei."),
-        ("Alarm, Spannungsabfall auf der blauen Leitung!", "Die Einspeisung schwankt stark.", "Stabilisiere das Netz."),
-        ("Warnung, der Generator überhitzt!", "Der grüne Abgassensor ist zu hoch.", "Kühle die Einheit schnell."),
+        ("Alarm, rote Turbine!",),
+        ("Druckanstieg in Kessel zwei.", "Das gelbe Ventil klemmt."),
+        ("Die blaue Kühlpumpe steht.", "Den weißen Schalter nicht berühren.", "Ersatzlauf startet."),
+        ("Trafo drei ist überlastet.", "Die violetten Spulen werden schnell heiß.",
+         "Prüfe die Spannung am grünen Feld.", "Senke die Zusatzlast."),
+        ("Dampfleck in der grünen Nordleitung.", "Der Druck fällt im roten Sektor.",
+         "Sensoren am gelben Monitor melden starken Abfall.", "Die Wartung rückt zu Sektor vier aus.",
+         "Sperre den Abschnitt."),
+        ("Achtung, das gelbe Kohleband klemmt am blauen Tor.",
+         "Der rote Antriebsmotor läuft unter hoher Last.",
+         "Der Staubpegel steigt am violetten Laufsteg.",
+         "Die Leitwarte leitet Strom über die grüne Ersatzleitung um.",
+         "Halte den Haupttrichter beim Neustart frei.", "Mach das Band frei."),
+        ("Spannungsabfall auf der blauen Hauptleitung.",
+         "Die Einspeisung der violetten Station schwankt stark.",
+         "Hilfsrelais in der grünen Halle schalten wiederholt um.",
+         "Im gelben Kontrollgang blinken rote Warnleuchten.",
+         "Wir stellen die Nebenleitung auf manuellen Halt um.",
+         "Warte bis die Frequenzanzeige ruhig bleibt vor dem Schließen.", "Stabilisiere das Netz."),
+        ("Grüner Generator überhitzt!", "Gelber Abgassensor zu hoch."),
     ],
 }
 
@@ -266,22 +345,19 @@ ANNOUNCEMENTS = {
 # ---------------------------------------------------------------------------
 def problem_clip_parts(lang, problem):
     """Spoken parts for one problem from panel_logic.build_pool().
-    Splits the two button steps and interleaves them at random positions inside the incident clauses.
+    Places the two short button commands either both at the end, or almost at the end + at the end,
+    after a variable-length incident lead-in.
     """
-    a, b, c = INCIDENTS[lang][problem["incident"] % len(INCIDENTS[lang])]
+    clauses = INCIDENTS[lang][problem["incident"] % len(INCIDENTS[lang])]
     steps = problem["steps"]
     if len(steps) != 2:
-        return a, b, command_text(lang, steps)
-    cmd1 = first_step_text(lang, steps[0])
-    cmd2 = second_step_text(lang, steps[1])
-    pos = problem.get("pos", 0) % 4
-    if pos == 0:
-        return a, cmd1, b, cmd2, c
-    if pos == 1:
-        return cmd1, a, b, cmd2, c
-    if pos == 2:
-        return a, cmd1, b, c, cmd2
-    return a, b, cmd1, c, cmd2
+        return (*clauses, command_text(lang, steps))
+    seed = int(hashlib.sha1(str(problem["id"]).encode("utf-8")).hexdigest()[:8], 16)
+    cmd1 = first_step_text(lang, steps[0], variant=seed)
+    cmd2 = second_step_text(lang, steps[1], variant=seed >> 3)
+    if len(clauses) >= 2 and problem.get("pos", 0) % 2 == 1:
+        return (*clauses[:-1], cmd1, clauses[-1], cmd2)
+    return (*clauses, cmd1, cmd2)
 
 
 def all_clips(lang, problems):

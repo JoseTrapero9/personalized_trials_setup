@@ -36,7 +36,7 @@ LCID_PREFERENCE = {
     "es": ([0x80A, 0x540A, 0xC0A], 0x0A),   # es-MX, es-US (Latin America), es-ES last
     "de": ([0x407, 0xC07, 0x807], 0x07),    # de-DE, de-AT, de-CH
 }
-PART_PAUSE_MS = 280          # pause between incident and command
+PART_PAUSE_MS = 140          # pause between incident and command
 TARGET_RMS_DB = -20.0        # same loudness for every clip and language
 PEAK_LIMIT = 0.89
 
@@ -251,7 +251,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--lang", default="all", choices=list(LANGUAGES) + ["all"])
     ap.add_argument("--voice", help="substring of the voice name (only with a single --lang)")
-    ap.add_argument("--rate", type=int, default=0, help="speech rate -10 (slow) .. 10 (fast), default 0")
+    ap.add_argument("--rate", type=int, default=2, help="speech rate -10 (slow) .. 10 (fast), default 2")
     ap.add_argument("--force", action="store_true", help="regenerate every clip")
     ap.add_argument("--list-voices", action="store_true")
     ap.add_argument("--engine", default="sapi", choices=["sapi", "dummy"], help=argparse.SUPPRESS)
