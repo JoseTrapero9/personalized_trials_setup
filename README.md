@@ -212,9 +212,11 @@ python live_evaluator.py --record off --record-fps 25   # no video / other video
 
 **Video of the evaluator camera (for the VLM).** The evaluator records its camera to
 `recordings/sXX_<condition>_mc050_<date_time>.mp4` (30 fps, `--record-fps` to change). By default
-(`--record sync`) it starts and stops together with `ximea_recorder.py` on the third PC and uses the same
-`<date_time>`, so the three videos of a condition (mc050, mq013, webcam) belong together. `--record gui` follows
-the GUI conditions itself, `--record manual` / **V** records by hand (V works in every mode), `--record off` = no video.
+(`--record sync`) it records every GUI condition and uses the same `<date_time>` as `ximea_recorder.py` on the
+third PC, so the three videos of a condition (mc050, mq013, webcam) belong together; if the third PC does not
+answer within 1.5 s it records alone. If the LSL link to the GUI broke just when a condition started (console:
+`Stream transmission broke off ... re-connecting`), the video starts late on the next marker of that condition
+instead of not at all (same in `ximea_recorder.py`). `--record gui` ignores the third PC, `--record manual` / **V** records by hand (V works in every mode), `--record off` = no video.
 Every camera frame goes into the video, also the ones the model skips; the window shows `REC <file>` while
 recording. Markers on the evaluator stream: `Eval_Recording_Start_<file>` (time of the first frame),
 `Eval_Recording_Stop_<file>_Frames_<n>_Seconds_<s>`.

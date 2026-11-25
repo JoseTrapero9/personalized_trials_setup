@@ -57,9 +57,13 @@ Video recording (data for the VLM)
   * The evaluator camera is recorded to recordings/<label>_mc050_<stamp>.mp4 at --record-fps (default 30), in
     real time (frame N = start + N / fps; a skipped camera frame is repeated). Every camera frame goes to the
     video, also the ones the model has no time for.
-  * --record sync (default): starts and stops together with ximea_recorder.py on the 3rd PC (MQ013 + face webcam),
-    with the same <label>_<stamp> in the file name. --record gui: every GUI condition. --record manual / V key:
+  * --record sync (default): every GUI condition (Condition_Start -> Condition_Complete), together with
+    ximea_recorder.py on the 3rd PC (MQ013 + face webcam): it waits 1.5 s for the recorder's start marker to use the
+    same <label>_<stamp> in the file name, then records anyway (recorder PC off). A manual R recording on the
+    recorder PC is followed too. --record gui: every GUI condition, recorder PC ignored. --record manual / V key:
     by hand (V works in every mode, test mode included). --record off: no video.
+  * If the LSL link broke just when a condition started (missed Condition_Start), the video starts late on the next
+    marker of that condition (radio, round, delivery) instead of not at all.
   * Markers on the evaluator stream: Eval_Recording_Start_<file> (time of the first frame) and
     Eval_Recording_Stop_<file>_Frames_<n>_Seconds_<s>.
   * Low impact on the model: the video is encoded by a separate background process at lower priority
@@ -157,6 +161,13 @@ RECORD_MODE = "sync"                       # --record: sync = start / stop with 
 RECORD_FPS = 30.0                          # --record-fps (video frame rate; frames are repeated / skipped to keep real time)
 RECORDINGS_DIR = os.path.join(base_dir, "recordings")   # --record-dir
 RECORDER_STREAM_NAME = "ximeasync_mq013"   # the marker stream of ximea_recorder.py
+RECORDER_WAIT_SECONDS = 1.5                # sync: wait this long after Condition_Start for the recorder PC (same file
+                                           # stamp), then record anyway
+# Missed Condition_Start (LSL link broke for a moment): these markers only come while a condition runs, so the
+# recording starts late on them instead of not at all. Not within LATE_START_GUARD_SECONDS after a condition ended.
+IN_CONDITION_RE = re.compile(r"^(Radio_|Dual_Workpiece_Task_Started_Round_|Checkpoint_Retrieval_Start_Round_|"
+                             r"Voice_Deliver_Activated_Round_|Handover_Confirmed_Point_|Assembly_Evaluated_)")
+LATE_START_GUARD_SECONDS = 15.0
 # =================================================
 
 AREA_FILE = os.path.join(base_dir, "evaluator_area.json")   # this camera PC only (in .gitignore)
@@ -1509,7 +1520,7 @@ class MarkerListener(threading.Thread):
                     if sample:
                         self.out_queue.put((str(sample[0]), ts + correction))
             except lost_error:
-                print("[LSL] GUI marker stream lost - waiting for it to come back...")
+                print("[LSL] GUI marker stream lost (GUI closed or network) - waiting for it to come back...")
             finally:
                 self.connected = False
 
@@ -1521,8 +1532,12 @@ SESSION_STOP_RE = re.compile(r"^Recording_Session_Stop_(.+)_(\d{8}_\d{6})$")
 class EvalRecorder:
     """Records the evaluator camera to recordings/<label>_<camera>_<stamp>.mp4 at a constant fps, in real time.
 
-    sync mode: ximea_recorder.py (3rd PC) says Recording_Session_Start_<label>_<stamp> -> this video starts with the
-    same label and stamp, so it belongs to the MQ013 and webcam videos of that moment; Recording_Session_Stop ends it.
+    gui / sync mode: starts at the GUI's Condition_Start, stops at Condition_Complete / menu / GUI closed. If the
+    Condition_Start was missed (LSL link broke), it starts late on the next marker of the running condition.
+    sync mode, in addition: ximea_recorder.py (3rd PC) says Recording_Session_Start_<label>_<stamp> -> this video uses
+    the same label and stamp, so it belongs to the MQ013 and webcam videos of that moment (also for a manual R
+    recording there); Recording_Session_Stop ends it. At Condition_Start the evaluator waits RECORDER_WAIT_SECONDS
+    for that marker and then records on its own (recorder PC off or not reachable).
     Markers on the evaluator stream: Eval_Recording_Start_<file> (stamped with the first frame) and
     Eval_Recording_Stop_<file>_Frames_<n>_Seconds_<s> (stamped with the end of the last frame)."""
 
@@ -1537,33 +1552,54 @@ class EvalRecorder:
         self.writer = BackgroundVideoWriter(camera_id, on_closed=self._closed)
         self.session = None
         self.recorder_linked = False
+        self._pending = None                 # (label, deadline): waiting for the recorder PC
+        self.condition = None                # condition announced by the GUI and not finished yet
+        self._ended_at = -1e9
+        self._lock = threading.RLock()       # called from the camera, model and LSL threads
         print(f"[REC] evaluator video: mode {mode}, {self.fps:g} fps -> {out_dir}")
 
     # ---------------- control
     def start(self, label, stamp=None):
-        stamp = stamp or time.strftime("%Y%m%d_%H%M%S")
-        name = f"{label}_{self.camera_id}_{stamp}.mp4"
-        self.stop()
-        self.session = (label, stamp)
-        self.writer.start(os.path.join(self.out_dir, name), self.fps)
-        print(f"[REC] recording -> {name}")
+        with self._lock:
+            stamp = stamp or time.strftime("%Y%m%d_%H%M%S")
+            name = f"{label}_{self.camera_id}_{stamp}.mp4"
+            self.stop()
+            self.session = (label, stamp)
+            self.writer.start(os.path.join(self.out_dir, name), self.fps)
+            print(f"[REC] recording -> {name}")
 
     def stop(self):
-        if self.session is None:
-            return
-        self.session = None
-        if self.writer.recording and self.writer.t0 is None:
-            self.send(f"Eval_Recording_Failed_No_Frames_{os.path.basename(self.writer.path)}")
-        self.writer.stop()
+        with self._lock:
+            self._pending = None
+            if self.session is None:
+                return
+            self.session = None
+            if self.writer.recording and self.writer.t0 is None:
+                self.send(f"Eval_Recording_Failed_No_Frames_{os.path.basename(self.writer.path)}")
+            self.writer.stop()
+            print("[REC] recording stopped")
 
     def toggle_manual(self, subject=None):
-        if self.session is not None:
-            self.stop()
-        else:
-            self.start(f"{subject_tag(subject) if subject else 's__'}_manual")
+        with self._lock:
+            if self.session is not None or self._pending is not None:
+                self.stop()
+            else:
+                self.start(f"{subject_tag(subject) if subject else 's__'}_manual")
+
+    def poll(self):
+        """Start on our own if the recorder PC did not answer in time."""
+        with self._lock:
+            p = self._pending
+            if p is not None and time.monotonic() >= p[1]:
+                self._pending = None
+                if self.session is None or self.session[0] != p[0]:
+                    print("[REC] no start marker from the recorder PC - recording on the evaluator's own")
+                    self.start(p[0])
 
     # ---------------- frames (camera thread)
     def on_frame(self, frame):
+        if self._pending is not None:
+            self.poll()
         if not self.writer.recording:
             return
         t = self.clock()
@@ -1585,29 +1621,57 @@ class EvalRecorder:
     def on_recorder_marker(self, msg):
         if self.mode != "sync":
             return
-        if (m := SESSION_START_RE.match(msg)):
-            self.start(m.group(1), m.group(2))
-        elif (m := SESSION_STOP_RE.match(msg)) and self.session == (m.group(1), m.group(2)):
-            self.stop()
+        with self._lock:
+            if (m := SESSION_START_RE.match(msg)):
+                label, stamp = m.group(1), m.group(2)
+                self._pending = None
+                if self.session is not None and self.session[0] == label and self.writer.recording:
+                    print(f"[REC] the recorder PC started {label} too - this video keeps running")
+                    return
+                self.start(label, stamp)
+            elif (m := SESSION_STOP_RE.match(msg)) and self.session == (m.group(1), m.group(2)):
+                self.stop()
+
+    def _begin(self, label):
+        if self.session is not None and self.session[0] == label and self.writer.recording:
+            return                                       # the recorder PC was quicker: already recording
+        if self.mode == "sync" and self.recorder_linked:
+            self._pending = (label, time.monotonic() + RECORDER_WAIT_SECONDS)
+        else:
+            self.start(label)
 
     def on_gui_marker(self, marker, tracker):
+        if self.mode not in ("sync", "gui"):
+            return
         m = marker[len(TRAINING_MARKER_PREFIX):] if marker.startswith(TRAINING_MARKER_PREFIX) else marker
         ending = m.startswith("Condition_Complete_") or m in ("Returned_To_Main_Menu", "Application_Closing")
-        if self.mode == "gui":
-            if (r := re.match(r"^Condition_Start_(.+)$", m)):
-                self.start(f"{subject_tag(tracker.subject) if tracker.subject else 's__'}_{r.group(1)}")
+        subj = subject_tag(tracker.subject) if tracker.subject else "s__"
+        with self._lock:
+            if (r := re.match(r"^Setup_Complete_Subj_(.+?)_Cond_(.+?)_Lang_", m)):
+                self.condition = r.group(2)
+            elif (r := re.match(r"^Condition_Start_(.+)$", m)):
+                self.condition = r.group(1)
+                self._begin(f"{subj}_{r.group(1)}")
             elif ending:
+                self._ended_at = time.monotonic()
+                self.condition = None
                 self.stop()
-        elif self.mode == "sync" and ending:
-            self.stop()                    # safety net if the recorder's stop marker never arrives
+            elif (self.session is None and self._pending is None and IN_CONDITION_RE.match(m)
+                  and time.monotonic() - self._ended_at > LATE_START_GUARD_SECONDS):
+                print(f"[REC] the start of the condition was missed (LSL link) - starting late on {m[:40]}")
+                self.start(f"{subj}_{self.condition or 'unknown'}")
+        self.poll()
 
     def status(self):
         text = self.writer.status()
         if text:
             return text
+        if self._pending is not None:
+            return "REC starting..."
         if self.mode == "sync":
-            return "REC waits for the recorder" if self.recorder_linked else "REC: recorder PC not found"
-        return "V = record" if self.mode in ("manual", "gui") else ""
+            return ("REC: waits for the condition (recorder PC linked)" if self.recorder_linked else
+                    "REC: waits for the condition (recorder PC not found - records alone)")
+        return "REC: waits for the condition" if self.mode == "gui" else "V = record"
 
     def close(self):
         self.stop()
@@ -2008,8 +2072,9 @@ def main():
                     help="test mode: 'voice' ('input correct'/'input incorrect') or 'tone' (default: %(default)s)")
     ap.add_argument("--no-sounds", action="store_true", help="test mode: no correct / mistake sounds")
     ap.add_argument("--record", default=RECORD_MODE, choices=("sync", "gui", "manual", "off"),
-                    help="video of the evaluator camera: sync = start / stop with ximea_recorder.py on the 3rd PC "
-                         "(default), gui = every condition of the GUI, manual = V key only, off = no video. "
+                    help="video of the evaluator camera: sync = every GUI condition, same file stamp as ximea_recorder.py "
+                         "on the 3rd PC (default; records alone if that PC is off), gui = every GUI condition, "
+                         "manual = V key only, off = no video. "
                          "V starts / stops a recording by hand in every mode except off")
     ap.add_argument("--record-fps", type=float, default=RECORD_FPS, help="video frame rate (default 30)")
     ap.add_argument("--record-dir", default=RECORDINGS_DIR, help="folder for the videos (default: recordings/)")
