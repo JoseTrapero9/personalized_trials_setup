@@ -47,6 +47,7 @@ RETRIEVAL_SECONDS = 5           # 5-second safe pause at checkpoint to pick up a
 DELIVERY_WINDOW_SECONDS = 5     # 5-second safe pause after pressing "D" (deliver) - the only way to deliver
 TASK_SECONDS_DEFAULT = 35       # Assembly time in baseline / audio / haptic scenarios
 WARNING_SECONDS = 10            # Red timer + blinking warning threshold
+START_FIXATION_SECONDS = 30     # Fixation cross duration before a task starts
 
 # Radio game (radio_script.py / panel_logic.py / game.py)
 RADIO_AUDIO_DIR = os.path.join(base_dir, "radio_audio")   # made by generate_radio_audio.py
