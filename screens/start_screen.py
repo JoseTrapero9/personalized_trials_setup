@@ -1,4 +1,4 @@
-"""Pre-condition screen with instructions and the start countdown."""
+"""Pre-condition screen with instructions and the pre-task fixation cross."""
 
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QFont
@@ -10,6 +10,7 @@ from config import (
     MAX_ROUNDS_PER_CONDITION,
     PROBLEMS_PER_CHECKPOINT,
     RETRIEVAL_SECONDS,
+    START_FIXATION_SECONDS,
     TRAINING_CONDITIONS,
     TRAINING_ROUNDS
 )
@@ -23,7 +24,7 @@ class startscreen(QWidget):
     def __init__(self, switch_callback):
         super().__init__()
         self.switch_callback = switch_callback
-        self.ticks_left = 5
+        self.ticks_left = START_FIXATION_SECONDS
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.timer_tick)
         self.init_ui()
@@ -35,7 +36,7 @@ class startscreen(QWidget):
 
         main_font = QFont("Helvetica", 24)
         button_font = QFont("Helvetica", 26, QFont.Bold)
-        timer_font = QFont("Helvetica", 72, QFont.Bold)
+        fixation_font = QFont("Helvetica", 120, QFont.Bold)
 
         self.message_label = QLabel()
         self.message_label.setFont(main_font)
@@ -43,11 +44,11 @@ class startscreen(QWidget):
         self.message_label.setWordWrap(True)
         layout.addWidget(self.message_label)
 
-        self.countdown_label = QLabel("")
-        self.countdown_label.setFont(timer_font)
-        self.countdown_label.setAlignment(Qt.AlignCenter)
-        self.countdown_label.hide()
-        layout.addWidget(self.countdown_label)
+        self.fixation_label = QLabel("+")
+        self.fixation_label.setFont(fixation_font)
+        self.fixation_label.setAlignment(Qt.AlignCenter)
+        self.fixation_label.hide()
+        layout.addWidget(self.fixation_label)
 
         self.start_button = QPushButton("Start")
         self.start_button.setFont(button_font)
@@ -59,6 +60,7 @@ class startscreen(QWidget):
         self.setLayout(layout)
 
     def configure_for_condition(self, cond_name):
+        self.timer.stop()
         rounds = TRAINING_ROUNDS if cond_name == "training" else MAX_ROUNDS_PER_CONDITION
         if cond_name == "training":
             title = t("start_title_block", i=state.training_block + 1, n=len(TRAINING_CONDITIONS),
@@ -71,19 +73,19 @@ class startscreen(QWidget):
                 d=DELIVERY_WINDOW_SECONDS, rounds=rounds)
             + (t("start_hard_line", p=IDLE_HIT_POINTS) if state.game_mode == "hard" else "")
         )
+        self.message_label.show()
         self.start_button.setText(t("start_button"))
         self.start_button.show()
-        self.countdown_label.hide()
+        self.fixation_label.hide()
 
     def on_start_clicked(self):
         send_marker("Robot_Started_Waiting")
         start_robot_process()
 
-        self.ticks_left = 5
+        self.ticks_left = START_FIXATION_SECONDS
         self.start_button.hide()
-        self.message_label.setText(t("preparing"))
-        self.countdown_label.setText(f"{self.ticks_left} s")
-        self.countdown_label.show()
+        self.message_label.hide()
+        self.fixation_label.show()
         self.timer.start(1000)
 
     def timer_tick(self):
@@ -91,5 +93,3 @@ class startscreen(QWidget):
         if self.ticks_left <= 0:
             self.timer.stop()
             self.switch_callback()
-        else:
-            self.countdown_label.setText(f"{self.ticks_left} s")
