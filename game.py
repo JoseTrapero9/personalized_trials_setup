@@ -180,8 +180,14 @@ class RadioPanelGame(QWidget):
             if self.problem is not None:
                 self._hold_problem(now)
             if self.player is not None:
-                self.player.stop()
+                cid = self.player.pause()        # frozen mid-word; continues from the same point on resume
+                if cid:
+                    send_marker(f"Radio_Audio_Paused_{cid}")
         elif not paused and self.paused:
+            if self.player is not None:
+                cid = self.player.resume()
+                if cid:
+                    send_marker(f"Radio_Audio_Resumed_{cid}")
             if self.problem is not None:
                 self._resume_problem(now)
                 self.next_problem_at = now + RESUME_GAP_SECONDS
@@ -336,7 +342,8 @@ class RadioPanelGame(QWidget):
             "id": base["id"], "type": base["type"], "steps": base["steps"], "layout": layout,
             "targets": targets, "progress": 0, "presses": [], "clip": clip,
             "onset": now, "instr_dur": self._duration(clip), "instr_end": None, "deadline": None,
-            "counted": self.counting, "paused_s": 0.0, "paused_after_instr": 0.0, "replays": 0,
+            "counted": self.counting, "paused_s": 0.0, "paused_in_instr": 0.0, "paused_after_instr": 0.0,
+            "pauses": 0,
         }
         self._play(clip)
         send_marker(f"Radio_Problem_Start_{base['id']}_Type_{base['type']}_Steps_{steps_to_str(base['steps'])}"
@@ -350,7 +357,7 @@ class RadioPanelGame(QWidget):
         if p["instr_end"] is not None:
             end = p["instr_end"]
         else:                                  # answered while the radio was still talking
-            end = p.get("replay_start", p["onset"]) + p["instr_dur"]
+            end = p["onset"] + p["paused_in_instr"] + p["instr_dur"]
         rt_after = now - end - p["paused_after_instr"]   # negative = answered before the instruction ended
         if outcome == "solved":
             mult = HARD_INSTRUCTION_MULTIPLIER if self.hard else 1
@@ -444,22 +451,23 @@ class RadioPanelGame(QWidget):
 
     def _hold_problem(self, now):
         """A pause (e.g. saying DELIVER) freezes the active problem instead of cancelling it,
-        so a pause can never be used to escape a hard instruction."""
+        so a pause can never be used to escape a hard instruction. An instruction that was being spoken
+        is paused with the audio and continues from the same word on resume (it is not repeated)."""
         p = self.problem
-        if p["instr_end"] is None:
-            p["replay"] = True                       # instruction was cut: say it again afterwards
-        else:
+        p["pauses"] += 1
+        p["held_in_instr"] = p["instr_end"] is None
+        if not p["held_in_instr"]:
             p["remaining"] = max(1.0, p["deadline"] - now)
             p["deadline"] = None
-        send_marker(f"Radio_Problem_Held_{p['id']}_Replay_{int(p.get('replay', False))}")
+        send_marker(f"Radio_Problem_Held_{p['id']}_DuringInstruction_{int(p['held_in_instr'])}")
 
     def _resume_problem(self, now):
         p = self.problem
         p["paused_s"] += now - self._paused_at
-        if p.pop("replay", False):
-            p["replays"] += 1
-            p["replay_start"] = now
-            self._play(p["clip"])                    # deadline starts when the replay ends
+        if p.pop("held_in_instr", False):
+            p["paused_in_instr"] += now - self._paused_at   # deadline starts when the instruction ends
+            if p["deadline"] is not None:            # it ended in the same instant as the pause
+                p["deadline"] = now + RESPONSE_SECONDS
         else:
             p["paused_after_instr"] += now - self._paused_at
             p["deadline"] = now + p.pop("remaining")
@@ -477,7 +485,7 @@ class RadioPanelGame(QWidget):
             p["id"], p["type"], len(p["steps"]), steps_to_str(p["steps"]), layout_to_str(p["layout"]),
             "-".join(map(str, p["targets"])), "-".join(map(str, p["presses"])), int(p["counted"]),
             outcome, round(rt, 3), "" if rt_after is None else round(rt_after, 3),
-            round(p["paused_s"], 3), p["replays"]])
+            round(p["paused_s"], 3), p["pauses"]])
 
     def _log_idle(self, idle, outcome, rt):
         self._write_row([
@@ -501,7 +509,7 @@ class RadioPanelGame(QWidget):
                     csv.writer(f).writerow([
                         "subject", "condition", "game_mode", "language", "problem_id", "type", "n_steps", "steps",
                         "layout", "targets", "presses", "counted_for_checkpoint", "outcome",
-                        "rt_from_onset_s", "rt_after_instruction_s", "paused_s", "instruction_replays",
+                        "rt_from_onset_s", "rt_after_instruction_s", "paused_s", "pauses",
                         "score"])
             with open(self.csv_path, "a", newline="", encoding="utf-8") as f:
                 csv.writer(f).writerow(
