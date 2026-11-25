@@ -92,6 +92,8 @@ class RadioPlayer:
         self._cid = None
         self._finished = None
         self._silent_end = None          # silent mode: perf_counter time the clip "ends"
+        self._paused = False             # pause(): the clip keeps its position and continues on resume()
+        self._silent_left = None         # silent mode: seconds of the clip left when it was paused
         self._overlays = []              # cue sounds mixed on top of the radio: [samples, position]
         self._cue_cache = {}             # (path, max seconds) -> samples at this stream's rate
         self.static_amp = 10 ** (RADIO_STATIC_DB / 20) if RADIO_STATIC_DB is not None else 0.0
@@ -122,7 +124,7 @@ class RadioPlayer:
     def _callback(self, outdata, frames, time_info, status):
         out = np.zeros(frames, dtype=np.float32)
         with self._lock:
-            if self._buf is not None:
+            if self._buf is not None and not self._paused:
                 n = min(frames, len(self._buf) - self._pos)
                 out[:n] = self._buf[self._pos:self._pos + n]
                 self._pos += n
@@ -144,6 +146,7 @@ class RadioPlayer:
 
     def play(self, cid, samples, duration):
         with self._lock:
+            self._paused, self._silent_left = False, None
             self._finished = None
             self._cid = cid
             if self.silent or samples is None:
@@ -186,6 +189,36 @@ class RadioPlayer:
     def stop(self):
         with self._lock:
             self._buf, self._cid, self._finished, self._silent_end = None, None, None, None
+            self._paused, self._silent_left = False, None
+
+    def pause(self):
+        """Freeze the clip that is playing at its current position (cue sounds and static keep going).
+        resume() continues it from exactly that point. Returns the paused clip id (None if nothing played)."""
+        self._check_silent()
+        with self._lock:
+            if self._cid is None or self._paused:
+                return None
+            self._paused = True
+            if self._silent_end is not None:
+                self._silent_left = max(0.0, self._silent_end - time.perf_counter())
+                self._silent_end = None
+            return self._cid
+
+    def resume(self):
+        """Continue the paused clip where it stopped. Returns its id (None if nothing was paused)."""
+        with self._lock:
+            if not self._paused:
+                return None
+            self._paused = False
+            if self._silent_left is not None:
+                self._silent_end = time.perf_counter() + self._silent_left
+                self._silent_left = None
+            return self._cid
+
+    @property
+    def paused(self):
+        with self._lock:
+            return self._paused
 
     def busy(self):
         self._check_silent()

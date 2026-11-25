@@ -41,8 +41,10 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 * One wrong key or no answer within `RESPONSE_SECONDS` after the instruction = failed, points lost,
   negative radio reaction, game goes on.
 * Checkpoint after `PROBLEMS_PER_CHECKPOINT` problems; problems during the battery task do not count.
-* Saying DELIVER pauses the radio; an open problem is held (and its instruction replayed if it was
-  cut off), so a pause can't be used to skip a problem.
+* DELIVER (D key) pauses the radio: the sentence it was saying freezes mid-word and continues from that
+  exact point when the pause ends (nothing is restarted or repeated). An open problem is held with it
+  (answer time frozen), so a pause can't be used to skip a problem. Markers `Radio_Audio_Paused_<clip>` /
+  `Radio_Audio_Resumed_<clip>`; the radio CSV counts the `pauses` of each problem.
 * Each condition owns 40 instructions that no other condition uses (240 in total, identical
   6 single / 7 pair / 7 triple mix per 20). Fixed order per condition, same for every participant
   and language. Button positions are generated live, so a sentence never implies the keys.
