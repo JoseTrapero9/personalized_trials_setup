@@ -31,7 +31,9 @@ Synchronisation (LSL)
 
 Recording control
   * Automatic (default): follows the GUI over LSL ("ParadigmMarkers"). Starts at Condition_Start_<condition>
-    (training: every block), stops at Condition_Complete / back to the menu / GUI closed.
+    (training: every block), stops at Condition_Complete / back to the menu / GUI closed. If the link to the GUI
+    broke just when the condition started ("Stream transmission broke off ... re-connecting"), the recording starts
+    late on the next marker of that condition (radio, round, delivery) instead of not at all.
   * R starts / stops a manual recording at any time. Q / Esc stops cleanly and quits.
   * The window shows both cameras live while they record (red dot = recording).
 
@@ -74,6 +76,11 @@ VIDEO_EXT = ".mp4"
 WEBCAM_INDEX = 0                     # face webcam (--webcam N); 0 = first camera Windows finds
 WEBCAM_SIZE = "1280x720"             # --webcam-size
 PREVIEW_FPS = 15                     # preview window refresh
+# Missed Condition_Start (the LSL link to the GUI broke for a moment): these markers only come while a condition
+# runs, so the recording starts late on them instead of not at all (not within 15 s after a condition ended).
+IN_CONDITION_RE = re.compile(r"^(Radio_|Dual_Workpiece_Task_Started_Round_|Checkpoint_Retrieval_Start_Round_|"
+                             r"Voice_Deliver_Activated_Round_|Handover_Confirmed_Point_|Assembly_Evaluated_)")
+LATE_START_GUARD_SECONDS = 15.0
 GUI_MARKER_STREAM = "ParadigmMarkers"
 TRAINING_PREFIX = "TRAIN_"
 FRAME_TIMEOUT_MS = 1000
@@ -387,6 +394,7 @@ class GuiMarkerListener(threading.Thread):
     def __init__(self, out_q):
         super().__init__(daemon=True)
         self.out_q, self.running, self.connected = out_q, True, False
+        self.last_marker = None             # time.monotonic() of the last GUI marker (shown in the window)
 
     def run(self):
         import pylsl
@@ -402,9 +410,11 @@ class GuiMarkerListener(threading.Thread):
                 while self.running:
                     sample, _ = inlet.pull_sample(timeout=0.2)
                     if sample:
+                        self.last_marker = time.monotonic()
                         self.out_q.put(str(sample[0]))
             except lost_error:
-                print("[LSL] GUI marker stream lost - waiting for it to come back...")
+                print("[LSL] GUI marker stream lost (GUI closed or network) - waiting for it to come back. "
+                      "A condition that starts meanwhile is picked up on its next marker.")
             finally:
                 self.connected = False
 
@@ -436,6 +446,7 @@ class Recorder:
         self.subject, self.condition = None, None
         self.fps_now, self._fps_count, self._fps_t = 0.0, 0, time.monotonic()
         self.last_file = ""
+        self._ended_at = -1e9
 
     def marker(self, text, timestamp=None):
         if timestamp is None:
@@ -495,13 +506,22 @@ class Recorder:
         m = marker[len(TRAINING_PREFIX):] if marker.startswith(TRAINING_PREFIX) else marker
         if (r := re.match(r"^Setup_Complete_Subj_(.+?)_Cond_(.+?)_Lang_", m)):
             self.subject, self.condition = r.group(1), r.group(2)
+            print(f"[GUI] {marker}")
         elif (r := re.match(r"^Condition_Start_(.+)$", m)):
+            print(f"[GUI] {marker}")
             self.condition = r.group(1)
             if self.auto:
                 self.start(f"{subject_tag(self.subject) if self.subject else 's__'}_{self.condition}")
         elif m.startswith("Condition_Complete_") or m in ("Returned_To_Main_Menu", "Application_Closing"):
+            print(f"[GUI] {marker}")
+            self._ended_at = time.monotonic()
+            self.condition = None                    # the next one is announced by Setup_Complete / Condition_Start
             if self.auto:
                 self.stop()
+        elif (self.auto and self.session is None and IN_CONDITION_RE.match(m)
+              and time.monotonic() - self._ended_at > LATE_START_GUARD_SECONDS):
+            print(f"[REC] the start of the condition was missed (LSL link) - starting late on {m[:40]}")
+            self.start(f"{subject_tag(self.subject) if self.subject else 's__'}_{self.condition or 'unknown'}")
 
     def toggle_manual(self):
         if self.session is not None:
@@ -509,10 +529,13 @@ class Recorder:
         else:
             self.start(f"{subject_tag(self.subject) if self.subject else 's__'}_manual")
 
-    def status_lines(self, camera_status, gui_linked, webcam=None):
+    def status_lines(self, camera_status, gui_linked, webcam=None, last_marker=None):
+        gui = "GUI NOT FOUND"
+        if gui_linked:
+            gui = "GUI linked" + ("" if last_marker is None else f" (last marker {time.monotonic() - last_marker:.0f} s ago)")
         lines = [f"{self.preset['name_match']} {self.fps_now:4.1f} fps"
                  + (f" | webcam {webcam.fps_now:4.1f} fps" if webcam is not None else "")
-                 + f" | rec {self.fps:g} fps | {'GUI linked' if gui_linked else 'GUI NOT FOUND'}"
+                 + f" | rec {self.fps:g} fps | {gui}"
                  + f" | {'auto' if self.auto else 'manual'}"]
         if self.session is not None:
             for writer in self.writers.values():
@@ -620,7 +643,7 @@ def main():
                 preview = frame
             except queue.Empty:
                 pass
-            lines = recorder.status_lines(camera.status, listener.connected, webcam)
+            lines = recorder.status_lines(camera.status, listener.connected, webcam, listener.last_marker)
             if cv2 is not None:
                 now = time.monotonic()
                 if now - last_view >= 1.0 / PREVIEW_FPS:         # the preview never slows the recording
