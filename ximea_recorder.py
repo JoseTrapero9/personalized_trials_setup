@@ -69,7 +69,8 @@ CAMERA_PRESETS = {
     },
 }
 DEFAULT_CAMERA = "MQ013"
-FPS = 60.0                           # camera + video frame rate (--fps); XIMEA: acq_timing_mode = FRAME_RATE
+FPS = 30.0                           # XIMEA camera + video frame rate (--fps); XIMEA: acq_timing_mode = FRAME_RATE
+WEBCAM_FPS = 60.0                    # webcam + video frame rate (--webcam-fps)
 XIMEA_API_PATH = r"C:\XIMEA\API\Python\v3"
 RECORDINGS_DIR = os.path.join(BASE_DIR, "recordings")
 VIDEO_EXT = ".mp4"
@@ -188,10 +189,12 @@ class CameraSource:
     """Camera in a separate process, restarted when frames stop. Frames arrive in .frames as
     (frame, lsl_time, camera_nframe, camera_time_s); .status is '' while frames arrive."""
 
-    def __init__(self, preset, fps, on_event=None):
+    def __init__(self, preset, fps, on_frame=None, on_event=None):
         import multiprocessing as mp
         from multiprocessing import shared_memory
-        self.preset, self.fps, self.on_event = preset, fps, on_event or (lambda e: None)
+        self.preset, self.fps = preset, fps
+        self.on_frame = on_frame
+        self.on_event = on_event or (lambda e: None)
         self.ctx = mp.get_context("spawn")
         self.shm = shared_memory.SharedMemory(create=True, size=SHM_BYTES)
         self.frames = queue.Queue(maxsize=4)
@@ -266,6 +269,11 @@ class CameraSource:
                     if self.status:
                         print("[CAMERA] frames are arriving")
                     self.status, self.last_frame = "", now
+                    if self.on_frame is not None:
+                        try:
+                            self.on_frame(item[0], item[1])
+                        except Exception as e:
+                            print(f"[REC] {e!r}")
                     try:
                         self.frames.put_nowait(item)
                     except queue.Full:                      # main loop busy: newest frame wins
@@ -329,6 +337,10 @@ class WebcamSource(threading.Thread):
         if not cap.isOpened():
             cap.release()
             return None
+        try:
+            cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+        except Exception:
+            pass
         if self.size:
             cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.size[0])
             cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.size[1])
@@ -337,8 +349,11 @@ class WebcamSource(threading.Thread):
             cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         except Exception:
             pass
+        fc = int(cap.get(cv2.CAP_PROP_FOURCC))
+        fourcc = "".join(chr((fc >> 8 * i) & 0xFF) for i in range(4)).strip()
         w, h = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        print(f"[WEBCAM] camera {self.index} opened: {w}x{h}, {cap.get(cv2.CAP_PROP_FPS):g} fps reported")
+        print(f"[WEBCAM] camera {self.index} opened: {w}x{h}, {cap.get(cv2.CAP_PROP_FPS):g} fps reported"
+              + (f" ({fourcc})" if fourcc.isprintable() and fourcc else ""))
         return cap
 
     def run(self):
@@ -430,16 +445,21 @@ class Recorder:
     """Ties the cameras, the LSL outlet, the video files and the GUI markers together (used by main()).
     sources: {source_id: label for the file name}, e.g. {"mq013": "mq013", "webcam": "webcam"}."""
 
-    def __init__(self, preset, out_dir, sources, fps=FPS, auto=True):
+    def __init__(self, preset, out_dir, sources, fps=FPS, source_fps=None, auto=True):
         import pylsl
         self.preset, self.out_dir, self.auto, self.fps = preset, out_dir, auto, float(fps)
+        self.sources = dict(sources)
+        self.source_fps = {sid: float((source_fps or {}).get(sid, self.fps)) for sid in self.sources}
         os.makedirs(out_dir, exist_ok=True)
         info = pylsl.StreamInfo(preset["lsl_stream_name"], "Markers", 1, 0, "string", preset["lsl_source_id"])
         info.desc().append_child_value("camera", preset["name_match"])
-        info.desc().append_child_value("cameras", ",".join(sources))
-        info.desc().append_child_value("video_fps", f"{self.fps:g}")
+        info.desc().append_child_value("cameras", ",".join(self.sources))
+        fps_values = list(self.source_fps.values())
+        fps_desc = f"{fps_values[0]:g}" if len(set(fps_values)) == 1 else ",".join(
+            f"{sid}:{self.source_fps[sid]:g}" for sid in self.sources
+        )
+        info.desc().append_child_value("video_fps", fps_desc)
         self.outlet = pylsl.StreamOutlet(info)
-        self.sources = dict(sources)
         # one encoder process per camera: the two videos are written in parallel and never slow the capture
         self.writers = {sid: BackgroundVideoWriter(sid, on_closed=self._closed) for sid in self.sources}
         self.session = None                 # (label, stamp) of the running recording
@@ -464,7 +484,7 @@ class Recorder:
         self.marker(f"Recording_Session_Start_{label}_{stamp}")
         for sid, writer in self.writers.items():
             name = f"{label}_{self.sources[sid]}_{stamp}{VIDEO_EXT}"
-            writer.start(os.path.join(self.out_dir, name), self.fps)
+            writer.start(os.path.join(self.out_dir, name), self.source_fps[sid])
             print(f"[REC] waiting for the first frame -> {name}")
         self.last_file = f"{label}_*_{stamp}{VIDEO_EXT}"
 
@@ -533,9 +553,12 @@ class Recorder:
         gui = "GUI NOT FOUND"
         if gui_linked:
             gui = "GUI linked" + ("" if last_marker is None else f" (last marker {time.monotonic() - last_marker:.0f} s ago)")
+        fps_values = list(self.source_fps.values())
+        rec_fps = (f"{fps_values[0]:g}" if len(set(fps_values)) == 1
+                   else "/".join(f"{sid} {self.source_fps[sid]:g}" for sid in self.sources))
         lines = [f"{self.preset['name_match']} {self.fps_now:4.1f} fps"
                  + (f" | webcam {webcam.fps_now:4.1f} fps" if webcam is not None else "")
-                 + f" | rec {self.fps:g} fps | {gui}"
+                 + f" | rec {rec_fps} fps | {gui}"
                  + f" | {'auto' if self.auto else 'manual'}"]
         if self.session is not None:
             for writer in self.writers.values():
@@ -593,7 +616,9 @@ def parse_size(text):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--camera", default=DEFAULT_CAMERA, choices=sorted(CAMERA_PRESETS))
-    ap.add_argument("--fps", type=float, default=FPS, help="frame rate of the cameras and the videos (default 30)")
+    ap.add_argument("--fps", type=float, default=FPS, help="XIMEA camera and video frame rate (default %(default)g)")
+    ap.add_argument("--webcam-fps", type=float, default=WEBCAM_FPS,
+                    help="webcam and video frame rate (default %(default)g)")
     ap.add_argument("--webcam", type=int, default=WEBCAM_INDEX, metavar="N",
                     help="index of the face webcam (default %(default)s; try 1, 2... if the wrong camera opens)")
     ap.add_argument("--webcam-size", default=WEBCAM_SIZE, metavar="WxH",
@@ -609,14 +634,17 @@ def main():
           f"gamma {preset['gammaY']}, wb {preset['wb_kr']}/{preset['wb_kb']}, "
           f"binning {preset['binning']}, {args.fps:g} fps -> {args.out}")
     sources = {preset["id"]: preset["id"]}
+    source_fps = {preset["id"]: args.fps}
     if not args.no_webcam:
         sources["webcam"] = "webcam"
-    recorder = Recorder(preset, args.out, sources, fps=args.fps, auto=not args.manual)
-    camera = CameraSource(preset, args.fps, on_event=recorder.marker)
+        source_fps["webcam"] = args.webcam_fps
+    recorder = Recorder(preset, args.out, sources, fps=args.fps, source_fps=source_fps, auto=not args.manual)
+    camera = CameraSource(preset, args.fps,
+                          on_frame=lambda f, t: recorder.on_frame(preset["id"], f, t), on_event=recorder.marker)
     camera.start()
     webcam = None
     if not args.no_webcam:
-        webcam = WebcamSource(args.webcam, args.fps, parse_size(args.webcam_size),
+        webcam = WebcamSource(args.webcam, args.webcam_fps, parse_size(args.webcam_size),
                               on_frame=lambda f, t: recorder.on_frame("webcam", f, t), on_event=recorder.marker)
         webcam.start()
     gui_q = queue.Queue()
@@ -639,7 +667,6 @@ def main():
                     break
             try:
                 frame, lsl_time, nframe, cam_ts = camera.frames.get(timeout=0.02)
-                recorder.on_frame(preset["id"], frame, lsl_time)
                 preview = frame
             except queue.Empty:
                 pass
