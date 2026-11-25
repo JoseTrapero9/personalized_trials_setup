@@ -24,7 +24,7 @@ import threading
 import time
 
 VIDEO_FOURCC = "mp4v"
-RING_SLOTS = 32                  # frames that can wait for the encoder (~1 s at 30 fps) before frames are left out
+RING_SLOTS = 64                  # frames that can wait for the encoder (~1 s at 60 fps, ~2 s at 30 fps) before frames are left out
 
 
 def _lower_priority():
@@ -105,7 +105,10 @@ def _writer_main(cmd_q, free_q, done_q):
                     repeated += 1
                 out.write(frame)
                 written += 1
-                last = frame.copy()                              # the slot is reused once it is freed
+                if last is None or last.shape != frame.shape or last.dtype != frame.dtype:
+                    last = frame.copy()                          # the slot is reused once it is freed
+                else:
+                    np.copyto(last, frame)                       # reuse buffer (no per-frame allocation)
             except Exception as e:
                 error = str(e)
             finally:
