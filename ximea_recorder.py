@@ -67,12 +67,12 @@ CAMERA_PRESETS = {
     },
 }
 DEFAULT_CAMERA = "MQ013"
-FPS = 30.0                           # camera + video frame rate (--fps); XIMEA: acq_timing_mode = FRAME_RATE
+FPS = 60.0                           # camera + video frame rate (--fps); XIMEA: acq_timing_mode = FRAME_RATE
 XIMEA_API_PATH = r"C:\XIMEA\API\Python\v3"
 RECORDINGS_DIR = os.path.join(BASE_DIR, "recordings")
 VIDEO_EXT = ".mp4"
-WEBCAM_INDEX = 0                     # face webcam (--webcam N); 0 = first camera Windows finds
-WEBCAM_SIZE = "1280x720"             # --webcam-size
+WEBCAM_INDEX = 1                     # face webcam (--webcam N); 0 = first camera Windows finds
+WEBCAM_SIZE = "1280x960"             # --webcam-size
 PREVIEW_FPS = 15                     # preview window refresh
 GUI_MARKER_STREAM = "ParadigmMarkers"
 TRAINING_PREFIX = "TRAIN_"
