@@ -21,14 +21,16 @@ from feedback_cues import channels_for, play_feedback
 from haptics import activate_haptic_vest
 from lsl_markers import send_marker
 from questionnaires import QUESTIONNAIRE_CONDITIONS, missing_conditions
-from robot import send_point_to_robot, set_robot_speed
+from robot import send_robot_command, set_robot_speed
 from screens.dual_task_screen import DualTaskScreen
 from screens.pretrain_screen import PretrainScreen
 from screens.questionnaire_screen import QuestionnaireScreen
 from screens.scoreboard_screen import ArcadeScoreboardScreen
 from screens.setup_screen import setupscreen
 from screens.start_screen import startscreen
+from screens.training_menu_dialog import TRAINING_PARTS, TrainingMenuDialog
 from screens.tutorial_screen import tutorialscreen
+from screens.warmup_screen import BatteryWarmupScreen, RadioWarmupScreen
 from sequences import build_training_sequence, load_training_sequence
 from state import state
 
@@ -39,6 +41,8 @@ class paradigmcontroller(QWidget):
         self.setWindowTitle("Dual-Task Assembly and Collaboration Paradigm")
         self.mistake_on_cooldown = False
         self._training_tasks = []
+        self.training_plan = []
+        self.last_training_score = None
         self.evaluator_connected = False
 
         self.stacked_widget = QStackedWidget()
@@ -54,6 +58,8 @@ class paradigmcontroller(QWidget):
         self.scoreboard_screen = ArcadeScoreboardScreen(self.after_scoreboard)
         self.questionnaire_screen = QuestionnaireScreen()
         self.pretrain_screen = PretrainScreen()
+        self.radio_warmup = RadioWarmupScreen(player_source=self.dual_task_screen.game_widget)
+        self.battery_warmup = BatteryWarmupScreen()
 
         self.stacked_widget.addWidget(self.setup_screen)       # 0
         self.stacked_widget.addWidget(self.tutorial_screen)    # 1
@@ -62,6 +68,8 @@ class paradigmcontroller(QWidget):
         self.stacked_widget.addWidget(self.scoreboard_screen)  # 4
         self.stacked_widget.addWidget(self.questionnaire_screen)  # 5
         self.stacked_widget.addWidget(self.pretrain_screen)       # 6
+        self.stacked_widget.addWidget(self.radio_warmup)          # 7
+        self.stacked_widget.addWidget(self.battery_warmup)        # 8
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -94,6 +102,7 @@ class paradigmcontroller(QWidget):
         if USE_REMOTE_EVALUATOR:
             self.evaluator_link = EvaluatorLink(parent=self)
             self.evaluator_link.verdict_received.connect(self.dual_task_screen.remote_verdict)
+            self.evaluator_link.result_received.connect(self.dual_task_screen.remote_practice_result)
             self.evaluator_link.battery_received.connect(self.dual_task_screen.remote_battery_cue)
             self.evaluator_link.connection_changed.connect(self._evaluator_connection)
             self.evaluator_link.start()
@@ -152,19 +161,56 @@ class paradigmcontroller(QWidget):
                               state.current_condition):
             return
         if state.current_condition == "training":
+            menu = TrainingMenuDialog(self)                  # where to start (e.g. after a problem)
+            if menu.exec_() != TrainingMenuDialog.Accepted:
+                send_marker("Training_Menu_Back")
+                self.return_to_setup()
+                return
+            start = menu.start_index
+            self.training_plan = TRAINING_PARTS[start:start + 1] if menu.only_this else TRAINING_PARTS[start:]
+            send_marker(f"Training_Plan_{'-'.join(self.training_plan)}")
             self._training_tasks = build_training_sequence(len(TRAINING_CONDITIONS) * TRAINING_ROUNDS)
             state.training_block = 0
             state.training_condition = TRAINING_CONDITIONS[0]
-            self.tutorial_screen.reset()
-            self.stacked_widget.setCurrentIndex(1)
-            self.tutorial_screen.setFocus()
+            self.next_training_part()
         else:
             self.start_screen.configure_for_condition(state.current_condition)
             self.stacked_widget.setCurrentIndex(2)
 
     def tutorial_finished_callback(self):
-        """Task tutorial done: first training block."""
-        self.show_training_block(0)
+        """Task tutorial done: next training part (normally the radio warm-up)."""
+        self.next_training_part()
+
+    def next_training_part(self):
+        """Runs the training parts chosen in the training menu, in order (TRAINING_PARTS)."""
+        if not self.training_plan:
+            self.finish_training()
+            return
+        part = self.training_plan.pop(0)
+        send_marker(f"Training_Part_{part}")
+        if part == "tutorial":
+            self.tutorial_screen.reset()
+            self.stacked_widget.setCurrentIndex(1)
+            self.tutorial_screen.setFocus()
+        elif part == "warmup_radio":
+            self.stacked_widget.setCurrentIndex(7)
+            self.radio_warmup.start(finish_cb=self.next_training_part)
+        elif part == "warmup_battery":
+            self.stacked_widget.setCurrentIndex(8)
+            self.battery_warmup.start(finish_cb=self.next_training_part)
+            self.battery_warmup.setFocus()
+        else:
+            self.show_training_block(int(part[5:]))
+
+    def finish_training(self):
+        """After the last chosen part: scoreboard if a block was played, else back to the menu."""
+        if self.last_training_score is None:
+            self.return_to_setup()
+            return
+        score, self.last_training_score = self.last_training_score, None
+        self.stacked_widget.setCurrentIndex(4)
+        self.scoreboard_screen.start_scoreboard("training", score)
+        self.scoreboard_screen.setFocus()
 
     # ------------------------------------------------------------------ training blocks
     def show_training_block(self, index):
@@ -197,6 +243,7 @@ class paradigmcontroller(QWidget):
         if state.current_condition == "training":
             send_marker(f"Training_Block_Start_{state.training_block + 1}_{state.training_condition}")
         self.announce_scenario()
+        self.robot_command("go 1")          # every condition and every training block starts at point 1
 
         rounds = TRAINING_ROUNDS if state.current_condition == "training" else MAX_ROUNDS_PER_CONDITION
         self.stacked_widget.setCurrentIndex(3)
@@ -240,11 +287,19 @@ class paradigmcontroller(QWidget):
         current_w = self.stacked_widget.currentWidget()
         if current_w is self.tutorial_screen:
             self.tutorial_screen.on_point_key(point)
+        elif current_w is self.battery_warmup:
+            self.battery_warmup.on_point_key(point)
         elif current_w is self.dual_task_screen:
             self.dual_task_screen.handover_received(point)
 
-    def on_handover_complete(self, point_pressed: int):
-        send_point_to_robot(point_pressed)
+    def on_handover_complete(self, point_pressed: int, next_point=None):
+        """Handover at point_pressed; next_point = point of the next round (None = last round: park)."""
+        self.robot_command(str(point_pressed))
+        self.robot_command(f"go {next_point}" if next_point else "home")
+
+    def robot_command(self, command):
+        sent = send_robot_command(command)
+        send_marker(f"Robot_Command_{command.replace(' ', '_')}{'' if sent else '_NotRunning'}")
 
     def on_condition_complete(self, final_score: int):
         audio_sys.stop_looping_alarm()
@@ -252,9 +307,9 @@ class paradigmcontroller(QWidget):
         if state.current_condition == "training":
             send_marker(f"Training_Block_Complete_{state.training_block + 1}_{state.training_condition}"
                         f"_Score_{final_score}")
-            if state.training_block + 1 < len(TRAINING_CONDITIONS):
-                self.show_training_block(state.training_block + 1)      # next block, scoreboard at the end
-                return
+            self.last_training_score = final_score
+            self.next_training_part()                    # next part, scoreboard after the last one
+            return
         self.stacked_widget.setCurrentIndex(4)
         self.scoreboard_screen.start_scoreboard(state.current_condition, final_score)
         self.scoreboard_screen.setFocus()
@@ -303,5 +358,7 @@ class paradigmcontroller(QWidget):
         self.questionnaire_screen.start_sus(state.subject_number, state.language, finish_cb=self.return_to_setup)
 
     def return_to_setup(self):
+        self.radio_warmup.stop()
+        self.training_plan, self.last_training_score = [], None
         send_marker("Returned_To_Main_Menu")
         self.stacked_widget.setCurrentIndex(0)

@@ -6,7 +6,11 @@ from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidg
 
 from config import (
     DELIVERY_WINDOW_SECONDS,
+    FAIL_PENALTY,
+    HARD_INSTRUCTION_MULTIPLIER,
+    HARD_PENALTY_MULTIPLIER,
     IDLE_HIT_POINTS,
+    POINTS_PER_STEP,
     PROBLEMS_PER_CHECKPOINT,
     RETRIEVAL_SECONDS,
     TASK_SECONDS_DEFAULT,
@@ -92,10 +96,10 @@ class tutorialscreen(QWidget):
         """Task tutorial (radio + battery) in the participant's language, from the first page."""
         blocks = "<br>".join(f"{i}. {block_name(c)}" for i, c in enumerate(TRAINING_CONDITIONS, start=1))
         fmt = dict(n=PROBLEMS_PER_CHECKPOINT, r=RETRIEVAL_SECONDS, d=DELIVERY_WINDOW_SECONDS, p=IDLE_HIT_POINTS,
+                   ip=POINTS_PER_STEP * HARD_INSTRUCTION_MULTIPLIER, fp=FAIL_PENALTY * HARD_PENALTY_MULTIPLIER,
                    s=TASK_SECONDS_DEFAULT, b=len(TRAINING_CONDITIONS), k=TRAINING_ROUNDS, blocks=blocks)
         steps = list(TUTORIAL.get(state.language, TUTORIAL["en"]))
-        if state.game_mode == "hard":
-            steps.insert(4, HARD_TUTORIAL_STEP.get(state.language, HARD_TUTORIAL_STEP["en"]))
+        steps.insert(4, HARD_TUTORIAL_STEP.get(state.language, HARD_TUTORIAL_STEP["en"]))   # the only game mode
         self.body_label.setFont(QFont("Helvetica", 24))
         self._load([(title, body.format(**fmt) if "{" in body else body) for title, body in steps],
                    self.finish_callback, lambda i, n: t("tut_header", i=i, n=n), t("tut_continue"),
@@ -162,7 +166,7 @@ class tutorialscreen(QWidget):
     def keyPressEvent(self, event):
         if event.isAutoRepeat():
             return
-        if event.key() in (Qt.Key_Right, Qt.Key_Up, Qt.Key_Return, Qt.Key_Enter):
+        if event.key() in (Qt.Key_Right, Qt.Key_Down, Qt.Key_Up, Qt.Key_Return, Qt.Key_Enter):
             self.next_step()
         elif event.key() == Qt.Key_Left:
             self.prev_step()

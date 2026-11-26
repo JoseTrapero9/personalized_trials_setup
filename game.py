@@ -5,7 +5,7 @@ Bimodal by design:
   * WHERE it is exists only on the screen: 3 buttons (Left / Up / Right keys) whose colors and
     words keep changing and never match each other (Stroop). They freeze while a problem is active.
 
-Hard mode (state.game_mode == "hard"): while no instruction is active, every button change is a
+Game mode "hard" (the only mode now): while no instruction is active, every button change is a
 "match round": exactly one button's word matches its color; pressing it scores IDLE_HIT_POINTS,
 a miss costs nothing, one press per round. Instructions pay double and cost double.
 
@@ -27,7 +27,8 @@ from PyQt5.QtWidgets import QWidget
 
 from audio import audio_sys
 from config import (
-    ERROR_CUES, FAIL_PENALTY, FILLER_GAP_SECONDS, HARD_INSTRUCTION_MULTIPLIER, HARD_PENALTY_MULTIPLIER,
+    ERROR_CUES, FAIL_PENALTY, FAKE_RANK_FIRST_SECONDS, FAKE_RANK_INTERVAL_SECONDS, FAKE_RANK_MESSAGES,
+    FAKE_RANK_PLACES, FAKE_RANK_SHOW_SECONDS, FILLER_GAP_SECONDS, HARD_INSTRUCTION_MULTIPLIER, HARD_PENALTY_MULTIPLIER,
     IDLE_HIT_POINTS, IDLE_WRONG_PENALTY, LATE_PRESS_SECONDS, ROULETTE_DURING_INSTRUCTION, ROULETTE_FRAME_SECONDS, LOG_TRAINING_CSV, POINTS_PER_STEP,
     PRESS_GRACE_SECONDS, PROBLEM_GAP_SECONDS, PROBLEMS_PER_CHECKPOINT, RESPONSE_SECONDS,
     RESUME_GAP_SECONDS, SHOW_RESPONSE_BAR, SHUFFLE_SECONDS, base_dir, error_cue_audio
@@ -43,7 +44,7 @@ from state import state
 from texts import t
 
 COLOR_HEX = {"red": "#E53935", "blue": "#1E5BD8", "green": "#1E9E4A", "yellow": "#F5C518", "purple": "#8E44C9"}
-KEY_GLYPHS = ["←", "↑", "→"]
+KEY_GLYPHS = ["←", "↓", "→"]          # keys: Left, DOWN (middle button), Right
 CHARS_PER_SECOND = 14.0          # duration estimate when a clip is missing (silent mode)
 
 _POOL = None
@@ -58,6 +59,7 @@ def _pool():
 
 class RadioPanelGame(QWidget):
     checkpoint_reached = pyqtSignal()
+    problem_done = pyqtSignal(str, object)     # outcome ("solved" / "wrong" / "timeout"), the problem dict
 
     def __init__(self):
         super().__init__()
@@ -95,6 +97,16 @@ class RadioPanelGame(QWidget):
         self.prev_idle = None             # last closed round, can still take a late press
         self.idle_n = 0
         self.popups = []                  # (pos, text, color, time)
+        # warm-up (screens/warmup_screen.py) can change these before start(); conditions use the defaults
+        self.response_seconds = RESPONSE_SECONDS
+        self.problem_gap = PROBLEM_GAP_SECONDS
+        self.score_offset = 0             # points of the participant's other conditions (general leaderboard)
+        self.banner = None                # (text, color, start, seconds): handover feedback on top of everything
+        self.hud_label = None             # replaces the checkpoint text top right (warm-up)
+        self.rank_msg = None              # (text, color, time) fake leaderboard message next to the score
+        self.rank_rng = random.Random()   # own generator: the radio problems / layouts stay as they were
+        self.fake_place = None
+        self.next_rank_msg_at = float("inf")
         self._paused_at = 0.0
         self.key_flash = [0.0, 0.0, 0.0]
         self.eq = [0.0] * 18
@@ -104,7 +116,8 @@ class RadioPanelGame(QWidget):
         self.timer.timeout.connect(self._tick)
 
     # ------------------------------------------------------------------ public API
-    def start(self):
+    def start(self, order_offset=0):
+        """order_offset: first problem of the fixed order (training parts start at different problems)."""
         lang = state.language
         cond = state.current_condition
         if self.player is None:
@@ -119,7 +132,7 @@ class RadioPanelGame(QWidget):
             print(f"RADIO WARNING: {msg}")
 
         self.order = problem_order(cond, blocks, training)
-        self.order_idx = 0
+        self.order_idx = order_offset
         self.rng = random.Random(f"radio-{cond}")
         self.score = 0
         self.problem = None
@@ -135,13 +148,17 @@ class RadioPanelGame(QWidget):
         self.idle = self.prev_idle = None
         self.idle_n = 0
         self.popups = []
+        self.rank_msg = None
+        self.fake_place = None
 
         now = time.perf_counter()
+        self.next_rank_msg_at = (now + self.rank_rng.uniform(*FAKE_RANK_FIRST_SECONDS)
+                                 if FAKE_RANK_MESSAGES and not state.training_active else float("inf"))
         self.running = True
         self.player.stop()
         send_marker(f"Radio_Game_Start_Mode_{state.game_mode}_Lang_{lang}_Voice_{(self.bank.voice or 'none').replace(' ', '')}"
                     f"_Silent_{int(self.player.silent or not self.bank.ok)}")
-        gap = self.rng.uniform(*PROBLEM_GAP_SECONDS)
+        gap = self.rng.uniform(*self.problem_gap)
         if gap <= 0:
             self.next_filler_at = float("inf")
             self.next_shuffle_at = float("inf")
@@ -199,6 +216,11 @@ class RadioPanelGame(QWidget):
                 self.next_filler_at = now + 0.4
                 self.next_shuffle_at = now          # fresh match round right away
         self.paused = paused
+        self.update()
+
+    def show_banner(self, text, color, seconds=2.5):
+        """Big message on top of the game (handover feedback). Also shown during a pause."""
+        self.banner = (text, color, time.perf_counter(), seconds)
         self.update()
 
     def set_pause_seconds(self, n):
@@ -291,8 +313,12 @@ class RadioPanelGame(QWidget):
             self._on_clip_finished(finished, now)
         self._animate_eq()
         if self.paused or not self.running:
+            if self.paused and self.next_rank_msg_at != float("inf"):
+                self.next_rank_msg_at += 0.03          # no messages during pauses (timer runs every 30 ms)
             self.update()
             return
+        if now >= self.next_rank_msg_at:
+            self._fake_rank_message(now)
 
         p = self.problem
         if p is not None and p["deadline"] is not None and now > p["deadline"]:
@@ -315,11 +341,25 @@ class RadioPanelGame(QWidget):
         self._finalize_prev_idle()
         self.update()
 
+    def _fake_rank_message(self, now):
+        """Invented leaderboard news among the first places (never in training). Logged as a marker."""
+        place = self.rank_rng.choice(FAKE_RANK_PLACES)
+        prev = self.fake_place
+        kind = "same" if prev is None or place == prev else ("up" if place < prev else "down")
+        if prev is None:
+            kind = "up" if place > 1 and self.rank_rng.random() < 0.5 else "same"
+        self.fake_place = place
+        name = t(f"place_{place}") if place <= 3 else t("place_n", n=place)
+        color = {"up": "#4ADE80", "down": "#FB923C", "same": "#FACC15"}[kind]
+        self.rank_msg = (t(f"rank_{kind}", place=name), color, now)
+        self.next_rank_msg_at = now + self.rank_rng.uniform(*FAKE_RANK_INTERVAL_SECONDS)
+        send_marker(f"Leaderboard_Fake_Message_Place_{place}_{kind}")
+
     def _on_clip_finished(self, cid, now):
         p = self.problem
         if p is not None and cid == p["clip"]:
             p["instr_end"] = now
-            p["deadline"] = now + RESPONSE_SECONDS
+            p["deadline"] = now + self.response_seconds
             send_marker(f"Radio_Instruction_End_{p['id']}")
         self.next_filler_at = now + self.rng.uniform(*FILLER_GAP_SECONDS)
 
@@ -381,10 +421,11 @@ class RadioPanelGame(QWidget):
             if self.counted >= PROBLEMS_PER_CHECKPOINT:
                 self.counted = 0
                 self.pending_checkpoint = True
-        gap = self.rng.uniform(*PROBLEM_GAP_SECONDS)
+        gap = self.rng.uniform(*self.problem_gap)
         self.next_problem_at = (now + fb_dur + gap) if gap > 0 else now
         self.next_shuffle_at = now if gap > 0 else float("inf")
         self._log(p, outcome, rt, rt_after)
+        self.problem_done.emit(outcome, p)
 
     def _spinning(self):
         """True while the radio is still giving the instruction and the buttons are hidden."""
@@ -469,7 +510,7 @@ class RadioPanelGame(QWidget):
         if p.pop("held_in_instr", False):
             p["paused_in_instr"] += now - self._paused_at   # deadline starts when the instruction ends
             if p["deadline"] is not None:            # it ended in the same instant as the pause
-                p["deadline"] = now + RESPONSE_SECONDS
+                p["deadline"] = now + self.response_seconds
         else:
             p["paused_after_instr"] += now - self._paused_at
             p["deadline"] = now + p.pop("remaining")
@@ -553,11 +594,39 @@ class RadioPanelGame(QWidget):
         painter.drawRoundedRect(hud, 10, 10)
         painter.setFont(QFont("Helvetica", 18, QFont.Bold))
         painter.setPen(QColor("#F8FAFC"))
-        painter.drawText(hud.adjusted(14, 0, -14, 0), Qt.AlignLeft | Qt.AlignVCenter,
-                         f"{t('score')}: {self.score:04d}")
+        score_text = f"{t('score')}: {self.score_offset + self.score:04d}"
+        painter.drawText(hud.adjusted(14, 0, -14, 0), Qt.AlignLeft | Qt.AlignVCenter, score_text)
         painter.setPen(QColor("#38BDF8"))
-        right = t("next_cp", n=PROBLEMS_PER_CHECKPOINT - self.counted) if self.counting else t("assembly_mode")
+        right = self.hud_label or (t("next_cp", n=PROBLEMS_PER_CHECKPOINT - self.counted) if self.counting
+                                   else t("assembly_mode"))
         painter.drawText(hud.adjusted(14, 0, -14, 0), Qt.AlignRight | Qt.AlignVCenter, right)
+        if self.rank_msg is not None:                  # fake leaderboard news, right next to the score
+            age = now - self.rank_msg[2]
+            if age > FAKE_RANK_SHOW_SECONDS:
+                self.rank_msg = None
+            else:
+                fm = QFontMetrics(painter.font())
+                x0 = hud.left() + 14 + fm.horizontalAdvance(score_text) + 16
+                x1 = hud.right() - 14 - fm.horizontalAdvance(right) - 16
+                text, col = self.rank_msg[0], QColor(self.rank_msg[1])
+                size = 15
+                font = QFont("Helvetica", size, QFont.Bold)
+                while size > 9 and QFontMetrics(font).horizontalAdvance(text) + 24 > x1 - x0:
+                    size -= 1
+                    font.setPointSize(size)
+                if x1 - x0 > 80:
+                    alpha = int(255 * min(1.0, (FAKE_RANK_SHOW_SECONDS - age) / 0.8, age / 0.3 + 0.2))
+                    pill_w = min(x1 - x0, QFontMetrics(font).horizontalAdvance(text) + 24)
+                    pill = QRectF(x0, hud.top() + 10, pill_w, hud.height() - 20)
+                    bgc = QColor(col)
+                    bgc.setAlpha(min(alpha, 60))
+                    col.setAlpha(alpha)
+                    painter.setBrush(bgc)
+                    painter.setPen(QPen(col, 2))
+                    painter.drawRoundedRect(pill, 8, 8)
+                    painter.setFont(font)
+                    painter.drawText(pill, Qt.AlignCenter, text)
+                    painter.setFont(QFont("Helvetica", 18, QFont.Bold))
 
         # Radio: title, on-air lamp, equalizer
         radio = QRectF(w * 0.12, 84, w * 0.76, h * 0.2)
@@ -568,7 +637,7 @@ class RadioPanelGame(QWidget):
         painter.setPen(QColor("#94A3B8"))
         painter.drawText(QRectF(radio.left() + 18, radio.top() + 8, radio.width() - 36, 28),
                          Qt.AlignLeft | Qt.AlignVCenter,
-                         t("radio_title") + (f"  ·  {t('mode_hard')}" if self.hard else ""))
+                         t("radio_title"))
         talking = self.player is not None and self.player.busy() and not self.paused
         painter.setPen(Qt.NoPen)
         painter.setBrush(QColor("#EF4444") if talking else QColor("#4B5563"))
@@ -610,7 +679,7 @@ class RadioPanelGame(QWidget):
                 painter.drawText(srect, Qt.AlignCenter, status[0])
             bar_y = srect.bottom() + 12
         if SHOW_RESPONSE_BAR and p is not None and p["deadline"] is not None:
-            frac = max(0.0, min(1.0, (p["deadline"] - now) / RESPONSE_SECONDS))
+            frac = max(0.0, min(1.0, (p["deadline"] - now) / self.response_seconds))
             full = QRectF(w * 0.12, bar_y, w * 0.76, 12)
             painter.setBrush(QColor("#1E293B"))
             painter.drawRoundedRect(full, 6, 6)
@@ -686,6 +755,24 @@ class RadioPanelGame(QWidget):
             self._draw_pause(painter, w, h)
         if self.system_failed_active:
             self._draw_failed(painter, w, h)
+        if self.banner is not None:
+            text, color, t0, secs = self.banner
+            if now - t0 > secs:
+                self.banner = None
+            else:
+                col = QColor(color)
+                rect = QRectF(20, 78, w - 40, 86)
+                painter.setPen(QPen(QColor("#FFFFFF"), 3))
+                painter.setBrush(col)
+                painter.drawRoundedRect(rect, 14, 14)
+                size = 30
+                font = QFont("Helvetica", size, QFont.Black)
+                while size > 12 and QFontMetrics(font).horizontalAdvance(text) > rect.width() - 30:
+                    size -= 1
+                    font.setPointSize(size)
+                painter.setFont(font)
+                painter.setPen(QColor("#FFFFFF"))
+                painter.drawText(rect, Qt.AlignCenter, text)
 
     def _draw_label(self, painter, rect, text):
         size = int(rect.height() * 0.24)

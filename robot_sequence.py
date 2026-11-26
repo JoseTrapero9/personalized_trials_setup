@@ -1,15 +1,27 @@
+"""Robot (UR) handover sequence, driven by the GUI (robot.py starts it and writes commands to its stdin).
+
+Commands, one per line:
+    go 1 / go 2   move above collection point 1 (left) / 2 (right) and wait there
+    1 / 2         the participant pressed that point's button: pick the piece up there, bring it to the
+                  disposal, bring an empty piece back (same moves and timings as before)
+    home          park at the home position (end of a condition / training block)
+    quit          home and end
+
+The GUI decides the point of every round (round 1 of every condition and of every training block = point 1),
+so the robot can never get out of step with the screen (before, the robot just alternated left/right for
+the whole program run: a 5-round training block made the next block start on the wrong side, and after
+20 handovers the sequence ended in the middle of a condition). Commands that arrive while the robot is
+still moving wait until the current move sequence is finished, so a move is never cut off.
+"""
+
 import socket
 import time
 import math
 import sys
-###test
+
 HOST = "192.168.29.61"
 PORT_SCRIPT = 30002
 PORT_DASHBOARD = 29999
-
-def wait_for_gui_signal():
-    # blocks execution until a line is written to standard input by the main application
-    sys.stdin.readline()
 
 class Scripter:
     def __init__(self):
@@ -158,75 +170,87 @@ class Dashboard:
         # clean up dashboard socket
         self.sock.close()
 
+def deliver_and_return_empty(s):
+    """After a pick-up: piece to the disposal, empty piece back (identical for both points)."""
+    s.move_home(wait_time=2.9 if s.last_point == 1 else 2.5)
+    s.move_disposal_up(wait_time=4.5)
+    s.move_disposal_down(wait_time=1.1)
+    s.open_gripper()
+    s.movel_disposal_up(wait_time=1.5)
+    s.move_pickup_empty_piece_up(wait_time=2.5)
+    s.move_pickup_empty_piece_down(wait_time=2.4)
+    s.close_gripper()
+    s.move_pickup_empty_piece_up(wait_time=2.5)
+    s.move_return_empty_piece_up(wait_time=4.2)
+    s.move_return_empty_piece_down(wait_time=1)
+    s.open_gripper()
+    s.move_return_empty_piece_up(wait_time=1.5)
+
+
+def go_to_point(s, point, where):
+    """Move above collection point 1 / 2. where = position the robot is at now."""
+    if where == point:
+        return
+    if where in (1, 2):                       # above the OTHER point: via home, never straight across
+        s.move_home(wait_time=3.0)
+        where = "home"
+    if point == 1:
+        s.move_left_up(wait_time=3)           # same as the old sequence
+    else:
+        s.move_right_up(wait_time=1.9 if where == "return" else 3.0)
+
+
+def pick_up(s, point):
+    s.last_point = point
+    if point == 1:
+        s.move_left_down(wait_time=1.9)
+        s.close_gripper()
+        s.movel_left_up(wait_time=1.9)
+    else:
+        s.move_right_down(wait_time=1.3)
+        s.close_gripper()
+        s.movel_right_up(wait_time=1.7)
+
+
 def main():
     s = Scripter()
     d = Dashboard()
-    
+    s.last_point = 1
+    where = "home"                            # home | 1 | 2 | return (above the empty-piece place)
     try:
-        # set the robot to go to the specific position and wait 15 seconds
         s.open_gripper()
         s.close_gripper()
         s.open_gripper()
         s.move_home(wait_time=5)
-
-        for i in range(10):  # repeat the sequence x times
-            # Going to first collection point
-            s.move_left_up(wait_time=3)
-            wait_for_gui_signal()
-            s.move_left_down(wait_time=1.9)
-            s.close_gripper()
-            s.movel_left_up(wait_time=1.9)
-            s.move_home(wait_time=2.9)
-
-            # Going to bring back piece
-            s.move_disposal_up(wait_time=4.5)
-            s.move_disposal_down(wait_time=1.1)
-            s.open_gripper()
-            s.movel_disposal_up(wait_time=1.5)
-            s.move_pickup_empty_piece_up(wait_time=2.5)
-            s.move_pickup_empty_piece_down(wait_time=2.4)
-            s.close_gripper()
-            s.move_pickup_empty_piece_up(wait_time=2.5)
-
-            #s.move_return_midpoint(wait_time=2.9)
-            s.move_return_empty_piece_up(wait_time=4.2)
-            s.move_return_empty_piece_down(wait_time=1)
-            s.open_gripper()
-            s.move_return_empty_piece_up(wait_time=1.5)
-            
-            # Going to second collection point
-            s.move_right_up(wait_time=1.9)
-            wait_for_gui_signal()
-            s.move_right_down(wait_time=1.3)
-            s.close_gripper()
-            s.movel_right_up(wait_time=1.7)
-            s.move_home(wait_time=2.5)
-
-            # Going to bring back piece
-            s.move_disposal_up(wait_time=4.5)
-            s.move_disposal_down(wait_time=1.1)
-            s.open_gripper()
-            s.movel_disposal_up(wait_time=1.5)
-            s.move_pickup_empty_piece_up(wait_time=2.5)
-            s.move_pickup_empty_piece_down(wait_time=2.4)
-            s.close_gripper()
-            s.move_pickup_empty_piece_up(wait_time=2.5)
-
-            #s.move_return_midpoint(wait_time=2.9)
-            s.move_return_empty_piece_up(wait_time=4.2)
-            s.move_return_empty_piece_down(wait_time=1)
-            s.open_gripper()
-            s.move_return_empty_piece_up(wait_time=1.5)
-            # s.move_home(wait_time=2)
-            
-
-        # End of cycle  
+        print("[ROBOT] ready, waiting for the GUI", flush=True)
+        for line in sys.stdin:                # blocks until the GUI writes a command
+            cmd = line.strip().lower()
+            if not cmd:
+                continue
+            print(f"[ROBOT] command: {cmd}", flush=True)
+            if cmd in ("go 1", "go 2"):
+                point = int(cmd[-1])
+                go_to_point(s, point, where)
+                where = point
+            elif cmd in ("1", "2"):
+                point = int(cmd)
+                go_to_point(s, point, where)  # normally already there
+                pick_up(s, point)
+                deliver_and_return_empty(s)
+                where = "return"
+            elif cmd == "home":
+                if where != "home":
+                    s.move_home(wait_time=3.0)
+                where = "home"
+            elif cmd == "quit":
+                break
+            else:
+                print(f"[ROBOT] unknown command ignored: {cmd}", flush=True)
         s.move_home(wait_time=8)
-
     finally:
-        # closing streams
         s.close()
         d.close()
+
 
 if __name__ == "__main__":
     main()

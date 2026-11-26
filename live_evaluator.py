@@ -1656,6 +1656,10 @@ class EvalRecorder:
                 self._ended_at = time.monotonic()
                 self.condition = None
                 self.stop()
+            elif m.startswith("Warmup_Start_"):
+                self._ended_at = float("inf")            # training warm-up: no condition runs, no late start
+            elif m.startswith("Warmup_End_"):
+                self._ended_at = time.monotonic()
             elif (self.session is None and self._pending is None and IN_CONDITION_RE.match(m)
                   and time.monotonic() - self._ended_at > LATE_START_GUARD_SECONDS):
                 print(f"[REC] the start of the condition was missed (LSL link) - starting late on {m[:40]}")
