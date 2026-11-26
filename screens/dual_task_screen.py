@@ -12,10 +12,17 @@ from audio import audio_sys
 from config import (
     BATTERY_CUE_CONDITIONS,
     DELIVERY_WINDOW_SECONDS,
+    HANDOVER_FEEDBACK,
+    HANDOVER_FEEDBACK_WAIT_SECONDS,
+    WRONG_POINT_FEEDBACK,
+    correct_audio,
+    error_cue_audio,
     LOG_TRAINING_CSV,
     MAX_ROUNDS_PER_CONDITION,
     RETRIEVAL_SECONDS,
     TASK_SECONDS_DEFAULT,
+    TRAINING_RADIO_OFFSET,
+    WARMUP_RADIO_PROBLEMS,
     USE_RADIO_CONTAINER_CUES,
     WARNING_SECONDS,
     alarm_audio,
@@ -25,6 +32,7 @@ from config import (
     container2_audio,
     incorrect_audio
 )
+import leaderboard
 from game import RadioPanelGame
 from feedback_cues import channels_for, play_feedback
 from haptics import play_pickup_cue
@@ -62,6 +70,9 @@ class DualTaskScreen(QWidget):
         self.session_csv_path = None
         self.sequence = []
         self.sequence_file = ""
+        self.feedback_wanted = None       # (round, time of the handover): feedback waits for the verdict
+        self.practice_result = None       # (round, is_correct) training result from the camera PC
+        self._wrong_point_at = 0.0
 
         self.phase_timer = QTimer(self)
         self.phase_timer.timeout.connect(self._on_phase_timer_tick)
@@ -204,7 +215,12 @@ class DualTaskScreen(QWidget):
             self.training_tag.hide()
 
         self.handover_label.setText(t("advance"))
-        self.game_widget.start()
+        # general leaderboard: the score continues from the participant's other conditions (not in training)
+        self.game_widget.score_offset = 0 if state.training_active else \
+            leaderboard.carried_score(state.subject_number, state.current_condition)
+        # training: every block starts further into the training instructions (the warm-up uses the first ones)
+        offset = (WARMUP_RADIO_PROBLEMS + state.training_block * TRAINING_RADIO_OFFSET) if state.training_active else 0
+        self.game_widget.start(order_offset=offset)
         self._enter_play_to_checkpoint()
         self.setFocus()
 
@@ -258,6 +274,8 @@ class DualTaskScreen(QWidget):
         self.evaluated = False
         self.assembly_status = "none"
         self.pending_log = None
+        self.feedback_wanted = None
+        self.practice_result = None
         self.alarm_triggered = False
         self.active_collection_pt = 1 if (self.current_round % 2 != 0) else 2
         self.task_start_time = time.perf_counter()
@@ -397,7 +415,10 @@ class DualTaskScreen(QWidget):
         """Accepts Left (Point 1) or Right (Point 2) button press during assembly or delivery window."""
         if self.phase not in ["DUAL_ASSEMBLY", "DELIVERY_PAUSE"]:
             return
-        if self.active_collection_pt is None or point_pressed != self.active_collection_pt:
+        if self.active_collection_pt is None:
+            return
+        if point_pressed != self.active_collection_pt:
+            self._wrong_point(point_pressed)
             return
 
         self.phase_timer.stop()
@@ -434,14 +455,21 @@ class DualTaskScreen(QWidget):
         else:
             self.pending_log = log_data
 
+        self._request_handover_feedback()
         self.active_collection_pt = None
-        self.round_complete_cb(point_pressed)
+        last = self.current_round >= self.max_rounds
+        # the robot is told where the next round's piece goes (round N+1: odd = point 1, even = point 2)
+        self.round_complete_cb(point_pressed, None if last else (1 if (self.current_round + 1) % 2 else 2))
 
         # Check if all 8 rounds (or training rounds) are complete
         if self.current_round >= self.max_rounds:
             self.game_widget.stop()
             self.flush_pending_log()
-            self.condition_complete_cb(self.game_widget.score)
+            if HANDOVER_FEEDBACK:                         # let the last feedback be seen, then the scoreboard
+                self.phase = "FINISHING"
+                QTimer.singleShot(3000, lambda: self.condition_complete_cb(self.game_widget.score))
+            else:
+                self.condition_complete_cb(self.game_widget.score)
         else:
             self.handover_label.setText(t("advance"))
             self._enter_play_to_checkpoint()
@@ -457,8 +485,7 @@ class DualTaskScreen(QWidget):
 
         if is_correct:
             self.game_widget.score += 100
-        else:
-            audio_sys.play_both(incorrect_audio)
+        self._give_handover_feedback_if_waiting()       # the sound / message come at the handover button
 
         if self.pending_log is not None:
             self.pending_log["assembly_status"] = self.assembly_status
@@ -475,6 +502,58 @@ class DualTaskScreen(QWidget):
             send_marker(f"Remote_Verdict_Ignored_Training_Round_{round_number}")
             return
         self.record_evaluation(is_correct, source="camera")
+
+    def remote_practice_result(self, round_number: int, is_correct: bool):
+        """Training result from the camera PC: only used for the feedback at the handover (no points, no log)."""
+        if not state.training_active or round_number != self.current_round:
+            return
+        self.practice_result = (round_number, is_correct)
+        self._give_handover_feedback_if_waiting()
+
+    # ------------------------------------------------------------------ handover feedback (F13 / F14)
+    def _round_result(self):
+        """True / False once the assembly of the current round is judged, else None."""
+        if state.training_active:
+            r = self.practice_result
+            return r[1] if r is not None and r[0] == self.current_round else None
+        return {"correct": True, "incorrect": False}.get(self.assembly_status)
+
+    def _request_handover_feedback(self):
+        if not HANDOVER_FEEDBACK:
+            return
+        self.feedback_wanted = (self.current_round, time.perf_counter())
+        self._give_handover_feedback_if_waiting()
+
+    def _give_handover_feedback_if_waiting(self):
+        w = self.feedback_wanted
+        if w is None or w[0] != self.current_round:
+            return
+        if time.perf_counter() - w[1] > HANDOVER_FEEDBACK_WAIT_SECONDS:
+            self.feedback_wanted = None
+            send_marker(f"Handover_Feedback_Skipped_Late_Round_{self.current_round}")
+            return
+        ok = self._round_result()
+        if ok is None:
+            return                                       # verdict not there yet: given when it arrives
+        self.feedback_wanted = None
+        text = t("fb_correct" if ok else "fb_incorrect") + ("  +100" if ok and not state.training_active else "")
+        self.game_widget.show_banner(text, "#15803D" if ok else "#B42318", 2.5)
+        if ok:
+            audio_sys.play_participant(correct_audio)
+        else:
+            audio_sys.play_both(incorrect_audio)
+        send_marker(f"Handover_Feedback_Round_{self.current_round}_{'correct' if ok else 'incorrect'}")
+
+    def _wrong_point(self, point_pressed):
+        send_marker(f"Handover_Wrong_Point_Pressed_{point_pressed}_Expected_{self.active_collection_pt}"
+                    f"_Round_{self.current_round}")
+        now = time.perf_counter()
+        if not WRONG_POINT_FEEDBACK or now - self._wrong_point_at < 1.0:     # no repeats when held / mashed
+            return
+        self._wrong_point_at = now
+        pt_name, key_hint = self._point_names()
+        self.game_widget.show_banner(t("fb_wrong_point", pt=pt_name, key=key_hint), "#B45309", 2.5)
+        audio_sys.play_participant(error_cue_audio)
 
     def remote_battery_cue(self, round_number: int, slot: int, is_correct: bool, cam_ms: int = -1, link_ms: int = -1):
         """A battery was seen in a slot (live_evaluator.py): confirm or alert with the condition's cue.
@@ -547,7 +626,7 @@ class DualTaskScreen(QWidget):
             return
         if event.key() == Qt.Key_Left:
             self.game_widget.press(0)
-        elif event.key() == Qt.Key_Up:
+        elif event.key() == Qt.Key_Down:         # middle button (was the Up arrow)
             self.game_widget.press(1)
         elif event.key() == Qt.Key_Right:
             self.game_widget.press(2)

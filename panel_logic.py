@@ -3,7 +3,7 @@
 A problem is a list of steps. Each step is (kind, color):
     kind "C" -> press the button whose COLOR is `color`      ("the red button")
     kind "L" -> press the button whose WORD is `color`       ("the button labeled red")
-A layout is 3 buttons, one per screen position (0 = Left arrow, 1 = Up arrow, 2 = Right arrow),
+A layout is 3 buttons, one per screen position (0 = Left arrow, 1 = Down arrow, 2 = Right arrow),
 each (fill_color, label_color). On every button the word never matches the fill (Stroop).
 """
 

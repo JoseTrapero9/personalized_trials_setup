@@ -532,6 +532,10 @@ class Recorder:
             self.condition = r.group(1)
             if self.auto:
                 self.start(f"{subject_tag(self.subject) if self.subject else 's__'}_{self.condition}")
+        elif m.startswith("Warmup_Start_"):
+            self._ended_at = float("inf")            # training warm-up: no condition runs, no late start
+        elif m.startswith("Warmup_End_"):
+            self._ended_at = time.monotonic()
         elif m.startswith("Condition_Complete_") or m in ("Returned_To_Main_Menu", "Application_Closing"):
             print(f"[GUI] {marker}")
             self._ended_at = time.monotonic()
@@ -539,7 +543,7 @@ class Recorder:
             if self.auto:
                 self.stop()
         elif (self.auto and self.session is None and IN_CONDITION_RE.match(m)
-              and time.monotonic() - self._ended_at > LATE_START_GUARD_SECONDS):
+              and time.monotonic() - self._ended_at > LATE_START_GUARD_SECONDS):   # inf (warm-up) -> never
             print(f"[REC] the start of the condition was missed (LSL link) - starting late on {m[:40]}")
             self.start(f"{subject_tag(self.subject) if self.subject else 's__'}_{self.condition or 'unknown'}")
 

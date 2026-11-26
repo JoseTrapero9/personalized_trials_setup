@@ -36,7 +36,8 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 
 * The radio talks all the time (chatter). Suddenly an incident: it says which button(s) to press,
   by **color** ("the red button") or by **word** ("the button labeled red"), single or in order (2-3).
-* 3 buttons on screen = keys **← ↑ →** (left / middle / right). Colors and words never match and
+* 3 buttons on screen = keys **← ↓ →** (left / middle / right; the middle button is the DOWN arrow, it was
+  the up arrow before). Tutorial slides and scoreboard also take ↓ to go on, so a 3-key pad is enough. Colors and words never match and
   keep changing; they freeze while a problem is active. No text of the instruction is ever shown.
 * One wrong key or no answer within `RESPONSE_SECONDS` after the instruction = failed, points lost,
   negative radio reaction, game goes on.
@@ -50,20 +51,51 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
   and language. Button positions are generated live, so a sentence never implies the keys.
   If someone needs more than 40, the condition reuses its own set (marker `Radio_Problem_Set_Exhausted_...`).
 
-## Game modes (setup screen)
+## Game mode (always the former "hard" mode)
 
-* **Normal**: as above.
-* **Hard**: while no instruction is active, every button change is a *match round*: exactly one
-  button's color matches its word. Press it before the next change for `IDLE_HIT_POINTS` (+30, half of
-  a hard one-button instruction). Missing costs nothing; one try per change (wrong press uses it up).
-  Radio instructions pay double and cost double. Checkpoints still count only radio instructions.
-  A press within `LATE_PRESS_SECONDS` of a change counts for the previous round; presses in the first
-  `PRESS_GRACE_SECONDS` of an instruction are ignored. Markers `Radio_Match_*`, CSV rows of type `match`.
-  Separate leaderboards (`arcade_scores_<condition>_hard.json`).
-* Hard mode banner: FIND THE MATCH! / WAIT FOR YOUR INSTRUCTION! / ANSWER NOW!. While the radio speaks
-  an instruction the buttons spin (random faces) and the arrows are locked (`Radio_Press_Blocked_*`);
-  the real buttons appear at ANSWER NOW (= `Radio_Instruction_End_*`). `ROULETTE_DURING_INSTRUCTION`
-  in config.py also enables this for normal mode.
+There is only one game mode now (the setup-screen choice and the normal mode were removed; logs still say
+`game_mode = hard`):
+* While no instruction is active, every button change is a *match round*: exactly one button's color matches
+  its word. Press it before the next change for `IDLE_HIT_POINTS` (+30). Missing costs nothing; one try per
+  change (wrong press uses it up). Radio instructions pay `POINTS_PER_STEP` x 2 per button and cost
+  `FAIL_PENALTY` x 2. Checkpoints still count only radio instructions. A press within `LATE_PRESS_SECONDS` of
+  a change counts for the previous round; presses in the first `PRESS_GRACE_SECONDS` of an instruction are
+  ignored. Markers `Radio_Match_*`, CSV rows of type `match`.
+* Banner: FIND THE MATCH! / WAIT FOR YOUR INSTRUCTION! / ANSWER NOW!. While the radio speaks an instruction the
+  buttons spin (random faces) and the arrows are locked (`Radio_Press_Blocked_*`); the real buttons appear at
+  ANSWER NOW (= `Radio_Instruction_End_*`).
+
+## Score and leaderboard
+
+* **General leaderboard** (`leaderboard.py`, `logs/leaderboard_general.json`): a participant's points are added
+  up over all conditions. The score on screen starts at the points of the participant's other conditions and
+  keeps growing; the scoreboard after a condition shows *this block* and the *total* and ranks everybody by
+  total (own row marked `◄ YOU`). Running a condition again replaces its points (never counted twice).
+  Initials are asked once per participant (first scoreboard, training included) and reused.
+  Training keeps its own practice board (`logs/arcade_scores_training.json`) and does not count.
+* **Fake leaderboard messages** (not in training): next to the score, every 25-50 s
+  (`FAKE_RANK_INTERVAL_SECONDS`) a message says the participant *moved up to*, *was passed / now at* or
+  *is holding* 1st-3rd place (`FAKE_RANK_PLACES`). Invented to keep them engaged; each is logged as
+  `Leaderboard_Fake_Message_Place_<n>_<up|down|same>`. `FAKE_RANK_MESSAGES = False` turns them off.
+* **Feedback at the handover** (F13 = point 1, F14 = point 2), all conditions and training:
+  right point -> **ASSEMBLY CORRECT** (+100, `correct_answer.wav`) or **ASSEMBLY INCORRECT** (loud incorrect
+  sound), from the camera verdict. A verdict that came before the button press waits for it; one that comes
+  later is shown when it arrives (up to `HANDOVER_FEEDBACK_WAIT_SECONDS`). Training uses the camera's practice
+  result (feedback only, no points). Wrong point -> **WRONG POINT: deliver at Point N** + short error sound;
+  the handover is not accepted. Markers `Handover_Feedback_Round_<r>_<correct|incorrect>`,
+  `Handover_Wrong_Point_Pressed_<p>_Expected_<q>_Round_<r>`. After the last round the screen stays 3 s so the
+  feedback is seen.
+
+## Robot (`robot_sequence.py`)
+
+The robot program now follows the GUI instead of alternating left / right by itself: the GUI sends
+`go 1` at the start of **every condition and every training block** (round 1 is always point 1), the point
+of each handover, then `go <next point>` (or `home` after the last round). Before, the robot program ran one
+fixed left/right loop for the whole program run: after a 5-round training block the next block started on
+the wrong side, after an interrupted condition the sides were swapped, and after 20 handovers (in the 3rd
+condition) the loop ended and the robot stopped. Commands that arrive while the robot moves wait until the
+move sequence is finished; switching between the two points always goes through home. Markers
+`Robot_Command_<command>` (`_NotRunning` if the robot program is not running).
 
 ## Files
 
@@ -240,10 +272,23 @@ Order for a participant: **pre-train** -> **training** -> the four conditions ->
   Saves `logs/pretrain/sXX_pretrain.csv`, one row per cue (block, cue, sound file, vest pattern and side,
   answer, right or wrong, reaction time, replays). A repeated pre-train overwrites the file; ESC stops early
   and saves what was answered. Markers `Pretrain_*`.
-* **training**: task slides (radio task, checkpoints, battery sum, delivering with D, how the practice works),
+* **training menu**: when training is started, a window asks where to start: tutorial slides, radio warm-up,
+  battery warm-up or block 1-4 (e.g. to continue after a problem), and whether to run only that part.
+  Default = everything in order. Marker `Training_Plan_<parts>`.
+* **Warm-ups** (interactive, one task at a time, `screens/warmup_screen.py`):
+  *Radio*: the radio alone, `WARMUP_RADIO_PROBLEMS` = 6 instructions; the first 3 are also shown as text while
+  spoken and have 10 s to answer, then listen only at the real pace. After each one the coach panel shows what
+  the radio said and which keys were right (and why: color or word). Match rounds in between.
+  *Battery*: `WARMUP_BATTERY_PUZZLES` = 4 sums on screen (keys 1-4 = Blue / Red / Yellow / Green into the next
+  slot, Backspace = undo, live sum), a hint after a mistake (wrong batteries or wrong order) and the answer after
+  the second; then delivery practice: D, then the button at point 1, D, then point 2 (wrong button = hint).
+  Markers `Warmup_Start_<radio|battery>`, `Warmup_Radio_Problem_*`, `Warmup_Battery_Puzzle_*`,
+  `Warmup_Delivery_*`, `Warmup_End_*` (the camera PCs do not record warm-ups).
+* **training blocks**: task slides (radio task, checkpoints, battery sum, delivering with D, how the practice works),
   then four blocks of `TRAINING_ROUNDS` = 5 rounds, always in the order baseline -> audio -> audio_haptic -> haptic
   (`TRAINING_CONDITIONS`). Before each block a slide explains its cues; keys **1** / **2** play a sample right /
-  wrong cue. Each block uses the cues of its condition and its own battery tasks. Scoreboard after the last block.
+  wrong cue. Each block uses the cues of its condition and its own battery tasks, and starts further into the
+  training radio instructions (before, every block replayed the same first ones). Scoreboard after the last block.
 * **Training log files**: `log_files/training_baseline.txt`, `training_audio.txt`, `training_audio_haptics.txt`,
   `training_haptics.txt` (5 pieces each, same for every subject, also on the first page of the answer-key PDF).
   The GUI and the camera PC load the same file, so the camera PC knows the answers and sends the per-battery

@@ -35,6 +35,14 @@ TRAINING_ROUNDS = 5             # Practice rounds per training block
 # Training = one short block per condition, always in this order (not randomised). Before every block a slide
 # explains that block's feedback cues.
 TRAINING_CONDITIONS = ["baseline", "audio", "audio_haptic", "haptic"]
+# Interactive warm-ups before the training blocks (screens/warmup_screen.py), one task at a time:
+WARMUP_RADIO_PROBLEMS = 6          # radio instructions in the radio warm-up...
+WARMUP_RADIO_CAPTIONED = 3         # ...the first ones also shown as text, with more time to answer:
+WARMUP_RESPONSE_SECONDS = 10.0     # (afterwards RESPONSE_SECONDS, the real pace)
+WARMUP_RADIO_GAP_SECONDS = (5.0, 5.0)   # pause between instructions to read the coaching (match round meanwhile)
+WARMUP_BATTERY_PUZZLES = 4         # on-screen battery sums, then a delivery practice (D + point 1, D + point 2)
+TRAINING_RADIO_OFFSET = 3          # training block k starts at radio problem WARMUP_RADIO_PROBLEMS + k * this
+                                   # (before, every block replayed the same first instructions)
 
 # Pre-train ("pre-train" in the condition menu): learn the feedback cues of the experiment before training.
 # A cue is played, the participant presses <- if it meant CORRECT and -> if it meant INCORRECT.
@@ -68,9 +76,9 @@ RADIO_STATIC_DB = -48              # constant soft hiss in dBFS (None = off)
 USE_RADIO_CONTAINER_CUES = True    # checkpoint announcement in the chosen language (else the old WAVs)
 ERROR_CUES = True                 # when True, play incorrect_answer.wav on the alarm/researcher PC on wrong button combinations
 
-# Game mode (chosen on the setup screen)
-GAME_MODES = ["normal", "hard"]
-# Hard mode: between instructions every button change shows exactly ONE button whose color matches
+# Game mode: "hard" is the only mode (the "normal" mode and the setup-screen choice were removed).
+GAME_MODES = ["hard"]
+# Between instructions every button change shows exactly ONE button whose color matches
 # its word. Pressing it scores; a miss costs nothing; one press per change (no button mashing).
 HARD_INSTRUCTION_MULTIPLIER = 2    # radio instructions: double points when solved...
 HARD_PENALTY_MULTIPLIER = 2        # ...and double penalty when wrong / too late
@@ -79,6 +87,16 @@ IDLE_WRONG_PENALTY = 0             # wrong button on a match round (0 = no penal
 PRESS_GRACE_SECONDS = 0.5          # presses this soon after an instruction starts are ignored
                                    # (they were aimed at the match round, not the instruction)
 LATE_PRESS_SECONDS = 0.25
+
+# General leaderboard (leaderboard.py): the points of all conditions are added up per participant.
+# Fake leaderboard messages next to the score keep participants engaged (never in training): every
+# FAKE_RANK_INTERVAL_SECONDS a message says the participant moved up / was passed / holds a place among
+# FAKE_RANK_PLACES. Purely invented; each one is logged (marker Leaderboard_Fake_Message_...).
+FAKE_RANK_MESSAGES = True
+FAKE_RANK_PLACES = (1, 2, 3)
+FAKE_RANK_INTERVAL_SECONDS = (25.0, 50.0)
+FAKE_RANK_FIRST_SECONDS = (10.0, 20.0)    # first message after the condition starts
+FAKE_RANK_SHOW_SECONDS = 6.0
 ROULETTE_DURING_INSTRUCTION = ("hard",)   # modes where the buttons spin + arrows lock while the radio
                                           # speaks; the real buttons appear at ANSWER NOW. Add "normal" to use it there too.
 ROULETTE_FRAME_SECONDS = 0.5             # spin speed          # a press this soon after a button change still counts for the previous one
@@ -88,6 +106,16 @@ ROULETTE_FRAME_SECONDS = 0.5             # spin speed          # a press this so
 # right away. While True the manual y / c evaluation keys are disabled.
 USE_REMOTE_EVALUATOR = True
 EVALUATOR_STREAM_NAME = "BatteryEvaluator"
+
+# Feedback at the handover (F13 = point 1 / F14 = point 2), in every condition and in training:
+#  * right point pressed -> "ASSEMBLY CORRECT" (correct_answer.wav) or "ASSEMBLY INCORRECT" (loud incorrect sound)
+#    from the camera verdict. A verdict that came earlier is kept until the button is pressed; one that comes
+#    later is shown when it arrives, up to HANDOVER_FEEDBACK_WAIT_SECONDS after the press.
+#    Training: the camera's practice result is used (feedback only, no points, nothing logged).
+#  * wrong point pressed -> "WRONG POINT" message + short error sound (the handover is not accepted).
+HANDOVER_FEEDBACK = True
+HANDOVER_FEEDBACK_WAIT_SECONDS = 8.0
+WRONG_POINT_FEEDBACK = True
 
 
 # Per-battery cues: sent by live_evaluator.py as soon as it sees a battery in a slot

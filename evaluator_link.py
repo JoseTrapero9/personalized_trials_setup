@@ -20,12 +20,14 @@ from PyQt5.QtCore import QThread, pyqtSignal
 from config import EVALUATOR_STREAM_NAME
 
 VERDICT_RE = re.compile(r"^Eval_Verdict_Round_(\d+)_(correct|incorrect)(?:_|$)")
+RESULT_RE = re.compile(r"^Eval_Result_Round_(\d+)_(correct|incorrect)(?:_|$)")     # training: feedback only
 BATTERY_RE = re.compile(r"^Eval_Battery_Round_(\d+)_Slot_(\d)_(correct|incorrect)(?:_|$)")
 CAM_MS_RE = re.compile(r"_CamMs_(\d+)")
 
 
 class EvaluatorLink(QThread):
     verdict_received = pyqtSignal(int, bool)      # round, is_correct
+    result_received = pyqtSignal(int, bool)       # training result (not a verdict): round, is_correct
     # round, slot (1-3), is_correct, camera ms (frame -> message sent, -1 unknown), link ms (sent -> received)
     battery_received = pyqtSignal(int, int, bool, int, int)
     message_received = pyqtSignal(str)            # every evaluator message (for logging)
@@ -83,6 +85,9 @@ class EvaluatorLink(QThread):
                     m = VERDICT_RE.match(msg)
                     if m:
                         self.verdict_received.emit(int(m.group(1)), m.group(2) == "correct")
+                    m = RESULT_RE.match(msg)
+                    if m:
+                        self.result_received.emit(int(m.group(1)), m.group(2) == "correct")
             except lost_error:
                 print("[EvaluatorLink] Evaluator stream lost - waiting for it to come back...")
             finally:
