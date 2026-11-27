@@ -20,9 +20,10 @@ from texts import block_name, t
 
 
 class startscreen(QWidget):
-    def __init__(self, switch_callback):
+    def __init__(self, switch_callback, on_start_callback=None):
         super().__init__()
         self.switch_callback = switch_callback
+        self.on_start_callback = on_start_callback
         self.ticks_left = START_FIXATION_SECONDS
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.timer_tick)
@@ -79,15 +80,23 @@ class startscreen(QWidget):
     def on_start_clicked(self):
         send_marker("Robot_Started_Waiting")
         start_robot_process()
+        if self.on_start_callback is not None:
+            self.on_start_callback()
+
+        if START_FIXATION_SECONDS <= 0:
+            self.switch_callback()
+            return
 
         self.ticks_left = START_FIXATION_SECONDS
         self.start_button.hide()
         self.message_label.hide()
         self.fixation_label.show()
+        send_marker("Fixation_Start")
         self.timer.start(1000)
 
     def timer_tick(self):
         self.ticks_left -= 1
         if self.ticks_left <= 0:
             self.timer.stop()
+            send_marker("Fixation_End")
             self.switch_callback()

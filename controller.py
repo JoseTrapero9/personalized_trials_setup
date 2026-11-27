@@ -49,7 +49,10 @@ class paradigmcontroller(QWidget):
         self.setup_screen = setupscreen(self.setup_finished_callback, self.start_sus_questionnaire,
                                         self.start_pretrain)
         self.tutorial_screen = tutorialscreen(self.tutorial_finished_callback, demo_callback=self.play_demo_cue)
-        self.start_screen = startscreen(self.start_experiment_tracking)
+        self.start_screen = startscreen(
+            self.start_experiment_tracking,
+            on_start_callback=self.on_condition_start,
+        )
         self.dual_task_screen = DualTaskScreen(
             round_complete_cb=self.on_handover_complete,
             condition_complete_cb=self.on_condition_complete,
@@ -238,10 +241,13 @@ class paradigmcontroller(QWidget):
         """Sample cue on a training slide (keys 1 / 2): exactly the cue of that condition."""
         play_feedback(channels_for(condition), is_correct)
 
-    def start_experiment_tracking(self):
+    def on_condition_start(self):
+        """Called as soon as Start is clicked (before the fixation cross) so cameras start recording."""
         send_marker(f"Condition_Start_{state.current_condition}")
         if state.current_condition == "training":
             send_marker(f"Training_Block_Start_{state.training_block + 1}_{state.training_condition}")
+
+    def start_experiment_tracking(self):
         self.announce_scenario()
         self.robot_command("go 1")          # every condition and every training block starts at point 1
 
@@ -358,6 +364,7 @@ class paradigmcontroller(QWidget):
         self.questionnaire_screen.start_sus(state.subject_number, state.language, finish_cb=self.return_to_setup)
 
     def return_to_setup(self):
+        self.start_screen.timer.stop()
         self.radio_warmup.stop()
         self.training_plan, self.last_training_score = [], None
         send_marker("Returned_To_Main_Menu")
