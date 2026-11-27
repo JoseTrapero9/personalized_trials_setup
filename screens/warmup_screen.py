@@ -42,7 +42,9 @@ from texts import t
 COLOR_VALUES = {"Blue": 1, "Red": 2, "Yellow": 3, "Green": 4}
 COLOR_HEX = {"Blue": "#2563EB", "Red": "#DC2626", "Yellow": "#EAB308", "Green": "#16A34A"}
 COLOR_TEXT = {"Blue": "white", "Red": "white", "Yellow": "#1F2937", "Green": "white"}   # readable on the colour
-SLOT_HEX = ["#475569", "#7C3AED", "#C2410C"]     # one accent per slot (x1 / x2 / x3)
+SLOT_HEX = ["#111827", "#111827", "#111827"]     # slots all in black (x1 / x2 / x3)
+TAG_PC = "color: white; background-color: #1D4ED8; border-radius: 12px; padding: 0 28px;"
+TAG_WALK = "color: white; background-color: #C2410C; border-radius: 12px; padding: 0 28px;"
 KEY_COLORS = {Qt.Key_1: "Blue", Qt.Key_2: "Red", Qt.Key_3: "Yellow", Qt.Key_4: "Green"}
 
 
@@ -265,35 +267,47 @@ class BatteryWarmupScreen(QWidget):
         panel, p = _panel()
         outer.addWidget(panel)
         self.title = _label(30, True)
+        p.addWidget(self.title)
+        # where the participant works right now: ON THE PC (keyboard) or WALK TO POINT n (delivery buttons)
+        self.tag = QLabel("")
+        self.tag.setAlignment(Qt.AlignCenter)
+        self.tag.setFont(QFont("Helvetica", 22, QFont.Bold))
+        self.tag.setFixedHeight(56)
+        p.addWidget(self.tag, alignment=Qt.AlignCenter)
         self.intro = _label(18)
         self.counter = _label(16, False, "#475467")
-        self.target = _label(34, True, "#222222")
-        self.instr = _label(30, True, "#0056B3")
-        for w in (self.title, self.intro, self.counter, self.target, self.instr):
-            p.addWidget(w)
-        # battery values: one coloured chip per colour (with its key), right above the slots
-        values_row = QHBoxLayout()
-        values_row.addStretch(1)
+        p.addWidget(self.intro)
+        p.addWidget(self.counter)
+
+        body = QHBoxLayout()
+        body.setSpacing(36)
+        # left side: the battery values as a column of coloured chips (with their keys)
+        values_col = QVBoxLayout()
+        values_col.setSpacing(12)
         self.values_title = QLabel("")
-        self.values_title.setFont(QFont("Helvetica", 20, QFont.Bold))
-        self.values_title.setStyleSheet("color: #334155;")
-        values_row.addWidget(self.values_title)
-        values_row.addSpacing(16)
+        self.values_title.setFont(QFont("Helvetica", 22, QFont.Bold))
+        self.values_title.setStyleSheet("color: #111827;")
+        self.values_title.setAlignment(Qt.AlignCenter)
+        values_col.addWidget(self.values_title)
         self.value_chips = {}
-        for c, v in COLOR_VALUES.items():
+        for c in COLOR_VALUES:
             chip = QLabel("")
             chip.setTextFormat(Qt.RichText)
             chip.setAlignment(Qt.AlignCenter)
-            chip.setFixedSize(200, 84)
+            chip.setFixedSize(230, 92)
             chip.setStyleSheet(f"color: {COLOR_TEXT[c]}; background-color: {COLOR_HEX[c]}; border-radius: 14px;")
-            values_row.addWidget(chip)
-            values_row.addSpacing(12)
+            values_col.addWidget(chip)
             self.value_chips[c] = chip
-        values_row.addStretch(1)
-        p.addSpacing(6)
-        p.addLayout(values_row)
-        p.addSpacing(10)
-        # the three slots, each with its multiplier on top
+        values_col.addStretch(1)
+        body.addLayout(values_col)
+
+        # right side: the task and the three slots (all in black), each with its multiplier on top
+        main = QVBoxLayout()
+        main.setSpacing(12)
+        self.target = _label(34, True, "#222222")
+        self.instr = _label(30, True, "#0056B3")
+        main.addWidget(self.target)
+        main.addWidget(self.instr)
         slots_row = QHBoxLayout()
         slots_row.addStretch(1)
         self.slot_boxes, self.slot_heads = [], []
@@ -313,16 +327,18 @@ class BatteryWarmupScreen(QWidget):
             col.addWidget(head)
             col.addWidget(box)
             slots_row.addLayout(col)
-            slots_row.addSpacing(28)
+            slots_row.addSpacing(24)
             self.slot_heads.append(head)
             self.slot_boxes.append(box)
         slots_row.addStretch(1)
-        p.addLayout(slots_row)
-        self.sum_now = _label(26, True, "#334155")
+        main.addLayout(slots_row)
+        self.sum_now = _label(26, True, "#111827")
         self.feedback = _label(22, True)
-        for w in (self.sum_now, self.feedback):
-            p.addWidget(w)
-        p.addStretch(1)
+        main.addWidget(self.sum_now)
+        main.addWidget(self.feedback)
+        main.addStretch(1)
+        body.addLayout(main, stretch=1)
+        p.addLayout(body, stretch=1)
         row, self.again_btn, self.cont_btn = _buttons(self.restart, self._continue)
         p.addLayout(row)
 
@@ -348,6 +364,7 @@ class BatteryWarmupScreen(QWidget):
         self.slots, self.tries, self.solved = [], 0, False
         total, instr, _ = self.puzzles[self.idx]
         self.intro.setText(t("wu_battery_intro"))
+        self._set_tag(pc=True)
         self.counter.setText(t("wu_puzzle", i=self.idx + 1, n=len(self.puzzles)))
         self.target.setText(f"Sum must be {total}")
         self.instr.setText(self._instr_text(instr))
@@ -438,9 +455,20 @@ class BatteryWarmupScreen(QWidget):
         self.counter.setText("")
         self.target.setText("")
         self.instr.setText(t("wu_deliver_d"))
+        self._set_tag(pc=True)
         self.feedback.setText("")
         self.slots = list(self.puzzles[-1][2])
         self._draw_slots()
+
+    def _set_tag(self, pc=True):
+        if pc:
+            self.tag.setText(t("wu_tag_pc"))
+            self.tag.setStyleSheet(TAG_PC)
+        else:
+            pt, side = self._point_names()
+            self.tag.setText(t("wu_tag_walk", pt=pt.upper(), key=side))
+            self.tag.setStyleSheet(TAG_WALK)
+        self.tag.show()
 
     def _point_names(self):
         n = self.deliver_point
@@ -451,6 +479,7 @@ class BatteryWarmupScreen(QWidget):
             self.stage = "deliver_pt"
             pt, key = self._point_names()
             self.instr.setText(t("wu_deliver_pt", pt=pt, key=key))
+            self._set_tag(pc=False)                      # now away from the PC: walk to the point
             self.feedback.setText("")
             send_marker(f"Warmup_Delivery_D_Point_{self.deliver_point}")
 
@@ -470,12 +499,18 @@ class BatteryWarmupScreen(QWidget):
         self.feedback.setText(t("wu_deliver_ok"))
         if self.deliver_point == 1:
             self.deliver_point, self.stage = 2, "deliver_d"
-            QTimer.singleShot(1200, lambda: self.instr.setText(t("wu_deliver_d")))
+            QTimer.singleShot(1200, self._back_to_pc_for_d)
         else:
             self.stage = "done"
             QTimer.singleShot(1000, self._finish)
 
+    def _back_to_pc_for_d(self):
+        self.instr.setText(t("wu_deliver_d"))
+        self.feedback.setText("")
+        self._set_tag(pc=True)
+
     def _finish(self):
+        self.tag.hide()
         self.title.setText(t("wu_battery_title"))
         self.instr.setText(t("wu_battery_done", k=self.first_try_ok, n=len(self.puzzles)))
         send_marker(f"Warmup_End_battery_FirstTry_{self.first_try_ok}_of_{len(self.puzzles)}")

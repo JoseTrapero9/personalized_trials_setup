@@ -35,53 +35,30 @@ PRETRAIN_DIR = os.path.join(base_dir, "logs", "pretrain")
 W, H = 1920.0, 1080.0
 
 TXT = {
-    "title": {"en": "Learn the feedback cues", "es": "Aprende las señales de retroalimentación",
-              "de": "Lerne die Feedback-Signale"},
-    "intro": {
-        "en": "In the experiment the system tells you whether each battery you place is right or wrong.\n\n"
+    "title": {"en": "Learn the feedback cues"},
+    "intro": {"en": "In the experiment the system tells you whether each battery you place is right or wrong.\n\n"
               "Here you learn these signals. After each signal press:\n"
               "     ←   if it means  RIGHT\n"
               "     →   if it means  WRONG\n\n"
-              "SPACE plays the signal again. There are {n} short blocks of {s} seconds:\n{blocks}",
-        "es": "En el experimento el sistema te dice si cada batería que colocas está bien o mal.\n\n"
-              "Aquí aprendes estas señales. Después de cada señal presiona:\n"
-              "     ←   si significa  BIEN\n"
-              "     →   si significa  MAL\n\n"
-              "ESPACIO repite la señal. Hay {n} bloques cortos de {s} segundos:\n{blocks}",
-        "de": "Im Experiment sagt dir das System, ob jede Batterie, die du einsetzt, richtig oder falsch ist.\n\n"
-              "Hier lernst du diese Signale. Drücke nach jedem Signal:\n"
-              "     ←   wenn es  RICHTIG  bedeutet\n"
-              "     →   wenn es  FALSCH  bedeutet\n\n"
-              "LEERTASTE spielt das Signal noch einmal. Es gibt {n} kurze Blöcke mit je {s} Sekunden:\n{blocks}"},
-    "block": {"en": "Block {i} of {n}: {name}", "es": "Bloque {i} de {n}: {name}", "de": "Block {i} von {n}: {name}"},
-    "where": {"audio": {"en": "You hear the signals in your headphones.", "es": "Escuchas las señales en tus audífonos.",
-                        "de": "Du hörst die Signale in deinen Kopfhörern."},
-              "haptic": {"en": "You feel the signals on the vest.", "es": "Sientes las señales en el chaleco.",
-                         "de": "Du spürst die Signale an der Weste."},
-              "audio_haptic": {"en": "You hear the signals and feel them on the vest.",
-                               "es": "Escuchas las señales y las sientes en el chaleco.",
-                               "de": "Du hörst die Signale und spürst sie an der Weste."}},
-    "press_enter": {"en": "Press ENTER to start", "es": "Presiona ENTER para empezar", "de": "Drücke ENTER zum Starten"},
-    "ask": {"en": "Signal given: was it RIGHT or WRONG?", "es": "Señal dada: ¿era BIEN o MAL?",
-            "de": "Signal gegeben: war es RICHTIG oder FALSCH?"},
-    "hit": {"en": "Correct!  +{p}", "es": "¡Correcto!  +{p}", "de": "Richtig erkannt!  +{p}"},
-    "miss_right": {"en": "Not quite: that was the RIGHT signal  -{p}", "es": "No: esa era la señal de BIEN  -{p}",
-                   "de": "Nicht ganz: das war das Signal RICHTIG  -{p}"},
-    "miss_wrong": {"en": "Not quite: that was the WRONG signal  -{p}", "es": "No: esa era la señal de MAL  -{p}",
-                   "de": "Nicht ganz: das war das Signal FALSCH  -{p}"},
-    "right": {"en": "RIGHT", "es": "BIEN", "de": "RICHTIG"},
-    "wrong": {"en": "WRONG", "es": "MAL", "de": "FALSCH"},
-    "right_sub": {"en": "the battery is right", "es": "la batería está bien", "de": "die Batterie ist richtig"},
-    "wrong_sub": {"en": "the battery is wrong", "es": "la batería está mal", "de": "die Batterie ist falsch"},
-    "keys": {"en": "[←] right   |   [→] wrong   |   [SPACE] play again",
-             "es": "[←] bien   |   [→] mal   |   [ESPACIO] repetir",
-             "de": "[←] richtig   |   [→] falsch   |   [LEERTASTE] nochmal"},
-    "done": {"en": "Well done!", "es": "¡Muy bien!", "de": "Gut gemacht!"},
-    "done_body": {"en": "You have finished learning the signals.\nPlease tell the researcher.",
-                  "es": "Terminaste de aprender las señales.\nPor favor, avisa al investigador.",
-                  "de": "Du hast die Signale gelernt.\nBitte sag der Versuchsleitung Bescheid."},
-    "score": {"en": "SCORE", "es": "PUNTOS", "de": "PUNKTE"},
-    "time": {"en": "TIME", "es": "TIEMPO", "de": "ZEIT"},
+              "SPACE plays the signal again. There are {n} short blocks of {s} seconds:\n{blocks}"},
+    "block": {"en": "Block {i} of {n}: {name}"},
+    "where": {"audio": {"en": "You hear the signals in your headphones."},
+              "haptic": {"en": "You feel the signals on the vest."},
+              "audio_haptic": {"en": "You hear the signals and feel them on the vest."}},
+    "press_enter": {"en": "Press ENTER to start"},
+    "ask": {"en": "Signal given: was it RIGHT or WRONG?"},
+    "hit": {"en": "Correct!  +{p}"},
+    "miss_right": {"en": "Not quite: that was the RIGHT signal  -{p}"},
+    "miss_wrong": {"en": "Not quite: that was the WRONG signal  -{p}"},
+    "right": {"en": "RIGHT"},
+    "wrong": {"en": "WRONG"},
+    "right_sub": {"en": "the battery is right"},
+    "wrong_sub": {"en": "the battery is wrong"},
+    "keys": {"en": "[←] right   |   [→] wrong   |   [SPACE] play again"},
+    "done": {"en": "Well done!"},
+    "done_body": {"en": "You have finished learning the signals.\nPlease tell the researcher."},
+    "score": {"en": "SCORE"},
+    "time": {"en": "TIME"},
 }
 
 CSV_COLUMNS = ["subject", "timestamp", "language", "audio_cue_mode", "block", "block_modality", "trial",
@@ -122,7 +99,7 @@ class PretrainScreen(QWidget):
         self.update()
 
     def _reset_session(self, subject, language, audio_cue_mode):
-        self.subject, self.lang, self.audio_cue_mode = subject, language if language in ("en", "es", "de") else "en", audio_cue_mode
+        self.subject, self.lang, self.audio_cue_mode = subject, "en", audio_cue_mode
         self.block = 0
         self.score = 0
         self.records = []
