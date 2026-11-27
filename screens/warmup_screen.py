@@ -20,7 +20,10 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
 from config import (
+    CUE_AUDIO_MAX_SECONDS,
     IDLE_HIT_POINTS,
+    correct_audio,
+    error_cue_audio,
     RESPONSE_SECONDS,
     WARMUP_BATTERY_PUZZLES,
     WARMUP_RADIO_CAPTIONED,
@@ -58,6 +61,11 @@ def _label(size, bold=False, color="#1E293B"):
     lbl.setWordWrap(True)
     lbl.setTextFormat(Qt.RichText)
     return lbl
+
+
+def _sound(ok):
+    """Right / wrong sound of the warm-ups, always in the participant's headphones (Trekz)."""
+    audio_sys.play_participant_clip(correct_audio if ok else error_cue_audio, CUE_AUDIO_MAX_SECONDS)
 
 
 def _buttons(again_cb, continue_cb):
@@ -352,6 +360,7 @@ class BatteryWarmupScreen(QWidget):
         ok = slots == answer
         result = "correct" if ok else ("order" if sorted(slots) == sorted(answer) else "colors")
         send_marker(f"Warmup_Battery_Puzzle_{self.idx + 1}_Try_{self.tries}_{result}_{'-'.join(slots)}")
+        _sound(ok)
         if ok:
             self.solved = True
             if self.tries == 1:
@@ -412,6 +421,7 @@ class BatteryWarmupScreen(QWidget):
         pt, key = self._point_names()
         ok = point == self.deliver_point
         send_marker(f"Warmup_Delivery_Pressed_{point}_Expected_{self.deliver_point}_{'correct' if ok else 'wrong'}")
+        _sound(ok)
         if not ok:
             self.feedback.setStyleSheet("color: #B42318;")
             self.feedback.setText(t("wu_deliver_bad", pt=pt, key=key))

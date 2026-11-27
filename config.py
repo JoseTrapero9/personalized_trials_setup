@@ -74,7 +74,7 @@ RADIO_VOLUME = 1.0
 RADIO_FX = True                    # light band-pass "radio" sound
 RADIO_STATIC_DB = -48              # constant soft hiss in dBFS (None = off)
 USE_RADIO_CONTAINER_CUES = True    # checkpoint announcement in the chosen language (else the old WAVs)
-ERROR_CUES = True                 # when True, play incorrect_answer.wav on the alarm/researcher PC on wrong button combinations
+ERROR_CUES = True                 # when True, play incorrect_answer.wav in the participant's Trekz on wrong button combinations
 
 # Game mode: "hard" is the only mode (the "normal" mode and the setup-screen choice were removed).
 GAME_MODES = ["hard"]

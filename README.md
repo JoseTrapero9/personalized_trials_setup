@@ -42,6 +42,10 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 * One wrong key or no answer within `RESPONSE_SECONDS` after the instruction = failed, points lost,
   negative radio reaction, game goes on.
 * Checkpoint after `PROBLEMS_PER_CHECKPOINT` problems; problems during the battery task do not count.
+* Wrong key combination (`ERROR_CUES`): `incorrect_answer.wav` in the participant's **Trekz** (mixed into the
+  radio stream), not on the researcher speakers. All participant sounds (radio, cues, warm-up feedback, handover
+  feedback) play in the Trekz; only the condition announcements and the SYSTEM FAILED alarm loop use the
+  researcher / alarm speakers.
 * DELIVER (D key) pauses the radio: the sentence it was saying freezes mid-word and continues from that
   exact point when the pause ends (nothing is restarted or repeated). An open problem is held with it
   (answer time frozen), so a pause can't be used to skip a problem. Markers `Radio_Audio_Paused_<clip>` /
