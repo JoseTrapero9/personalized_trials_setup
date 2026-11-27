@@ -76,7 +76,8 @@ RECORDINGS_DIR = os.path.join(BASE_DIR, "recordings")
 VIDEO_EXT = ".mp4"
 WEBCAM_INDEX = 1                     # face webcam (--webcam N); 0 = first camera Windows finds
 WEBCAM_SIZE = "1280x960"             # --webcam-size
-PREVIEW_FPS = 15                     # preview window refresh
+PREVIEW_FPS = 5                      # preview window refresh (low to save CPU; does not affect recording)
+PREVIEW_WIDTH = 640                  # total preview window width in pixels (does not affect recording)
 # Missed Condition_Start (the LSL link to the GUI broke for a moment): these markers only come while a condition
 # runs, so the recording starts late on them instead of not at all (not within 15 s after a condition ended).
 IN_CONDITION_RE = re.compile(r"^(Radio_|Dual_Workpiece_Task_Started_Round_|Checkpoint_Retrieval_Start_Round_|"
@@ -583,29 +584,39 @@ class Recorder:
             writer.close()
 
 
-def preview_image(ximea_frame, webcam_frame, lines, recording, width=1280):
+def preview_image(ximea_frame, webcam_frame, lines, recording, width=PREVIEW_WIDTH):
     """Both cameras side by side (each scaled to the same height) with the status on top."""
     import cv2
     import numpy as np
-    tiles = []
-    for frame in (ximea_frame, webcam_frame):
-        if frame is None:
-            continue
-        if frame.ndim == 2:
-            frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
-        tiles.append(frame)
-    h = 480
-    tiles = [cv2.resize(f, (max(1, int(f.shape[1] * h / f.shape[0])), h)) for f in tiles] or \
-            [np.zeros((h, 640, 3), np.uint8)]
-    view = np.hstack(tiles)
-    scale = width / view.shape[1]
-    view = cv2.resize(view, (width, int(view.shape[0] * scale)))
-    cv2.rectangle(view, (0, 0), (width, 14 + 26 * len(lines)), (0, 0, 0), -1)
+    tiles = [frame for frame in (ximea_frame, webcam_frame) if frame is not None]
+    if tiles:
+        aspect_sum = sum(f.shape[1] / f.shape[0] for f in tiles)
+        h = max(1, int(round(width / aspect_sum)))
+        resized = []
+        used_w = 0
+        for idx, f in enumerate(tiles):
+            tile_w = max(1, width - used_w) if idx == len(tiles) - 1 else max(1, int(round(h * f.shape[1] / f.shape[0])))
+            used_w += tile_w
+            tile = cv2.resize(f, (tile_w, h), interpolation=cv2.INTER_NEAREST)
+            if tile.ndim == 2:
+                tile = cv2.cvtColor(tile, cv2.COLOR_GRAY2BGR)
+            resized.append(tile)
+        view = np.hstack(resized) if len(resized) > 1 else resized[0]
+    else:
+        view = np.zeros((max(1, int(round(width * 3 / 4))), width, 3), np.uint8)
+    w = view.shape[1]
+    line_h = 18
+    cv2.rectangle(view, (0, 0), (w, 10 + line_h * len(lines)), (0, 0, 0), -1)
+    max_text_w = max(1, w - (36 if recording else 16))
     for i, line in enumerate(lines):
         color = (0, 0, 255) if line.startswith(("REC", "CAMERA", "WEBCAM")) else (0, 220, 0)
-        cv2.putText(view, line, (12, 28 + 26 * i), cv2.FONT_HERSHEY_SIMPLEX, 0.55, color, 1, cv2.LINE_AA)
+        font_scale = 0.42
+        tw, _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 1)[0]
+        if tw > max_text_w:
+            font_scale = max(0.28, font_scale * max_text_w / tw)
+        cv2.putText(view, line, (8, 18 + line_h * i), cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA)
     if recording:
-        cv2.circle(view, (width - 24, 24), 11, (0, 0, 255), -1)
+        cv2.circle(view, (w - 16, 16), 8, (0, 0, 255), -1)
     return view
 
 
@@ -631,6 +642,10 @@ def main():
     ap.add_argument("--out", default=RECORDINGS_DIR, help="folder for the videos (default: recordings/)")
     ap.add_argument("--manual", action="store_true", help="do not follow the GUI; only R starts / stops")
     ap.add_argument("--no-window", action="store_true", help="no preview window (console only, Ctrl+C stops)")
+    ap.add_argument("--preview-fps", type=float, default=PREVIEW_FPS,
+                    help="preview window refresh rate (default %(default)g; does not affect recording)")
+    ap.add_argument("--preview-width", type=int, default=PREVIEW_WIDTH,
+                    help="preview window width in pixels (default %(default)s; does not affect recording)")
     args = ap.parse_args()
 
     preset = CAMERA_PRESETS[args.camera]
@@ -674,19 +689,20 @@ def main():
                 preview = frame
             except queue.Empty:
                 pass
-            lines = recorder.status_lines(camera.status, listener.connected, webcam, listener.last_marker)
             if cv2 is not None:
                 now = time.monotonic()
-                if now - last_view >= 1.0 / PREVIEW_FPS:         # the preview never slows the recording
+                if now - last_view >= 1.0 / max(0.5, args.preview_fps):  # the preview never slows the recording
                     last_view = now
+                    lines = recorder.status_lines(camera.status, listener.connected, webcam, listener.last_marker)
                     cv2.imshow("Recorder", preview_image(preview, webcam.latest if webcam else None, lines,
-                                                         recorder.session is not None))
+                                                         recorder.session is not None, width=max(160, args.preview_width)))
                 key = cv2.waitKey(1) & 0xFF
                 if key in (ord("q"), ord("Q"), 27):
                     break
                 if key in (ord("r"), ord("R")):
                     recorder.toggle_manual()
             elif time.monotonic() - last_print > 2.0:
+                lines = recorder.status_lines(camera.status, listener.connected, webcam, listener.last_marker)
                 print("[STATUS] " + " | ".join(lines))
                 last_print = time.monotonic()
     except KeyboardInterrupt:
