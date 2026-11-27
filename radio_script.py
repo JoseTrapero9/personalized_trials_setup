@@ -119,25 +119,25 @@ FILLER = {"en": [
 # so participants cannot predict when the short commands will arrive at the end.
 # ---------------------------------------------------------------------------
 INCIDENTS = {"en": [
-        ("Red turbine alert!",),
-        ("Boiler two pressure is rising.", "The yellow relief valve is stuck."),
-        ("Yellow cooling pump stopped.", "Do not touch the white switch.", "Backup flow is starting."),
-        ("Blue transformer is overloaded.", "Do not press the black switch.",
+        ("Red switch alert!",),
+        ("Boiler two pressure is rising.", "The yellow relief button is stuck."),
+        ("Yellow cooling button stopped.", "Do not touch the white button.", "Backup flow is starting."),
+        ("Blue transformer is overloaded.", "Do not press the black button.",
          "Check the purple gauge on the green panel.", "Shed the green load now."),
-        ("Green steam leak in the north pipe.", "Pressure is falling in the red sector.",
+        ("Green steam leak in the north pipe.", "Button is falling in the red sector.",
          "Sensors on the yellow monitor show a sharp drop.", "Maintenance is heading to sector four.",
          "Seal that section."),
-        ("Attention, the yellow conveyor is jammed near the blue gate.",
-         "The red drive motor is straining under heavy load.",
+        ("Attention, the yellow button is jammed near the blue gate.",
+         "The red drive button is straining under heavy load.",
          "Dust levels are climbing along the purple walkway.",
-         "Control room is rerouting power from the green backup line.",
-         "Keep the main hopper clear while we reset.", "Clear the belt."),
+         "Control room button is rerouting power from the green line.",
+         "Keep the blue button clear while we reset.", "Clear station."),
         ("Voltage is dropping on the blue main line.",
-         "The purple feeder is unstable and flickering.",
-         "Auxiliary relays in the green bay are clicking repeatedly.",
-         "Operators report red warning lights in the yellow corridor.",
-         "We are switching the secondary bus to manual hold.",
-         "Wait for the frequency meter to settle before closing the breaker.", "Balance the network."),
+         "The purple button is unstable and flickering.",
+         "Auxiliary buttons in the green bay are clicking repeatedly.",
+         "Operators report red warning buttons in the yellow corridor.",
+         "We are switching the secondary button to manual hold.",
+         "Wait for the frequency button to settle before closing the breaker.", "Balance the network."),
         ("Green generator overheating!", "Yellow exhaust sensor high."),
     ]}
 
@@ -145,9 +145,9 @@ INCIDENTS = {"en": [
 # Reactions after a problem (short)
 # ---------------------------------------------------------------------------
 FEEDBACK = {"en": {
-        "solved": ["Fixed.", "Nice, stable again.", "Good, problem solved."],
-        "wrong": ["Wrong button, power lost.", "No, system damaged.", "Wrong move."],
-        "timeout": ["Too late, power lost.", "Time's up."],
+        "solved": ["Fixed.", "Stable again.", "Good, solved."],
+        "wrong": ["Wrong button!", "No, system damaged.", "Wrong move!"],
+        "timeout": ["Too late, power lost.", "Time's up!"],
     }}
 
 # ---------------------------------------------------------------------------

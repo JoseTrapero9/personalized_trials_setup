@@ -173,7 +173,9 @@ class DualTaskScreen(QWidget):
 
         slots_lbl = QLabel(
             "<b>Slots:</b><br>"
-            "Slot 1 = ×1 &nbsp;|&nbsp; Slot 2 = ×2 &nbsp;|&nbsp; Slot 3 = ×3"
+            "Slot 1 = ×1<br>"
+            "Slot 2 = ×2<br>"
+            "Slot 3 = ×3"
         )
         slots_lbl.setFont(QFont("Helvetica", 18))
 
