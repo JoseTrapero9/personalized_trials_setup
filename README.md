@@ -5,13 +5,13 @@
 ```powershell
 conda activate paradigm
 python -m pip install -r requirements.txt
-python generate_radio_audio.py --list-voices    # check you have EN, ES (Mexico) and DE voices
-python generate_radio_audio.py --lang all        # writes radio_audio/en|es|de (once, ~1-3 min)
+python generate_radio_audio.py --list-voices    # check you have an English voice
+python generate_radio_audio.py                   # writes radio_audio/en (once, ~1 min; already in the repo)
 python main.py
 ```
 
-Missing a voice: Windows Settings > Time & language > Speech > Add voices
-(Spanish (Mexico), German (Germany)), then re-run the generator.
+Everything is in **English only** (the Spanish / German texts, radio audio and the language choice were removed).
+Missing a voice: Windows Settings > Time & language > Speech > Add voices (English), then re-run the generator.
 After editing `radio_script.py`, re-run the generator; it only redoes changed clips.
 
 Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `workpieces/`,
@@ -42,13 +42,16 @@ Folders that must sit next to `main.py`: `audios/`, `log_files/` (see below), `w
 * One wrong key or no answer within `RESPONSE_SECONDS` after the instruction = failed, points lost,
   negative radio reaction, game goes on.
 * Checkpoint after `PROBLEMS_PER_CHECKPOINT` problems; problems during the battery task do not count.
+* Wrong key combination (`ERROR_CUES`): `incorrect_answer.wav` in the participant's **Trekz** (mixed into the
+  radio stream), not on the researcher speakers. All participant sounds (radio, cues, warm-up feedback, handover
+  feedback) play in the Trekz; only the condition announcements and the SYSTEM FAILED alarm loop use the
+  researcher / alarm speakers.
 * DELIVER (D key) pauses the radio: the sentence it was saying freezes mid-word and continues from that
   exact point when the pause ends (nothing is restarted or repeated). An open problem is held with it
   (answer time frozen), so a pause can't be used to skip a problem. Markers `Radio_Audio_Paused_<clip>` /
   `Radio_Audio_Resumed_<clip>`; the radio CSV counts the `pauses` of each problem.
 * Each condition owns 40 instructions that no other condition uses (240 in total, identical
-  6 single / 7 pair / 7 triple mix per 20). Fixed order per condition, same for every participant
-  and language. Button positions are generated live, so a sentence never implies the keys.
+  6 single / 7 pair / 7 triple mix per 20). Fixed order per condition, same for every participant. Button positions are generated live, so a sentence never implies the keys.
   If someone needs more than 40, the condition reuses its own set (marker `Radio_Problem_Set_Exhausted_...`).
 
 ## Game mode (always the former "hard" mode)
@@ -109,10 +112,10 @@ move sequence is finished; switching between the two points always goes through 
 | `radio.py` | radio playback on the participant headphones |
 | `game.py` | the radio button game (left panel) |
 | `texts.py` | participant screen text in EN / ES / DE |
-| `screens/` | setup (incl. language), tutorial + cue slides, start, dual task, scoreboard, questionnaires, pre-train |
+| `screens/` | setup, tutorial + cue slides, start, dual task, scoreboard, questionnaires, pre-train |
 | `feedback_cues.py` | the feedback cues (sound / vest), used by the battery cues, the training slides and the pre-train |
 | `sequences.py` | loads `log_files/sXX_<condition>.txt` |
-| `questionnaires.py` | NASA-TLX + experience questionnaire: text (EN/ES/DE), saving, subject summary files |
+| `questionnaires.py` | NASA-TLX + experience questionnaire: text (English), saving, subject summary files |
 | `generate_log_files.py` | makes `log_files/` + answer-key PDF |
 | `live_evaluator.py` | camera PC: YOLO tray check, follows the GUI over LSL, sends verdicts |
 | `evaluator_link.py` | GUI side: receives the camera verdicts |
@@ -282,6 +285,10 @@ Order for a participant: **pre-train** -> **training** -> the four conditions ->
   *Battery*: `WARMUP_BATTERY_PUZZLES` = 4 sums on screen (keys 1-4 = Blue / Red / Yellow / Green into the next
   slot, Backspace = undo, live sum), a hint after a mistake (wrong batteries or wrong order) and the answer after
   the second; then delivery practice: D, then the button at point 1, D, then point 2 (wrong button = hint).
+  Values in a column of coloured chips on the left, slots in black with their multiplier (SLOT n ×n) on top.
+  A tag says where to act: blue **ON THE PC · keyboard** (sums, D) or orange **WALK TO POINT n · the left /
+  right delivery point** (point buttons). The real task's delivery texts say the same (1. on the PC: D,
+  2. walk to Point n and press the button there), so "left" is never mistaken for the ← key.
   Markers `Warmup_Start_<radio|battery>`, `Warmup_Radio_Problem_*`, `Warmup_Battery_Puzzle_*`,
   `Warmup_Delivery_*`, `Warmup_End_*` (the camera PCs do not record warm-ups).
 * **training blocks**: task slides (radio task, checkpoints, battery sum, delivering with D, how the practice works),
@@ -344,7 +351,7 @@ python ximea_recorder.py --out D:\videos
   `sXX_nasatlx_all_conditions.csv/.xlsx` and `sXX_sus_all_conditions.csv/.xlsx` (Excel needs `openpyxl`).
   If a condition has no NASA-TLX file, a warning lists the missing conditions: Continue or Go back.
 * Answer with the mouse or the keys: UP / DOWN line, LEFT / RIGHT answer (1-5 also work for statements),
-  ENTER continue. Every line must be answered. Language = the participant language of the setup screen.
+  ENTER continue. Every line must be answered.
 * Text, statements and the list of conditions: `questionnaires.py`. Markers: `NasaTLX_Started|Saved_...`,
   `SUS_Started|Saved|Finished_...`.
 

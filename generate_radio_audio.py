@@ -1,10 +1,9 @@
-"""Generate the plant-radio audio with the offline Windows voices (run once per language).
+"""Generate the plant-radio audio (English) with the offline Windows voices.
 
     pip install pywin32
     python generate_radio_audio.py --list-voices          # which voices this PC has
-    python generate_radio_audio.py --lang all             # en + es + de
-    python generate_radio_audio.py --lang es --voice Sabina
-    python generate_radio_audio.py --lang de --rate -1    # slower (-10 .. 10)
+    python generate_radio_audio.py                        # English (the only language)
+    python generate_radio_audio.py --rate -1              # slower (-10 .. 10)
 
 Output: radio_audio/<lang>/<clip>.wav + manifest.json. Only missing or changed clips are made
 (use --force to redo everything). Re-run after editing radio_script.py.
@@ -31,11 +30,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUT_ROOT = os.path.join(BASE_DIR, "radio_audio")
 
 # Windows LCIDs: preferred first, then any voice of the same primary language
-LCID_PREFERENCE = {
-    "en": ([0x409, 0x809], 0x09),           # en-US, en-GB
-    "es": ([0x80A, 0x540A, 0xC0A], 0x0A),   # es-MX, es-US (Latin America), es-ES last
-    "de": ([0x407, 0xC07, 0x807], 0x07),    # de-DE, de-AT, de-CH
-}
+LCID_PREFERENCE = {"en": ([0x409, 0x809], 0x09)}
 PART_PAUSE_MS = 140          # pause between incident and command
 TARGET_RMS_DB = -20.0        # same loudness for every clip and language
 PEAK_LIMIT = 0.89

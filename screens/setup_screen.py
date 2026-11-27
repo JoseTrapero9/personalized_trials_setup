@@ -19,7 +19,6 @@ from lsl_markers import send_marker
 from questionnaires import SUS_MENU_ITEM
 
 PRETRAIN_MENU_ITEM = "pre-train"
-from radio_script import LANGUAGES
 from state import state
 
 
@@ -85,18 +84,6 @@ class setupscreen(QWidget):
             self.audio_cue_combo.setCurrentIndex(default_idx)
         layout.addWidget(self.audio_cue_combo, alignment=Qt.AlignCenter)
 
-        self.lang_label = QLabel("Participant Language (radio + screens):")
-        self.lang_label.setFont(main_font)
-        layout.addWidget(self.lang_label, alignment=Qt.AlignCenter)
-
-        self.lang_combo = QComboBox()
-        self.lang_combo.setFont(main_font)
-        self.lang_combo.setFixedWidth(320)
-        for code, name in LANGUAGES.items():
-            self.lang_combo.addItem(name, code)
-        self.lang_combo.currentIndexChanged.connect(self._update_audio_status)
-        layout.addWidget(self.lang_combo, alignment=Qt.AlignCenter)
-
         self.audio_status = QLabel("")
         self.audio_status.setFont(QFont("Helvetica", 15))
         self.audio_status.setAlignment(Qt.AlignCenter)
@@ -123,7 +110,7 @@ class setupscreen(QWidget):
         self._update_audio_status()
 
     def _update_audio_status(self):
-        code = self.lang_combo.currentData()
+        code = "en"                                    # English only
         path = os.path.join(RADIO_AUDIO_DIR, code, "manifest.json")
         try:
             with open(path, encoding="utf-8") as f:
@@ -139,7 +126,7 @@ class setupscreen(QWidget):
         if self.cond_combo.currentText() == PRETRAIN_MENU_ITEM:
             # cue learning only: uses the audio cue mode chosen here, keeps the condition state untouched
             state.subject_number = self.subj_combo.currentText()
-            state.language = self.lang_combo.currentData()
+            state.language = "en"
             state.audio_cue_mode = self.audio_cue_combo.currentData()
             state.training_active = False
             send_marker(f"Setup_Pretrain_Subj_{state.subject_number}_Lang_{state.language}"
@@ -150,7 +137,7 @@ class setupscreen(QWidget):
         if self.cond_combo.currentText() == SUS_MENU_ITEM:
             # questionnaire only: keep the condition state untouched (no Setup_Complete marker)
             state.subject_number = self.subj_combo.currentText()
-            state.language = self.lang_combo.currentData()
+            state.language = "en"
             state.training_active = False
             send_marker(f"Setup_Questionnaire_Subj_{state.subject_number}_Lang_{state.language}")
             self.questionnaire_callback()
@@ -159,7 +146,7 @@ class setupscreen(QWidget):
         state.subject_number = self.subj_combo.currentText()
         state.current_condition = self.cond_combo.currentText()
         state.training_active = (state.current_condition == "training")
-        state.language = self.lang_combo.currentData()
+        state.language = "en"
         state.game_mode = "hard"                       # the only game mode
         state.audio_cue_mode = self.audio_cue_combo.currentData()
 

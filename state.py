@@ -11,7 +11,7 @@ class SessionState:
         self.training_active = False
         self.game_mode = "hard"       # the only game mode (kept in the logs / markers)
         self.audio_cue_mode = "voice"  # "voice" ("input correct"/"input incorrect") | "tone"
-        self.language = "en"          # "en" | "es" | "de" (radio + participant screens)
+        self.language = "en"          # English only (kept in the logs / markers)
         self.training_sequence = []   # battery tasks of the current training block
         self.training_sequence_file = ""      # log_files/training_<condition>.txt of the block ("" = generated)
         self.training_block = 0       # index in config.TRAINING_CONDITIONS

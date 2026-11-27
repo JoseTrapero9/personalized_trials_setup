@@ -290,8 +290,9 @@ class RadioPanelGame(QWidget):
         else:
             send_marker(f"Radio_Press_Wrong_{p['id']}_Step_{p['progress'] + 1}_Pos_{pos}"
                         f"_Expected_{p['targets'][p['progress']]}")
-            if ERROR_CUES:
-                audio_sys.play_researcher(error_cue_audio)
+            if ERROR_CUES:                      # participant's Trekz, through the radio's open stream (no delay)
+                if not self.play_cue(error_cue_audio, 1.0):
+                    audio_sys.play_participant(error_cue_audio)
             self._resolve("wrong", now)
         self.update()
 
