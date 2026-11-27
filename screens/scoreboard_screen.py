@@ -1,4 +1,4 @@
-"""Arcade-style scoreboard shown after each condition."""
+"""Arcade-style scoreboard shown after each condition (general board, see leaderboard.py) and after training."""
 
 import json
 import os
@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
+import leaderboard
 from config import base_dir
 from lsl_markers import send_marker
 from state import state
@@ -19,6 +20,8 @@ class ArcadeScoreboardScreen(QWidget):
         self.finish_callback = finish_callback
         self.condition_name = "baseline"
         self.final_score = 0
+        self.total = 0
+        self.general = True
         self.letters = [0, 0, 0]   # Indices 0..25 ('A'..'Z')
         self.slot_idx = 0          # 0, 1, 2 for letter entry; 3 = leaderboard view
         self.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -45,7 +48,7 @@ class ArcadeScoreboardScreen(QWidget):
         layout.addWidget(self.score_label)
 
         self.prompt_label = QLabel(
-            "ENTER YOUR INITIALS\n[LEFT / RIGHT ARROW] = Select Letter    [UP ARROW] = Confirm"
+            "ENTER YOUR INITIALS\n[LEFT / RIGHT ARROW] = Select Letter    [DOWN ARROW] = Confirm"
         )
         self.prompt_label.setFont(QFont("Courier", 20, QFont.Bold))
         self.prompt_label.setStyleSheet("color: #A3E635;")
@@ -76,7 +79,7 @@ class ArcadeScoreboardScreen(QWidget):
             "color: #E2E8F0; background-color: #111827; border: 3px solid #38BDF8; "
             "border-radius: 12px; padding: 18px 36px;"
         )
-        self.board_label.setAlignment(Qt.AlignCenter)
+        self.board_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)   # columns stay aligned
         layout.addWidget(self.board_label, alignment=Qt.AlignCenter)
 
         self.footer_label = QLabel("")
@@ -86,21 +89,39 @@ class ArcadeScoreboardScreen(QWidget):
         layout.addWidget(self.footer_label)
 
     def start_scoreboard(self, condition_name: str, score: int):
+        """Conditions: the GENERAL board (points of all conditions added up, leaderboard.py).
+        Training: its own practice board. Initials are asked only if this subject has none yet."""
         self.condition_name = condition_name
         self.final_score = score
+        self.general = condition_name != "training"
         self.letters = [0, 0, 0]
         self.slot_idx = 0
-
-        self.title_label.setText(f"HIGH SCORES — {condition_name.upper()}")
-        self.score_label.setText(f"YOUR SCORE: {score:04d}")
-        self.prompt_label.setText(
-            "ENTER YOUR INITIALS\n[LEFT / RIGHT ARROW] = Choose Letter   |   [UP ARROW] = Confirm Letter"
-        )
         self.footer_label.setText("")
+        if self.general:
+            self.total = leaderboard.save_condition_score(state.subject_number, condition_name, score)
+            self.title_label.setText("HIGH SCORES — ALL BLOCKS")
+            self.score_label.setText(f"THIS BLOCK: {score:04d}     TOTAL: {self.total:05d}")
+            send_marker(f"Arcade_Scoreboard_Started_{condition_name}_Score_{score}_Total_{self.total}")
+        else:
+            self.total = score
+            self.title_label.setText("HIGH SCORES — PRACTICE")
+            self.score_label.setText(f"YOUR SCORE: {score:04d}")
+            send_marker(f"Arcade_Scoreboard_Started_{condition_name}_Score_{score}")
+        known = leaderboard.initials(state.subject_number)
+        if known:                                   # initials from an earlier scoreboard: no entry needed
+            self.letters = [self.alphabet.index(c) if c in self.alphabet else 0 for c in known[:3].ljust(3, "A")]
+            self.slot_idx = 3
+            if not self.general:
+                self._save_training_score(known)
+            self.prompt_label.setText(f"WELL DONE, {known}!")
+            self.footer_label.setText("Press [DOWN ARROW] to continue")
+        else:
+            self.prompt_label.setText(
+                "ENTER YOUR INITIALS\n[LEFT / RIGHT ARROW] = Choose Letter   |   [DOWN ARROW] = Confirm Letter"
+            )
         self._update_slots_ui()
         self._render_leaderboard()
         self.setFocus()
-        send_marker(f"Arcade_Scoreboard_Started_{condition_name}_Score_{score}")
 
     def _update_slots_ui(self):
         for i, lbl in enumerate(self.letter_labels):
@@ -122,51 +143,53 @@ class ArcadeScoreboardScreen(QWidget):
                     "border: 2px solid #334155; border-radius: 12px;"
                 )
 
-    def _scores_filepath(self):
+    def _training_filepath(self):
         log_dir = os.path.join(base_dir, "logs")
         os.makedirs(log_dir, exist_ok=True)
-        suffix = "_hard" if state.game_mode == "hard" else ""    # separate leaderboard per game mode
-        return os.path.join(log_dir, f"arcade_scores_{self.condition_name}{suffix}.json")
+        return os.path.join(log_dir, "arcade_scores_training.json")
 
-    def _load_scores(self):
-        path = self._scores_filepath()
-        if not os.path.exists(path):
-            return []
+    def _load_training_scores(self):
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(self._training_filepath(), "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             return []
 
+    def _save_training_score(self, initials):
+        scores = self._load_training_scores()
+        scores.append({"name": initials, "score": self.final_score, "subject": state.subject_number,
+                       "time": time.strftime("%Y-%m-%d %H:%M")})
+        scores.sort(key=lambda x: x["score"], reverse=True)
+        with open(self._training_filepath(), "w", encoding="utf-8") as f:
+            json.dump(scores[:10], f, indent=2)
+
     def _save_current_score(self):
         initials = "".join(self.alphabet[idx] for idx in self.letters)
-        scores = self._load_scores()
-        scores.append({
-            "name": initials,
-            "score": self.final_score,
-            "subject": state.subject_number,
-            "time": time.strftime("%Y-%m-%d %H:%M")
-        })
-        scores.sort(key=lambda x: x["score"], reverse=True)
-        scores = scores[:10]
+        leaderboard.set_initials(state.subject_number, initials)      # reused by every later scoreboard
+        if not self.general:
+            self._save_training_score(initials)
+        send_marker(f"Arcade_Initials_Saved_{initials}_Score_{self.final_score}_Total_{self.total}")
+        self._render_leaderboard()
 
-        with open(self._scores_filepath(), "w", encoding="utf-8") as f:
-            json.dump(scores, f, indent=2)
-
-        send_marker(f"Arcade_Initials_Saved_{initials}_Score_{self.final_score}")
-        self._render_leaderboard(scores)
-
-    def _render_leaderboard(self, scores=None):
-        if scores is None:
-            scores = self._load_scores()
-        if not scores:
-            self.board_label.setText("NO SCORES RECORDED YET FOR THIS CONDITION")
+    def _render_leaderboard(self):
+        me = str(state.subject_number)
+        if self.general:
+            rows = [(rank, name, pts, subj == me) for rank, name, pts, subj in leaderboard.ranking()]
+            empty = "NO SCORES RECORDED YET"
+        else:
+            rows = [(i, e["name"], e["score"], False) for i, e in enumerate(self._load_training_scores(), start=1)]
+            empty = "NO PRACTICE SCORES YET"
+        if not rows:
+            self.board_label.setText(empty)
             return
-
-        lines = ["RANK   NAME    SCORE"]
-        lines.append("------------------------")
-        for idx, entry in enumerate(scores[:8], start=1):
-            lines.append(f" #{idx:<4}  {entry['name']:<5}   {entry['score']:04d}")
+        lines = ["RANK   NAME    SCORE", "--------------------------"]
+        shown = rows[:8]
+        mine = next((r for r in rows if r[3]), None)
+        for rank, name, pts, is_me in shown:
+            lines.append(f" #{rank:<4}  {name:<5}  {pts:05d}" + ("  ◄ YOU" if is_me else ""))
+        if mine is not None and mine not in shown:                   # own place below the top 8
+            lines.append("   ...")
+            lines.append(f" #{mine[0]:<4}  {mine[1]:<5}  {mine[2]:05d}  ◄ YOU")
         self.board_label.setText("\n".join(lines))
 
     def keyPressEvent(self, event):
@@ -180,13 +203,13 @@ class ArcadeScoreboardScreen(QWidget):
             elif event.key() == Qt.Key_Right:
                 self.letters[self.slot_idx] = (self.letters[self.slot_idx] + 1) % 26
                 self._update_slots_ui()
-            elif event.key() in (Qt.Key_Up, Qt.Key_Return, Qt.Key_Enter):
+            elif event.key() in (Qt.Key_Down, Qt.Key_Up, Qt.Key_Return, Qt.Key_Enter):
                 self.slot_idx += 1
                 self._update_slots_ui()
                 if self.slot_idx == 3:
                     self._save_current_score()
                     self.prompt_label.setText("SCORE SAVED!")
-                    self.footer_label.setText("Press [UP ARROW] to return to Main Menu")
+                    self.footer_label.setText("Press [DOWN ARROW] to continue")
         else:
-            if event.key() in (Qt.Key_Up, Qt.Key_Return, Qt.Key_Enter):
+            if event.key() in (Qt.Key_Down, Qt.Key_Up, Qt.Key_Return, Qt.Key_Enter):
                 self.finish_callback()

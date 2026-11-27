@@ -16,6 +16,14 @@ T = {
     },
     "radio_title": {"en": "PLANT RADIO", "es": "RADIO DE LA PLANTA", "de": "WERKSRADIO"},
     "score": {"en": "SCORE", "es": "PUNTOS", "de": "PUNKTE"},
+    "rank_up": {"en": "▲ You moved up to {place}!", "es": "▲ ¡Subiste al {place}!", "de": "▲ Du bist auf {place} aufgestiegen!"},
+    "rank_down": {"en": "▼ Another player passed you: now {place}!", "es": "▼ ¡Otro jugador te superó: ahora {place}!",
+                  "de": "▼ Jemand hat dich überholt: jetzt {place}!"},
+    "rank_same": {"en": "★ You are holding {place}!", "es": "★ ¡Mantienes el {place}!", "de": "★ Du hältst {place}!"},
+    "place_1": {"en": "1st place", "es": "1.er lugar", "de": "Platz 1"},
+    "place_2": {"en": "2nd place", "es": "2.º lugar", "de": "Platz 2"},
+    "place_3": {"en": "3rd place", "es": "3.er lugar", "de": "Platz 3"},
+    "place_n": {"en": "place {n}", "es": "lugar {n}", "de": "Platz {n}"},
     "next_cp": {"en": "CHECKPOINT IN {n}", "es": "PUNTO DE CONTROL EN {n}", "de": "KONTROLLPUNKT IN {n}"},
     "assembly_mode": {"en": "ASSEMBLY RUNNING", "es": "ENSAMBLAJE EN CURSO", "de": "MONTAGE LÄUFT"},
     "audio_missing": {"en": "RADIO AUDIO MISSING", "es": "FALTA EL AUDIO DE LA RADIO",
@@ -36,6 +44,10 @@ T = {
 
     # ---------------- right panel (battery) ----------------
     "point": {"en": "Point {n}", "es": "Punto {n}", "de": "Punkt {n}"},
+    "fb_correct": {"en": "✔ ASSEMBLY CORRECT", "es": "✔ ENSAMBLAJE CORRECTO", "de": "✔ MONTAGE RICHTIG"},
+    "fb_incorrect": {"en": "✘ ASSEMBLY INCORRECT", "es": "✘ ENSAMBLAJE INCORRECTO", "de": "✘ MONTAGE FALSCH"},
+    "fb_wrong_point": {"en": "✘ WRONG POINT: deliver at {pt} ({key})", "es": "✘ PUNTO EQUIVOCADO: entrega en {pt} ({key})",
+                       "de": "✘ FALSCHER PUNKT: übergib auf {pt} ({key})"},
     "key_left": {"en": "Left", "es": "Izquierda", "de": "Links"},
     "key_right": {"en": "Right", "es": "Derecha", "de": "Rechts"},
     "advance": {"en": "Answer the radio to reach the next checkpoint.",
@@ -58,19 +70,19 @@ T = {
     "start_title_cond": {"en": "Block {c}", "es": "Bloque {c}", "de": "Block {c}"},
     "start_body": {
         "en": "1. Listen to the <b>plant radio</b>. When something breaks, it tells you which buttons to press.<br>"
-              "2. Find those buttons on the screen and press them with <b>← ↑ →</b> (left, middle, right).<br>"
+              "2. Find those buttons on the screen and press them with <b>← ↓ →</b> (left, middle, right).<br>"
               "3. After some problems the radio pauses for <b>{r}s</b>: take parts from Container I or II.<br>"
               "4. The screen splits: build the battery while you keep answering the radio.<br>"
               "5. Press <b>\"D: DELIVER\"</b> for a <b>{d}s</b> pause, place the piece and press the Point button.<br><br>"
               "Rounds: <b>{rounds}</b>",
         "es": "1. Escucha la <b>radio de la planta</b>. Cuando algo falla, te dice qué botones presionar.<br>"
-              "2. Busca esos botones en la pantalla y presiónalos con <b>← ↑ →</b> (izquierda, centro, derecha).<br>"
+              "2. Busca esos botones en la pantalla y presiónalos con <b>← ↓ →</b> (izquierda, centro, derecha).<br>"
               "3. Después de unos problemas la radio hace una pausa de <b>{r}s</b>: toma piezas del Contenedor I o II.<br>"
               "4. La pantalla se divide: arma la batería mientras sigues respondiendo a la radio.<br>"
               "5. Presiona <b>\"D: DELIVER\"</b> para una pausa de <b>{d}s</b>, coloca la pieza y presiona el botón del Punto.<br><br>"
               "Rondas: <b>{rounds}</b>",
         "de": "1. Hör dem <b>Werksradio</b> zu. Wenn etwas kaputtgeht, sagt es dir, welche Knöpfe du drücken musst.<br>"
-              "2. Finde diese Knöpfe auf dem Bildschirm und drücke sie mit <b>← ↑ →</b> (links, Mitte, rechts).<br>"
+              "2. Finde diese Knöpfe auf dem Bildschirm und drücke sie mit <b>← ↓ →</b> (links, Mitte, rechts).<br>"
               "3. Nach einige Problemen pausiert das Radio <b>{r}s</b>: nimm Teile aus Behälter I oder II.<br>"
               "4. Der Bildschirm teilt sich: baue die Batterie und reagiere weiter auf das Radio.<br>"
               "5. Drück <b>\"D: DELIVER\"</b> für <b>{d}s</b> Pause, lege das Teil ab und drücke den Punkt-Knopf.<br><br>"
@@ -91,42 +103,115 @@ T = {
     "block_start": {"en": "Start block →", "es": "Empezar bloque →", "de": "Block starten →"},
     "demo_pos": {"en": "1 · Right cue", "es": "1 · Señal de bien", "de": "1 · Signal richtig"},
     "demo_neg": {"en": "2 · Wrong cue", "es": "2 · Señal de mal", "de": "2 · Signal falsch"},
+    # ---- warm-ups (screens/warmup_screen.py)
+    "wu_radio_title": {"en": "Warm-up · Radio", "es": "Calentamiento · Radio", "de": "Aufwärmen · Radio"},
+    "wu_radio_intro": {
+        "en": "Only the radio for now. Listen and press the buttons it names with <b>←</b> <b>↓</b> <b>→</b>.<br>"
+              "First you can also <b>read</b> what it says, then you only <b>hear</b> it.",
+        "es": "Por ahora solo la radio. Escucha y presiona los botones que nombra con <b>←</b> <b>↓</b> <b>→</b>.<br>"
+              "Primero también puedes <b>leer</b> lo que dice, después solo lo <b>escuchas</b>.",
+        "de": "Erst nur das Radio. Hör zu und drücke die genannten Knöpfe mit <b>←</b> <b>↓</b> <b>→</b>.<br>"
+              "Zuerst kannst du auch <b>mitlesen</b>, danach nur noch <b>zuhören</b>."},
+    "wu_stage_read": {"en": "READ + LISTEN", "es": "LEE + ESCUCHA", "de": "LESEN + HÖREN"},
+    "wu_stage_listen": {"en": "LISTEN ONLY", "es": "SOLO ESCUCHA", "de": "NUR HÖREN"},
+    "wu_progress": {"en": "Instruction {i} of {n}  ·  solved {k}", "es": "Instrucción {i} de {n}  ·  resueltas {k}",
+                    "de": "Anweisung {i} von {n}  ·  gelöst {k}"},
+    "wu_listen": {"en": "🔊 Listen to the radio...", "es": "🔊 Escucha la radio...", "de": "🔊 Hör dem Radio zu..."},
+    "wu_between": {"en": "Between instructions: press the button whose <b>color matches its word</b> (+{p}).",
+                   "es": "Entre instrucciones: presiona el botón cuyo <b>color coincide con su palabra</b> (+{p}).",
+                   "de": "Zwischen den Anweisungen: drücke den Knopf, dessen <b>Farbe zum Wort passt</b> (+{p})."},
+    "wu_solved": {"en": "✔ Well done!", "es": "✔ ¡Muy bien!", "de": "✔ Gut gemacht!"},
+    "wu_wrong": {"en": "✘ Not quite. The answer was:", "es": "✘ Casi. La respuesta era:", "de": "✘ Nicht ganz. Richtig war:"},
+    "wu_timeout": {"en": "⏱ Too slow. The answer was:", "es": "⏱ Muy lento. La respuesta era:",
+                   "de": "⏱ Zu langsam. Richtig war:"},
+    "wu_said": {"en": "The radio said:", "es": "La radio dijo:", "de": "Das Radio sagte:"},
+    "wu_step_color": {"en": "{n}. the button that IS {x}: press {key}", "es": "{n}. el botón que ES {x}: presiona {key}",
+                      "de": "{n}. der Knopf, der {x} IST: drücke {key}"},
+    "wu_step_word": {"en": "{n}. the button with the WORD {x}: press {key}",
+                     "es": "{n}. el botón con la PALABRA {x}: presiona {key}",
+                     "de": "{n}. der Knopf mit dem WORT {x}: drücke {key}"},
+    "wu_hud": {"en": "WARM-UP", "es": "CALENTAMIENTO", "de": "AUFWÄRMEN"},
+    "wu_radio_done": {"en": "Radio warm-up done: {k} of {n} solved.", "es": "Calentamiento de radio terminado: {k} de {n} resueltas.",
+                      "de": "Radio-Aufwärmen fertig: {k} von {n} gelöst."},
+    "wu_again": {"en": "↺ Again", "es": "↺ Otra vez", "de": "↺ Nochmal"},
+    "wu_continue": {"en": "Continue →", "es": "Continuar →", "de": "Weiter →"},
+    "wu_battery_title": {"en": "Warm-up · Battery sums", "es": "Calentamiento · Sumas de baterías",
+                         "de": "Aufwärmen · Batterie-Summen"},
+    "wu_battery_intro": {
+        "en": "Fill the 3 slots: press <b>1</b> Blue, <b>2</b> Red, <b>3</b> Yellow, <b>4</b> Green "
+              "(<b>Backspace</b> = undo). The sum is shown live.",
+        "es": "Llena las 3 ranuras: presiona <b>1</b> Azul, <b>2</b> Rojo, <b>3</b> Amarillo, <b>4</b> Verde "
+              "(<b>Retroceso</b> = deshacer). La suma se muestra en vivo.",
+        "de": "Fülle die 3 Plätze: drücke <b>1</b> Blau, <b>2</b> Rot, <b>3</b> Gelb, <b>4</b> Grün "
+              "(<b>Rücktaste</b> = zurück). Die Summe siehst du sofort."},
+    "wu_puzzle": {"en": "Puzzle {i} of {n}", "es": "Ejercicio {i} de {n}", "de": "Aufgabe {i} von {n}"},
+    "wu_sum_now": {"en": "Sum now: {s}   (needed: {t})", "es": "Suma actual: {s}   (necesaria: {t})",
+                   "de": "Summe jetzt: {s}   (nötig: {t})"},
+    "wu_b_correct": {"en": "✔ Correct!  {calc}", "es": "✔ ¡Correcto!  {calc}", "de": "✔ Richtig!  {calc}"},
+    "wu_b_colors": {"en": "✘ Use exactly the batteries it says: {instr}.", "es": "✘ Usa exactamente las baterías indicadas: {instr}.",
+                    "de": "✘ Nimm genau die genannten Batterien: {instr}."},
+    "wu_b_order": {"en": "✘ Right batteries, wrong order: {calc}. Try another order.",
+                   "es": "✘ Baterías correctas, orden equivocado: {calc}. Prueba otro orden.",
+                   "de": "✘ Richtige Batterien, falsche Reihenfolge: {calc}. Probier eine andere."},
+    "wu_b_answer": {"en": "The answer: {ans}  ({calc})", "es": "La respuesta: {ans}  ({calc})",
+                    "de": "Die Lösung: {ans}  ({calc})"},
+    "wu_b_next": {"en": "ENTER = next", "es": "ENTER = siguiente", "de": "ENTER = weiter"},
+    "wu_deliver_title": {"en": "Warm-up · Delivery", "es": "Calentamiento · Entrega", "de": "Aufwärmen · Übergabe"},
+    "wu_deliver_d": {"en": "Your battery is ready. Press <b>D</b> to deliver.",
+                     "es": "Tu batería está lista. Presiona <b>D</b> para entregar.",
+                     "de": "Deine Batterie ist fertig. Drücke <b>D</b> zum Übergeben."},
+    "wu_deliver_pt": {"en": "Now place it at <b>{pt}</b> and press the <b>{key}</b> button there.",
+                      "es": "Ahora colócala en <b>{pt}</b> y presiona el botón <b>{key}</b> de ahí.",
+                      "de": "Lege sie jetzt auf <b>{pt}</b> und drücke dort den Knopf <b>{key}</b>."},
+    "wu_deliver_ok": {"en": "✔ Right point!", "es": "✔ ¡Punto correcto!", "de": "✔ Richtiger Punkt!"},
+    "wu_deliver_bad": {"en": "✘ That is the other point. Use {pt} ({key}).", "es": "✘ Ese es el otro punto. Usa {pt} ({key}).",
+                       "de": "✘ Das ist der andere Punkt. Nimm {pt} ({key})."},
+    "wu_battery_done": {"en": "Battery warm-up done: {k} of {n} right at the first try.",
+                        "es": "Calentamiento de baterías terminado: {k} de {n} bien al primer intento.",
+                        "de": "Batterie-Aufwärmen fertig: {k} von {n} beim ersten Versuch richtig."},
+    "color_Blue": {"en": "Blue", "es": "Azul", "de": "Blau"},
+    "color_Red": {"en": "Red", "es": "Rojo", "de": "Rot"},
+    "color_Yellow": {"en": "Yellow", "es": "Amarillo", "de": "Gelb"},
+    "color_Green": {"en": "Green", "es": "Verde", "de": "Grün"},
     "start_title_block": {"en": "Practice block {i} of {n}: {name}", "es": "Bloque de práctica {i} de {n}: {name}",
                           "de": "Übungsblock {i} von {n}: {name}"},
 }
 
 HARD_TUTORIAL_STEP = {
-    "en": ("Hard mode · Find the match",
+    "en": ("Radio · Find the match",
            "While you wait for the next instruction, the buttons keep changing, and each time <b>one</b> "
            "button's color <b>matches</b> its word (for example a <b>red</b> button that says RED).<br><br>"
            "Press it before the buttons change: <b>+{p} points</b>. You get <b>one try</b> per change, "
            "and missing it costs nothing.<br><br>"
            "While the radio gives an instruction (<b>WAIT FOR YOUR INSTRUCTION!</b>) the buttons spin and the "
            "arrows are <b>locked</b>. At <b>ANSWER NOW!</b> the real buttons appear: press the ones it said.<br><br>"
-           "Radio instructions now give <b>double points</b>, and mistakes cost <b>double</b>."),
-    "es": ("Modo difícil · Encuentra la coincidencia",
+           "A solved radio instruction gives <b>{ip} points per button</b>; a wrong key or running out of "
+           "time costs <b>{fp} points</b>."),
+    "es": ("Radio · Encuentra la coincidencia",
            "Mientras esperas la siguiente instrucción, los botones siguen cambiando, y cada vez <b>un</b> "
            "botón tiene el color que <b>coincide</b> con su palabra (por ejemplo un botón <b>rojo</b> que dice ROJO).<br><br>"
            "Presiónalo antes de que cambien los botones: <b>+{p} puntos</b>. Tienes <b>un intento</b> por cambio, "
            "y si no lo presionas no pierdes puntos.<br><br>"
            "Mientras la radio da una instrucción (<b>¡ESPERA TU INSTRUCCIÓN!</b>) los botones giran y las "
            "flechas están <b>bloqueadas</b>. En <b>¡RESPONDE AHORA!</b> aparecen los botones reales: presiona los que dijo.<br><br>"
-           "Las instrucciones de la radio ahora valen <b>el doble</b>, y los errores cuestan <b>el doble</b>."),
-    "de": ("Schwerer Modus · Finde den Treffer",
+           "Una instrucción de la radio resuelta da <b>{ip} puntos por botón</b>; una tecla equivocada o quedarte "
+           "sin tiempo cuesta <b>{fp} puntos</b>."),
+    "de": ("Radio · Finde den Treffer",
            "Während du auf die nächste Anweisung wartest, wechseln die Knöpfe weiter, und jedes Mal "
            "<b>passt</b> bei <b>einem</b> Knopf die Farbe zum Wort (zum Beispiel ein <b>roter</b> Knopf mit ROT).<br><br>"
            "Drücke ihn, bevor die Knöpfe wechseln: <b>+{p} Punkte</b>. Du hast <b>einen Versuch</b> pro Wechsel, "
            "und Verpassen kostet nichts.<br><br>"
            "Während das Radio eine Anweisung gibt (<b>WARTE AUF DEINE ANWEISUNG!</b>), drehen sich die Knöpfe und die "
            "Pfeiltasten sind <b>gesperrt</b>. Bei <b>JETZT ANTWORTEN!</b> erscheinen die echten Knöpfe: drücke die genannten.<br><br>"
-           "Radio-Anweisungen geben jetzt <b>doppelte Punkte</b>, und Fehler kosten <b>doppelt</b>."),
+           "Eine gelöste Radio-Anweisung bringt <b>{ip} Punkte pro Knopf</b>; eine falsche Taste oder zu wenig "
+           "Zeit kostet <b>{fp} Punkte</b>."),
 }
 
 TUTORIAL = {
     "en": [
         ("Two tasks at the same time",
          "Today you keep a power plant running <b>and</b> build batteries, both at the same time.<br><br>"
-         "• <b>Radio task</b>: listen to the plant radio and press buttons with <b>←</b> <b>↑</b> <b>→</b><br>"
+         "• <b>Radio task</b>: listen to the plant radio and press buttons with <b>←</b> <b>↓</b> <b>→</b><br>"
          "• <b>Battery task</b>: build batteries on the tray in front of you<br><br>"
          "Both tasks count, so try to keep both going."),
         ("Radio · Listen",
@@ -139,7 +224,7 @@ TUTORIAL = {
          "• <i>\"the button labeled red\"</i> → the button with the <b>word RED</b><br><br>"
          "If the radio names several buttons, press them <b>in that order</b>."),
         ("Radio · Which key?",
-         "Left button = <b>←</b> &nbsp; Middle button = <b>↑</b> &nbsp; Right button = <b>→</b><br><br>"
+         "Left button = <b>←</b> &nbsp; Middle button = <b>↓</b> &nbsp; Right button = <b>→</b><br><br>"
          "The buttons <b>stop changing</b> while a problem is active.<br>"
          "One wrong key or running out of time = problem failed, you lose points, and the radio goes on."),
         ("Checkpoints",
@@ -156,14 +241,15 @@ TUTORIAL = {
          "<b>Point 1</b> or <b>Point 2</b> (the screen tells you which) and press that point's button.<br><br>"
          "You have <b>{s} seconds</b> per battery. At 0, <b>SYSTEM FAILED</b> flashes until you deliver."),
         ("How the practice works",
-         "You practise in <b>{b} short blocks of {k} rounds</b>:<br><br>"
+         "First a short <b>warm-up</b> for each task on its own: the radio, then the battery sums and the delivery.<br>"
+         "Then you practise both together in <b>{b} short blocks of {k} rounds</b>:<br><br>"
          "{blocks}<br><br>"
          "Before each block, one slide shows how its feedback works."),
     ],
     "es": [
         ("Dos tareas al mismo tiempo",
          "Hoy mantienes funcionando una planta de energía <b>y</b> armas baterías, las dos cosas a la vez.<br><br>"
-         "• <b>Tarea de la radio</b>: escucha la radio de la planta y presiona botones con <b>←</b> <b>↑</b> <b>→</b><br>"
+         "• <b>Tarea de la radio</b>: escucha la radio de la planta y presiona botones con <b>←</b> <b>↓</b> <b>→</b><br>"
          "• <b>Tarea de las baterías</b>: arma baterías en la bandeja que tienes enfrente<br><br>"
          "Las dos tareas cuentan, así que intenta mantener ambas."),
         ("Radio · Escucha",
@@ -176,7 +262,7 @@ TUTORIAL = {
          "• <i>\"el botón que dice rojo\"</i> → el botón con la <b>palabra ROJO</b><br><br>"
          "Si la radio nombra varios botones, presiónalos <b>en ese orden</b>."),
         ("Radio · ¿Qué tecla?",
-         "Botón izquierdo = <b>←</b> &nbsp; Botón del centro = <b>↑</b> &nbsp; Botón derecho = <b>→</b><br><br>"
+         "Botón izquierdo = <b>←</b> &nbsp; Botón del centro = <b>↓</b> &nbsp; Botón derecho = <b>→</b><br><br>"
          "Los botones <b>dejan de cambiar</b> mientras hay un problema activo.<br>"
          "Una tecla equivocada o quedarte sin tiempo = problema fallido, pierdes puntos y la radio sigue."),
         ("Puntos de control",
@@ -193,14 +279,15 @@ TUTORIAL = {
          "<b>Punto 1</b> o el <b>Punto 2</b> (la pantalla te dice cuál) y presiona el botón de ese punto.<br><br>"
          "Tienes <b>{s} segundos</b> por batería. En 0, <b>FALLA DEL SISTEMA</b> parpadea hasta que entregues."),
         ("Cómo funciona la práctica",
-         "Practicas en <b>{b} bloques cortos de {k} rondas</b>:<br><br>"
+         "Primero un breve <b>calentamiento</b> de cada tarea por separado: la radio, luego las sumas de baterías y la entrega.<br>"
+         "Después practicas las dos juntas en <b>{b} bloques cortos de {k} rondas</b>:<br><br>"
          "{blocks}<br><br>"
          "Antes de cada bloque, una diapositiva te muestra cómo funciona su retroalimentación."),
     ],
     "de": [
         ("Zwei Aufgaben gleichzeitig",
          "Heute hältst du ein Kraftwerk am Laufen <b>und</b> baust Batterien, beides gleichzeitig.<br><br>"
-         "• <b>Radio-Aufgabe</b>: hör dem Werksradio zu und drücke Knöpfe mit <b>←</b> <b>↑</b> <b>→</b><br>"
+         "• <b>Radio-Aufgabe</b>: hör dem Werksradio zu und drücke Knöpfe mit <b>←</b> <b>↓</b> <b>→</b><br>"
          "• <b>Batterie-Aufgabe</b>: baue Batterien auf dem Tablett vor dir<br><br>"
          "Beide Aufgaben zählen, also versuche, beide am Laufen zu halten."),
         ("Radio · Zuhören",
@@ -213,7 +300,7 @@ TUTORIAL = {
          "• <i>\"den Knopf mit der Aufschrift Rot\"</i> → der Knopf mit dem <b>Wort ROT</b><br><br>"
          "Nennt das Radio mehrere Knöpfe, drücke sie <b>in dieser Reihenfolge</b>."),
         ("Radio · Welche Taste?",
-         "Linker Knopf = <b>←</b> &nbsp; Mittlerer Knopf = <b>↑</b> &nbsp; Rechter Knopf = <b>→</b><br><br>"
+         "Linker Knopf = <b>←</b> &nbsp; Mittlerer Knopf = <b>↓</b> &nbsp; Rechter Knopf = <b>→</b><br><br>"
          "Während ein Problem läuft, <b>ändern sich die Knöpfe nicht</b>.<br>"
          "Eine falsche Taste oder zu langsam = Problem verloren, du verlierst Punkte, und das Radio redet weiter."),
         ("Kontrollpunkte",
@@ -230,7 +317,8 @@ TUTORIAL = {
          "<b>Punkt 1</b> oder <b>Punkt 2</b> (der Bildschirm sagt dir, welchen) und drücke den Knopf dieses Punkts.<br><br>"
          "Du hast <b>{s} Sekunden</b> pro Batterie. Bei 0 blinkt <b>SYSTEMAUSFALL</b>, bis du übergibst."),
         ("So läuft das Training",
-         "Du übst in <b>{b} kurzen Blöcken mit je {k} Runden</b>:<br><br>"
+         "Zuerst ein kurzes <b>Aufwärmen</b> für jede Aufgabe einzeln: das Radio, dann die Batterie-Summen und die Übergabe.<br>"
+         "Danach übst du beides zusammen in <b>{b} kurzen Blöcken mit je {k} Runden</b>:<br><br>"
          "{blocks}<br><br>"
          "Vor jedem Block zeigt dir eine Folie, wie sein Feedback funktioniert."),
     ],

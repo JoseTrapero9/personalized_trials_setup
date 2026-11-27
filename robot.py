@@ -41,13 +41,21 @@ def start_robot_process():
             print(f"Could not launch robot_sequence.py: {e}")
 
 
-def send_point_to_robot(point_pressed: int):
+def send_robot_command(command: str):
+    """One line to robot_sequence.py: 'go 1' / 'go 2' (wait above that point), '1' / '2' (handover there),
+    'home'. Commands queue up in the robot program, so a running move is never cut off."""
     if _robot_process is not None and _robot_process.poll() is None:
         try:
-            _robot_process.stdin.write(f"{point_pressed}\n")
+            _robot_process.stdin.write(f"{command}\n")
             _robot_process.stdin.flush()
+            return True
         except Exception:
             pass
+    return False
+
+
+def send_point_to_robot(point_pressed: int):
+    return send_robot_command(str(point_pressed))
 
 
 def stop_robot_process():

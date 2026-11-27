@@ -11,7 +11,6 @@ from config import (
     ALL_CONDITIONS,
     AUDIO_CUE_MODES,
     DEFAULT_AUDIO_CUE_MODE,
-    GAME_MODES,
     MAX_ROUNDS_PER_CONDITION,
     PROBLEMS_PER_CHECKPOINT,
     RADIO_AUDIO_DIR,
@@ -70,17 +69,6 @@ class setupscreen(QWidget):
             self.cond_combo.insertSeparator(self.cond_combo.count())
             self.cond_combo.addItem(SUS_MENU_ITEM)             # questionnaire after all conditions
         layout.addWidget(self.cond_combo, alignment=Qt.AlignCenter)
-
-        self.mode_label = QLabel("Game Mode:")
-        self.mode_label.setFont(main_font)
-        layout.addWidget(self.mode_label, alignment=Qt.AlignCenter)
-
-        self.mode_combo = QComboBox()
-        self.mode_combo.setFont(main_font)
-        self.mode_combo.setFixedWidth(320)
-        for mode in GAME_MODES:
-            self.mode_combo.addItem(mode.capitalize(), mode)
-        layout.addWidget(self.mode_combo, alignment=Qt.AlignCenter)
 
         self.audio_cue_label = QLabel("Audio Feedback Mode (audio / audio_haptic):")
         self.audio_cue_label.setFont(main_font)
@@ -172,7 +160,7 @@ class setupscreen(QWidget):
         state.current_condition = self.cond_combo.currentText()
         state.training_active = (state.current_condition == "training")
         state.language = self.lang_combo.currentData()
-        state.game_mode = self.mode_combo.currentData()
+        state.game_mode = "hard"                       # the only game mode
         state.audio_cue_mode = self.audio_cue_combo.currentData()
 
         if state.current_condition in ["training", "baseline"]:

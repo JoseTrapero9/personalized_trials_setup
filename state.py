@@ -9,7 +9,7 @@ class SessionState:
         self.subject_number = "1"
         self.current_condition = "training"
         self.training_active = False
-        self.game_mode = "normal"     # "normal" | "hard"
+        self.game_mode = "hard"       # the only game mode (kept in the logs / markers)
         self.audio_cue_mode = "voice"  # "voice" ("input correct"/"input incorrect") | "tone"
         self.language = "en"          # "en" | "es" | "de" (radio + participant screens)
         self.training_sequence = []   # battery tasks of the current training block
