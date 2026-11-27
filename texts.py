@@ -140,10 +140,12 @@ T = {
     "wu_battery_intro": {
         "en": "Fill the 3 slots: press <b>1</b> Blue, <b>2</b> Red, <b>3</b> Yellow, <b>4</b> Green "
               "(<b>Backspace</b> = undo). The sum is shown live.",
-        "es": "Llena las 3 ranuras: presiona <b>1</b> Azul, <b>2</b> Rojo, <b>3</b> Amarillo, <b>4</b> Verde "
-              "(<b>Retroceso</b> = deshacer). La suma se muestra en vivo.",
-        "de": "Fülle die 3 Plätze: drücke <b>1</b> Blau, <b>2</b> Rot, <b>3</b> Gelb, <b>4</b> Grün "
-              "(<b>Rücktaste</b> = zurück). Die Summe siehst du sofort."},
+        "es": "Llena las 3 ranuras: presiona <b>1</b> Blue (azul), <b>2</b> Red (rojo), <b>3</b> Yellow (amarillo), "
+              "<b>4</b> Green (verde) (<b>Retroceso</b> = deshacer). La suma se muestra en vivo. "
+              "Los colores aparecen en inglés, como en la tarea real.",
+        "de": "Fülle die 3 Plätze: drücke <b>1</b> Blue (blau), <b>2</b> Red (rot), <b>3</b> Yellow (gelb), "
+              "<b>4</b> Green (grün) (<b>Rücktaste</b> = zurück). Die Summe siehst du sofort. "
+              "Die Farben stehen auf Englisch, wie in der echten Aufgabe."},
     "wu_puzzle": {"en": "Puzzle {i} of {n}", "es": "Ejercicio {i} de {n}", "de": "Aufgabe {i} von {n}"},
     "wu_sum_now": {"en": "Sum now: {s}   (needed: {t})", "es": "Suma actual: {s}   (necesaria: {t})",
                    "de": "Summe jetzt: {s}   (nötig: {t})"},
@@ -169,6 +171,10 @@ T = {
     "wu_battery_done": {"en": "Battery warm-up done: {k} of {n} right at the first try.",
                         "es": "Calentamiento de baterías terminado: {k} de {n} bien al primer intento.",
                         "de": "Batterie-Aufwärmen fertig: {k} von {n} beim ersten Versuch richtig."},
+    "wu_values": {"en": "VALUES", "es": "VALORES", "de": "WERTE"},
+    "wu_key": {"en": "key {n}", "es": "tecla {n}", "de": "Taste {n}"},
+    "wu_slot": {"en": "SLOT {n}", "es": "RANURA {n}", "de": "PLATZ {n}"},
+    "wu_slot_empty": {"en": "empty", "es": "vacía", "de": "leer"},
     "color_Blue": {"en": "Blue", "es": "Azul", "de": "Blau"},
     "color_Red": {"en": "Red", "es": "Rojo", "de": "Rot"},
     "color_Yellow": {"en": "Yellow", "es": "Amarillo", "de": "Gelb"},
