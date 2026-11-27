@@ -51,6 +51,7 @@ import threading
 import time
 from datetime import datetime
 
+from camera_health import log_event
 from video_writer import BackgroundVideoWriter
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -87,6 +88,7 @@ GUI_MARKER_STREAM = "ParadigmMarkers"
 TRAINING_PREFIX = "TRAIN_"
 FRAME_TIMEOUT_MS = 1000
 RESTART_SECONDS = 3.0                # no frame this long -> camera process restarted
+RELEASE_SECONDS = 1.5                # pause between killing a stuck camera process and opening the camera again
 OPEN_SECONDS = 20.0
 SHM_BYTES = 32 * 1024 * 1024
 # ===============================================================================
@@ -150,6 +152,11 @@ def _camera_worker(preset, fps, sys_path, shm_name, meta_i, meta_f, lock, new_fr
                     cam.set_param("framerate", float(fps))
                 except Exception:
                     pass
+            try:                                      # USB speed report + bandwidth limit (camera_health.py)
+                from camera_health import usb_check
+                usb_check(cam, fps, say)
+            except Exception as e:
+                say(f"USB check failed: {e}")
             cam.start_acquisition()
             return cam, name
         raise RuntimeError(f"no camera matching '{preset['name_match']}' found")
@@ -203,6 +210,8 @@ class CameraSource:
         self.restarts = 0
         self.running = True
         self.proc = None
+        self.usb_info = ""                   # USB link report of the last camera start (camera_health.py)
+        self.lost_at = None
         self.thread = threading.Thread(target=self._supervise, daemon=True)
 
     def start(self):
@@ -245,6 +254,10 @@ class CameraSource:
                     if msg.startswith("OPENED"):
                         print(f"[CAMERA] {msg[7:]} opened")
                         self.opened = now
+                    elif msg.startswith("USB "):           # link report, not an error
+                        print(f"[CAMERA] {msg[4:]}")
+                        self.usb_info = msg[4:]
+                        log_event(self.preset["name_match"], "usb_report", detail=self.usb_info, restarts=self.restarts)
                     elif msg != self.status:
                         print(f"[CAMERA] {msg}")
                         self.status = msg
@@ -266,6 +279,8 @@ class CameraSource:
                 if item is not None:
                     if lost:
                         self.on_event("Camera_Restored")
+                        log_event(self.preset["name_match"], "restored", now - (self.lost_at or now),
+                                  restarts=self.restarts)
                         lost = False
                     if self.status:
                         print("[CAMERA] frames are arriving")
@@ -293,13 +308,18 @@ class CameraSource:
                 stalled = now - self.spawned > OPEN_SECONDS and not self.status.startswith("CAMERA NOT FOUND")
             if stalled or not self.proc.is_alive():
                 self.restarts += 1
+                why = "stopped" if not self.proc.is_alive() else "delivers no frames"
+                log_event(self.preset["name_match"], f"lost ({why})",
+                          now - self.last_frame if self.last_frame is not None else None, detail=self.status,
+                          restarts=self.restarts)
                 if not lost:
                     self.on_event("Camera_Lost")
+                    self.lost_at = self.last_frame or now
                     lost = True
                 print(f"[CAMERA] no frames - restarting the camera (restart {self.restarts})")
                 self.status = f"CAMERA LOST - restarting the camera (restart {self.restarts})"
                 self._kill()
-                time.sleep(0.5)
+                time.sleep(RELEASE_SECONDS)             # let the driver release the device before reopening
                 if self.running:
                     self._spawn()
 
@@ -689,6 +709,9 @@ def main():
                 preview = frame
             except queue.Empty:
                 pass
+            cam_status = camera.status or ("CAMERA ON USB 2 SPEED - use a blue USB 3 port, no hub / extension"
+                                           if "USB 2 SPEED" in camera.usb_info else "")
+            lines = recorder.status_lines(cam_status, listener.connected, webcam, listener.last_marker)
             if cv2 is not None:
                 now = time.monotonic()
                 if now - last_view >= 1.0 / max(0.5, args.preview_fps):  # the preview never slows the recording

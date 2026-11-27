@@ -100,6 +100,7 @@ from config import (
     audio_dir,
     base_dir,
 )
+from camera_health import log_event
 from sequences import sequence_path, subject_tag
 
 # ================= CONFIGURATION =================
@@ -981,6 +982,7 @@ CAMERA_FRAME_TIMEOUT_MS = 1000     # camera process: wait this long for one fram
 CAMERA_RESTART_SECONDS = 3.0       # no frame this long -> the camera process is killed and started again
 CAMERA_OPEN_SECONDS = 20.0         # time a new camera process gets to deliver its first frame
 CAMERA_BUFFER_BYTES = 64 * 1024 * 1024
+CAMERA_RELEASE_SECONDS = 1.5       # pause between killing a stuck camera process and opening the camera again
 
 
 def _ximea_worker(preset, fps, sys_path, shm_name, meta, lock, new_frame, status_q):
@@ -1042,6 +1044,11 @@ def _ximea_worker(preset, fps, sys_path, shm_name, meta, lock, new_frame, status
                 cam.set_param("framerate", float(fps))
             except Exception:
                 pass
+            try:                                      # USB speed report + bandwidth limit (camera_health.py)
+                from camera_health import usb_check
+                usb_check(cam, fps, say)
+            except Exception as e:
+                say(f"USB check failed: {e}")
             cam.start_acquisition()
             return cam, name
         raise RuntimeError(f"no camera matching '{preset['name_match']}' found")
@@ -1090,6 +1097,8 @@ class XimeaProcessCamera:
         self.restarts = 0
         self.running = True
         self.proc = None
+        self.usb_info = ""                   # USB link report of the last camera start (camera_health.py)
+        self.lost_at = None
         self.on_frame = None                 # recording tap: gets EVERY camera frame, before the model skips any
         self.thread = threading.Thread(target=self._supervise, daemon=True)
 
@@ -1137,6 +1146,11 @@ class XimeaProcessCamera:
                     if msg.startswith("OPENED"):
                         print(f"[CAMERA] {msg[7:]} opened")
                         self.opened = now
+                    elif msg.startswith("USB "):           # link report, not an error
+                        print(f"[CAMERA] {msg[4:]}")
+                        self.usb_info = msg[4:]
+                        log_event(self.preset.get("name_match", "camera"), "usb_report", detail=self.usb_info,
+                                  restarts=self.restarts)
                     else:
                         if msg != self.status:
                             print(f"[CAMERA] {msg}")
@@ -1155,6 +1169,10 @@ class XimeaProcessCamera:
                     finally:
                         self.lock.release()
                 if frame is not None:
+                    if self.lost_at is not None:
+                        log_event(self.preset.get("name_match", "camera"), "restored", now - self.lost_at,
+                                  restarts=self.restarts)
+                        self.lost_at = None
                     if self.status:
                         print("[CAMERA] frames are arriving")
                     self.status, self.last_frame = "", now
@@ -1184,9 +1202,14 @@ class XimeaProcessCamera:
                 self.restarts += 1
                 why = "stopped" if not self.proc.is_alive() else "delivers no frames"
                 print(f"[CAMERA] camera process {why} - restarting it (restart {self.restarts})")
+                gap = now - self.last_frame if self.last_frame is not None else None
+                log_event(self.preset.get("name_match", "camera"), f"lost ({why})", gap, detail=self.status,
+                          restarts=self.restarts)
+                if self.lost_at is None:
+                    self.lost_at = self.last_frame or now
                 self.status = f"CAMERA LOST - restarting the camera (restart {self.restarts})"
                 self._kill()
-                time.sleep(0.5)
+                time.sleep(CAMERA_RELEASE_SECONDS)      # let the driver release the device before reopening
                 if self.running:
                     self._spawn()
 
@@ -1240,6 +1263,9 @@ class CameraModel:
     def status(self):
         """'' while frames arrive and the areas are fixed, otherwise what is going on."""
         cam = getattr(self.cam, "status", "")
+        usb = getattr(self.cam, "usb_info", "")
+        if not cam and "USB 2 SPEED" in usb:           # stays on screen: this is why the camera gets lost
+            return "CAMERA ON USB 2 SPEED - use a blue USB 3 port, no hub / extension (see console)"
         if cam or self.locked:
             return cam
         return "SETTING THE EVALUATION AREA - keep the station visible and empty"
